@@ -1,0 +1,85 @@
+; CREATE PATCHES =======================================================================================
+to create-light-green-patches
+  ask patches [
+    set pcolor green ;
+  ]
+end
+
+to create-dark-green-clusters [num]
+  repeat num [
+    let cluster-size random 5 + 2  ; Losowa wielkość klastra
+    let cluster-patch one-of patches
+    ask cluster-patch [
+      create-dark-green-cluster cluster-size
+    ]
+  ]
+end
+
+to create-dark-green-cluster [cluster-size]
+  ask patches in-radius cluster-size [
+    set pcolor green - 1 ; Ustaw ciemno-zielony kolor
+  ]
+end
+
+to setup-lines [num]
+  repeat num [
+    let line-length random 10 + 5
+    let start-x random (world-width + 1)
+    let start-y random (world-height + 1)
+    let direction one-of [0 90] ;; 0 oznacza ruch w prawo, 90 - ruch do góry
+    create-line start-x start-y direction line-length
+  ]
+end
+
+to create-line [x y direction line-length]
+  let end-x x
+  let end-y y
+
+  let shortest-distance min (list end-x end-y (world-width - end-x) (world-height - end-y))
+
+  if shortest-distance < line-length [
+    ; Znajdź kierunek najbliższej krawędzi i ustaw end-x i end-y na odpowiednią krawędź
+    if end-x <= shortest-distance [set end-x 0]
+    if end-y <= shortest-distance [set end-y 0]
+    if world-width - end-x <= shortest-distance [set end-x world-width]
+    if world-height - end-y <= shortest-distance [set end-y world-height]
+  ]
+  
+  ; Rysowanie linii
+  repeat line-length [
+    if end-x >= 0 and end-x <= world-width and end-y >= 0 and end-y <= world-height [
+      if direction = 0 [
+        if end-x + 1 <= world-width [
+          set end-x end-x + 1
+        ]
+      ]
+      if direction = 90 [
+        if end-y + 1 <= world-height [
+          set end-y end-y + 1
+        ]
+      ]
+      ; Dodatkowe sprawdzenie warunków granicznych przed wywołaniem ask patch
+      if end-x <= world-width and end-y <= world-height [       
+        let target-patch patch end-x end-y
+        if is-patch? target-patch [
+          ask target-patch [ set pcolor blue ]
+        ]
+      ]
+    ]
+  ]
+end
+
+to create-rectangle
+  let left-bound -12
+  let right-bound 12
+  let bottom-bound -12
+  let top-bound 12
+  
+  ; Rysowanie prostokąta
+  ask patches with [
+    (pxcor >= left-bound and pxcor <= right-bound and pycor = bottom-bound) or
+    (pxcor >= left-bound and pxcor <= right-bound and pycor = top-bound) or
+    (pycor >= bottom-bound and pycor <= top-bound and pxcor = left-bound) or
+    (pycor >= bottom-bound and pycor <= top-bound and pxcor = right-bound)
+  ] [ set pcolor blue ]
+end
