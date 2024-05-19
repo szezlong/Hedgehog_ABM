@@ -1,48 +1,54 @@
-
 ;;;;;;;;;;;;;;;;;;;;;
 ;;; Go procedures ;;;
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go
   ask turtles [
-;    if random-float 1 < 0.02 [ ;;2% szans że jednak zboczy z prostej drogi
-;      ifelse random 2 = 0 [rt random 46 + 45] [lt random 46 + 45]
-;    ]
-
-    while [not can-move? 1] [
+    ; if random-float 1 < 0.02 [ ;;2% szans że jednak zboczy z prostej drogi
+    ;   ifelse random 2 = 0 [rt random 46 + 45] [lt random 46 + 45]
+    ; ]
+    
+    let attempts 0
+    while [not can-move? 1 and attempts < 5] [
       random-turn-turtle ;; Jeśli dojdzie do krawędzi świata obraca się o 45 stopni
+      set attempts attempts + 1
+    ]
+    if attempts = 5 [
+      rt 180
     ]
 
     let direction decide-direction
     move-in-direction direction
-
   ]
   tick
 end
 
 to move-in-direction [direction]
-  if direction = 0 [
-    fd speed
+  while [direction != 0] [
+    if direction = 1 or direction = 2 [
+      rt random 136 + 45
+      set direction decide-direction
+    ]
+    if direction = -1 [
+      lt random 136 + 45
+      set direction decide-direction
+    ]
   ]
-  if direction = 1 or direction = 2 [
-    rt 45
-    set direction decide-direction
-    move-in-direction direction
-  ]
-  if direction = -1 [
-    lt 45
-    set direction decide-direction
-    move-in-direction direction
-  ]
+  fd speed
 end
 
 to-report decide-direction
-  let ahead-patch patch-ahead 1
-  ifelse ahead-patch != nobody and [pcolor] of ahead-patch = blue [
-    let right-diagonal-patch patch-right-and-ahead 1 45
-    ifelse right-diagonal-patch != nobody and [pcolor] of right-diagonal-patch = blue  [
-      let left-diagonal-patch patch-right-and-ahead 1 -45
-      ifelse left-diagonal-patch != nobody and [pcolor] of left-diagonal-patch = blue  [
+  ifelse patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = blue [
+    let right-patch patch-right-and-ahead 45 1.5
+    let left-patch patch-left-and-ahead 45 1.5 
+    
+    if right-patch = nobody or left-patch = nobody [
+      rt 180
+      report 2
+    ]
+    
+    ifelse [pcolor] of right-patch = blue [
+      ifelse [pcolor] of left-patch = blue [
         report 2 ;; Jest otoczony ogrodzeniem
       ] [
         report -1 ;; Po lewo nie ma ogrodzenia
@@ -56,9 +62,10 @@ to-report decide-direction
 end
 
 to random-turn-turtle
-  ifelse random-float 1 < 0.5 [
-    rt 45
+  let random-angle random 91 ;; Losuje kąt od 0 do 90 stopni
+  ifelse random 2 = 0 [
+    rt random-angle
   ] [
-    lt 45
+    lt random-angle
   ]
 end
