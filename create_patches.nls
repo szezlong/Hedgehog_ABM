@@ -1,4 +1,7 @@
-; CREATE PATCHES =======================================================================================
+;;;;;;;;;;;;;;;;;;;;;;
+;;; Create patches ;;;
+;;;;;;;;;;;;;;;;;;;;;;
+
 to create-light-green-patches
   ask patches [
     set pcolor green ;
