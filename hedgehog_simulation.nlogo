@@ -9,6 +9,7 @@ to setup
   create-dark-green-clusters 5
   setup-lines 10
   create-rectangle
+  draw-random-diagonal-lines
 
   setup-turtles
 
@@ -17,8 +18,9 @@ end
 
 to setup-turtles
   let available-patches patches with [pcolor != blue] ;; Wybieramy dostępne patche, których kolor nie jest niebieski
-  create-turtles 3 [
+  create-turtles 1 [
     move-to one-of available-patches
+    random-turn-turtle
     set color brown - 2
     set size 2
     set speed 1

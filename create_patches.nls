@@ -86,3 +86,26 @@ to create-rectangle
     (pycor >= bottom-bound and pycor <= top-bound and pxcor = right-bound)
   ] [ set pcolor blue ]
 end
+
+to draw-random-diagonal-lines
+
+  let number-of-lines 5  ; liczba linii do narysowania
+  let max-line-length 8  ; maksymalna długość linii
+  
+  repeat number-of-lines [
+    let start-patch one-of patches  ; wybiera losową łatkę jako początek
+    let line-length random-float (max-line-length + 5)  ; wybiera losową długość linii od 1 do max-line-length
+    ask start-patch [
+      ; rysuje linię o długości line-length w diagonalnym kierunku
+      repeat line-length [
+        set pcolor blue
+        if (patch-at 1 1 != nobody) [ ask patch-at 1 1 [ set pcolor blue ] ]
+        if (patch-at 2 2 != nobody) [ ask patch-at 2 2 [ set pcolor blue ] ]
+        if (patch-at 3 3 != nobody) [ ask patch-at 3 3 [ set pcolor blue ] ]
+        if (patch-at 4 4 != nobody) [ ask patch-at 4 4 [ set pcolor blue ] ]
+        if (patch-at 5 5 != nobody) [ ask patch-at 5 5 [ set pcolor blue ] ]
+      ]
+    ]
+  ]
+  reset-ticks
+end

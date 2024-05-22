@@ -25,16 +25,22 @@ end
 
 to move-in-direction [direction] ;; nie działa dla diagonalnych jeszcze
   while [direction != 0] [
-    let closest-blue-patch patch-ahead 0.5 
+    let closest-blue-patch patch-ahead 1 
     ;ask closest-blue-patch [ set pcolor yellow]
     
-    ifelse closest-blue-patch != patch-here [
+    ifelse closest-blue-patch != patch-here or direction = -2[
       let direction-to-patch [towards myself] of closest-blue-patch
       let turtle-direction get-turtle-direction
     
+
+      
       if direction = 2 [
-        rt random 91 + 90
+        random-turn-turtle
       ]
+      
+      ;print direction-to-patch
+      ;print direction
+      ;print turtle-direction
       
       ;if direction = -2 [
         (ifelse
@@ -75,7 +81,7 @@ to move-in-direction [direction] ;; nie działa dla diagonalnych jeszcze
            ]
          ] 
          (direction-to-patch > 225 and direction-to-patch <= 315) [
-          
+
            ;; lewy bok patcha
            ifelse turtle-direction = 1 and (direction = -2 or direction = -1) [
              set heading 0
@@ -88,46 +94,83 @@ to move-in-direction [direction] ;; nie działa dla diagonalnych jeszcze
            ] 
          ]  
        )  
+      ;print heading
       ;] 
     ] [
-       random-turn-turtle
-    ]
+      
+      random-turn-turtle
+      
+    ] 
     
     set direction decide-direction
-  ]
+  ] 
   fd speed
 end
 
 to-report decide-direction
-  ifelse patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = blue [
- 
+  ifelse (patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = blue) or (patch-ahead 2 != nobody and [pcolor] of patch-ahead 2 = blue) [
+   ;ask patch-ahead 2 [set pcolor yellow]
+   ;ask patch-ahead 2 [set pcolor orange]
     let direction search-for-gap
-    report direction
+    report direction 
   ] [
-    report 0 ;; Brak ogrodzenia na przeciwko
+    let right-diagonal patch-right-and-ahead 30 2
+    let left-diagonal patch-left-and-ahead 30 2
+    ifelse right-diagonal != nobody and [pcolor] of right-diagonal = blue and left-diagonal != nobody and [pcolor] of left-diagonal = blue [
+      let direction search-for-gap
+      
+      report direction
+    ] [
+      report 0 ;; Brak ogrodzenia na przeciwko
+    ]
   ] 
 end
  
 to-report search-for-gap
-  let right-patch patch-right-and-ahead 90 1
-  let left-patch patch-left-and-ahead 90 1   
+  let right-patch patch-right-and-ahead 90 2  
+  let left-patch patch-left-and-ahead 90 2
+  
+  let right-diagonal patch-right-and-ahead 30 2
+  let left-diagonal patch-left-and-ahead 30 2
+    
   if right-patch = nobody or left-patch = nobody [
     report 2 ;; na krawędzi świata
-  ]  
-  ifelse [pcolor] of right-patch = blue [
+  ]
+  
+  
+  ifelse [pcolor] of right-patch = blue [   
     ifelse [pcolor] of left-patch = blue [
       report 2 ;; Jest otoczony ogrodzeniem
     ] [
-      report -1 ;; Po lewo nie ma ogrodzenia
+      ifelse [pcolor] of left-diagonal != blue [
+        lt 45
+        report 0
+      ] [
+        report -1 ;; Po lewo nie ma ogrodzenia
+      ]
     ]
+    
   ] [
-    ifelse [pcolor] of left-patch != blue [
-      ;; nie ma ogrodzenia na boki
-      report -2
+    ;; możesz skręcić w prawo, sprawdź czy nie pod kątem + 45
+    ifelse [pcolor] of right-diagonal != blue [
+      rt 45
+      report 0
     ] [
-      report 1 ;; Po prawo nie ma ogrodzenia
+      ifelse [pcolor] of left-patch != blue [
+        ;; nie ma ogrodzenia na boki
+        report -2
+      ] [
+        report 1 ;; Po prawo nie ma ogrodzenia
+      ]
     ]
   ]
+end
+
+to-report check-diagonals
+  let right-diagonal patch-right-and-ahead 30 2
+  let left-diagonal patch-left-and-ahead 30 2
+  
+  
 end
 
 to-report get-turtle-direction
@@ -152,19 +195,15 @@ to-report get-turtle-direction
 end
 
 to random-turn-turtle
-  let random-angle random 181
-  ifelse random 2 = 0 [
-    rt random-angle
-  ] [
-    lt random-angle
-  ]
+  let possible-angles [0 45 90 135 180 225 270 315 360]
+  set heading one-of possible-angles
 end
 
 ;;;;;
 
 to-report check-surroundings
-  let right-patch patch-right-and-ahead 90 1
-  let left-patch patch-left-and-ahead 90 1
+  let right-patch patch-right-and-ahead 90 2
+  let left-patch patch-left-and-ahead 90 2
 
   ask right-patch [ set pcolor yellow ]
   
