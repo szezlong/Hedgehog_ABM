@@ -8,42 +8,29 @@ to go
     ;   ifelse random 2 = 0 [rt random 46 + 45] [lt random 46 + 45]
     ; ]
     
-;    let attempts 0
     while [not can-move? 1] [
-      random-turn-turtle ;; Jeśli dojdzie do krawędzi świata obraca się o 45 stopni
-;      set attempts attempts + 1
+      random-turn-turtle ;; krawędź świata
     ]
-;    if attempts = 5 [
-;      rt 180
-;    ]
-
+    
     let direction decide-direction
-    move-in-direction direction
+    move-along-fencing direction
   ]
   tick
 end 
 
-to move-in-direction [direction]
+to move-along-fencing [direction]
   while [direction != 0] [
-    let closest-blue-patch patch-ahead 1 
-    ;ask closest-blue-patch [ set pcolor yellow]
+    let closest-fence-patch patch-ahead 1 
     
-    ifelse closest-blue-patch != patch-here and closest-blue-patch != nobody and direction = -2 [
-      let direction-to-patch [towards myself] of closest-blue-patch
+    ifelse closest-fence-patch != patch-here and closest-fence-patch != nobody and direction = -2 [
+      let direction-to-patch [towards myself] of closest-fence-patch
       let turtle-direction get-turtle-direction
      
- 
-      
       if direction = 2 [
         random-turn-turtle
       ]
       
-      ;print direction-to-patch
-      ;print direction 
-      ;print turtle-direction
-      
-      ;if direction = -2 [
-        (ifelse
+      (ifelse
          (direction-to-patch > 315 or direction-to-patch <= 45) [
            ;; góra patcha
            ifelse turtle-direction = 3 and (direction = -2 or direction = 1) [
@@ -70,7 +57,6 @@ to move-in-direction [direction]
          ]
          (direction-to-patch > 135 and direction-to-patch <= 225) [
            ;; dół patcha
-          ;print turtle-direction
            ifelse turtle-direction = 4 and (direction = -2 or direction = -1) [  
              set heading 270
            ] [
@@ -82,12 +68,11 @@ to move-in-direction [direction]
            ]
          ] 
          (direction-to-patch > 225 and direction-to-patch <= 315) [
-
            ;; lewy bok patcha
            ifelse turtle-direction = 1 and (direction = -2 or direction = -1) [
              set heading 0
            ] [
-            ifelse direction = 1 [
+            ifelse direction = 1 [ 
               set heading 180 ;; direction=2
             ] [  
               set heading 0
@@ -95,41 +80,31 @@ to move-in-direction [direction]
            ] 
          ]  
        )   
-      ;print heading
-      ;] 
     ] [
-      
       random-turn-turtle
-      
     ] 
-    
     set direction decide-direction
   ] 
   fd speed
 end
 
 to-report decide-direction
-  ifelse (any? patches in-cone 2 135 with [pcolor = blue])  
-  or (patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = blue) 
-  or (patch-ahead 2 != nobody and [pcolor] of patch-ahead 2 = blue) [
-   ;ask patch-ahead 2 [set pcolor yellow]
-   ;ask patch-ahead 2 [set pcolor orange] 
-    
-    ;ask patches in-cone 2 135 [set pcolor orange]
- 
+  ifelse (any? patches in-cone 2 45 with [pcolor = fence])  
+  or (patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = fence) 
+  or (patch-ahead 2 != nobody and [pcolor] of patch-ahead 2 = fence)
+  [  
     let direction search-for-gap
-    ;print direction
-    report direction 
-  ] [ 
-          report 0 ;; Brak ogrodzenia na przeciwko
+    report direction   
+  ] [
+    report 0 ;; Brak ogrodzenia na przeciwko
   ]  
 end
  
 to-report search-for-gap
   let right-patch patch-right-and-ahead 90 1  
   let left-patch patch-left-and-ahead 90 1
-  let left-patch-far patch-left-and-ahead 90 2
   let right-patch-far patch-right-and-ahead 90 2
+  let left-patch-far patch-left-and-ahead 90 2
   
   let right-diagonal patch-right-and-ahead 30 2
   let left-diagonal patch-left-and-ahead 30 2
@@ -140,32 +115,30 @@ to-report search-for-gap
     report 2 ;; na krawędzi świata
   ]
   
-  ;print [pcolor] of right-patch 
-  ;print [pcolor] of left-patch
-  
-  ifelse [pcolor] of right-patch = blue 
-  or (right-patch-far != nobody and [pcolor] of right-patch-far = blue) [
-
-    ifelse [pcolor] of left-patch = blue 
-    or (left-patch-far != nobody and [pcolor] of left-patch-far = blue) [
+  ifelse [pcolor] of right-patch = fence 
+  or (right-patch-far != nobody and [pcolor] of right-patch-far = fence)
+  [
+    ifelse [pcolor] of left-patch = fence 
+    or (left-patch-far != nobody and [pcolor] of left-patch-far = fence) 
+    [
       report 2 ;; Jest otoczony ogrodzeniem
     ] [
-      ifelse (left-diagonal != nobody and [pcolor] of left-diagonal != blue) [
+      ifelse (left-diagonal != nobody and [pcolor] of left-diagonal != fence) [
         lt 45
         report 0 
       ] [
         report -1 ;; Po lewo nie ma ogrodzenia
       ]
-    ]
-    
-  ] [
+    ]   
+  ] [ 
     ;; możesz skręcić w prawo, sprawdź czy nie pod kątem + 45
-    ifelse right-diagonal != nobody and [pcolor] of right-diagonal != blue [
+    ifelse right-diagonal != nobody and [pcolor] of right-diagonal != fence [
       rt 45
       report 0
     ] [
-      ifelse [pcolor] of left-patch = blue 
-        or (left-patch-far != nobody and [pcolor] of left-patch-far = blue) [
+      ifelse [pcolor] of left-patch = fence 
+        or (left-patch-far != nobody and [pcolor] of left-patch-far = fence) 
+      [
         report 1 ;; luka po prawo
       ] [
         report -2 ;; nie ma ogrodzenia na boki
@@ -177,19 +150,15 @@ end
 to-report get-turtle-direction
   (ifelse
     heading >= 0 and heading <= 90 [
-      ;; upper right
       report 1
     ]
     heading > 90 and heading <= 180 [
-      ;; lower right
       report 2
     ]
     heading > 180 and heading <= 270 [
-      ;; lower left
       report 3
     ]
     heading > 270 and heading <= 360 [
-      ;; upper left
       report 4
     ]
   )
@@ -198,21 +167,4 @@ end
 to random-turn-turtle
   let possible-angles [0 45 90 135 180 225 270 315 360]
   set heading one-of possible-angles
-end
-
-;;;;;
-
-to-report check-surroundings
-  let right-patch patch-right-and-ahead 90 2
-  let left-patch patch-left-and-ahead 90 2
-
-  ask right-patch [ set pcolor yellow ]
-  
-  if [pcolor] of right-patch = blue [
-    report 1 ;; ogrodzenie po prawo
-  ]
-  if [pcolor] of left-patch = blue [
-    report -1 ;; ogrodzenie po lewo
-  ]
-  report 0 ;; brak ogrodzenia po bokach
 end

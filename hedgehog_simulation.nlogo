@@ -1,5 +1,7 @@
 __includes ["create_patches.nls" "go_procedures.nls"]
 
+globals [fence]
+
 turtles-own [speed]
 
 to setup
@@ -17,8 +19,11 @@ to setup
 end
 
 to setup-turtles
-  let available-patches patches with [pcolor != blue] ;; Wybieramy dostępne patche, których kolor nie jest niebieski
-  create-turtles 1 [
+  set fence blue
+
+  let available-patches patches with [pcolor != fence and not any? neighbors with [pcolor = fence]]
+
+  create-turtles 2 [
     move-to one-of available-patches
     random-turn-turtle
     set color brown - 2
