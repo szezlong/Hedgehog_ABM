@@ -23,23 +23,23 @@ to go
   tick
 end 
 
-to move-in-direction [direction] ;; nie działa dla diagonalnych jeszcze
+to move-in-direction [direction]
   while [direction != 0] [
     let closest-blue-patch patch-ahead 1 
     ;ask closest-blue-patch [ set pcolor yellow]
     
-    ifelse closest-blue-patch != patch-here or direction = -2[
+    ifelse closest-blue-patch != patch-here and closest-blue-patch != nobody and direction = -2 [
       let direction-to-patch [towards myself] of closest-blue-patch
       let turtle-direction get-turtle-direction
-    
-
+     
+ 
       
       if direction = 2 [
         random-turn-turtle
       ]
       
       ;print direction-to-patch
-      ;print direction
+      ;print direction 
       ;print turtle-direction
       
       ;if direction = -2 [
@@ -70,6 +70,7 @@ to move-in-direction [direction] ;; nie działa dla diagonalnych jeszcze
          ]
          (direction-to-patch > 135 and direction-to-patch <= 225) [
            ;; dół patcha
+          ;print turtle-direction
            ifelse turtle-direction = 4 and (direction = -2 or direction = -1) [  
              set heading 270
            ] [
@@ -93,7 +94,7 @@ to move-in-direction [direction] ;; nie działa dla diagonalnych jeszcze
             ] 
            ] 
          ]  
-       )  
+       )   
       ;print heading
       ;] 
     ] [
@@ -108,43 +109,50 @@ to move-in-direction [direction] ;; nie działa dla diagonalnych jeszcze
 end
 
 to-report decide-direction
-  ifelse (patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = blue) or (patch-ahead 2 != nobody and [pcolor] of patch-ahead 2 = blue) [
+  ifelse (any? patches in-cone 2 135 with [pcolor = blue])  
+  or (patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = blue) 
+  or (patch-ahead 2 != nobody and [pcolor] of patch-ahead 2 = blue) [
    ;ask patch-ahead 2 [set pcolor yellow]
-   ;ask patch-ahead 2 [set pcolor orange]
+   ;ask patch-ahead 2 [set pcolor orange] 
+    
+    ;ask patches in-cone 2 135 [set pcolor orange]
+ 
     let direction search-for-gap
+    ;print direction
     report direction 
-  ] [
-    let right-diagonal patch-right-and-ahead 30 2
-    let left-diagonal patch-left-and-ahead 30 2
-    ifelse right-diagonal != nobody and [pcolor] of right-diagonal = blue and left-diagonal != nobody and [pcolor] of left-diagonal = blue [
-      let direction search-for-gap
-      
-      report direction
-    ] [
-      report 0 ;; Brak ogrodzenia na przeciwko
-    ]
-  ] 
+  ] [ 
+          report 0 ;; Brak ogrodzenia na przeciwko
+  ]  
 end
  
 to-report search-for-gap
-  let right-patch patch-right-and-ahead 90 2  
-  let left-patch patch-left-and-ahead 90 2
+  let right-patch patch-right-and-ahead 90 1  
+  let left-patch patch-left-and-ahead 90 1
+  let left-patch-far patch-left-and-ahead 90 2
+  let right-patch-far patch-right-and-ahead 90 2
   
   let right-diagonal patch-right-and-ahead 30 2
   let left-diagonal patch-left-and-ahead 30 2
+  let right-diagonal-far patch-right-and-ahead 30 2
+  let left-diagonal-far patch-left-and-ahead 30 2
     
   if right-patch = nobody or left-patch = nobody [
     report 2 ;; na krawędzi świata
   ]
   
+  ;print [pcolor] of right-patch 
+  ;print [pcolor] of left-patch
   
-  ifelse [pcolor] of right-patch = blue [   
-    ifelse [pcolor] of left-patch = blue [
+  ifelse [pcolor] of right-patch = blue 
+  or (right-patch-far != nobody and [pcolor] of right-patch-far = blue) [
+
+    ifelse [pcolor] of left-patch = blue 
+    or (left-patch-far != nobody and [pcolor] of left-patch-far = blue) [
       report 2 ;; Jest otoczony ogrodzeniem
     ] [
-      ifelse [pcolor] of left-diagonal != blue [
+      ifelse (left-diagonal != nobody and [pcolor] of left-diagonal != blue) [
         lt 45
-        report 0
+        report 0 
       ] [
         report -1 ;; Po lewo nie ma ogrodzenia
       ]
@@ -152,25 +160,18 @@ to-report search-for-gap
     
   ] [
     ;; możesz skręcić w prawo, sprawdź czy nie pod kątem + 45
-    ifelse [pcolor] of right-diagonal != blue [
+    ifelse right-diagonal != nobody and [pcolor] of right-diagonal != blue [
       rt 45
       report 0
     ] [
-      ifelse [pcolor] of left-patch != blue [
-        ;; nie ma ogrodzenia na boki
-        report -2
+      ifelse [pcolor] of left-patch = blue 
+        or (left-patch-far != nobody and [pcolor] of left-patch-far = blue) [
+        report 1 ;; luka po prawo
       ] [
-        report 1 ;; Po prawo nie ma ogrodzenia
+        report -2 ;; nie ma ogrodzenia na boki
       ]
     ]
   ]
-end
-
-to-report check-diagonals
-  let right-diagonal patch-right-and-ahead 30 2
-  let left-diagonal patch-left-and-ahead 30 2
-  
-  
 end
 
 to-report get-turtle-direction
