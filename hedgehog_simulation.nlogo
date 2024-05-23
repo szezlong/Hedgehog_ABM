@@ -1,4 +1,4 @@
-__includes ["create_patches.nls" "go_procedures.nls"]
+__includes ["create_patches.nls" "go_procedures//go_procedure.nls"]
 
 globals [fence]
 
