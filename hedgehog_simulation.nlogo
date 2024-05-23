@@ -3,19 +3,33 @@ __includes ["create_patches.nls" "go_procedures.nls"]
 globals [fence]
 
 turtles-own [speed]
+patches-own [abundance]
 
 to setup
   clear-all
 
+  setup-patches
+  setup-turtles
+
+  reset-ticks
+end
+
+to setup-patches
   create-light-green-patches
   create-dark-green-clusters 5
   setup-lines 10
   create-rectangle
   draw-random-diagonal-lines
 
-  setup-turtles
-
-  reset-ticks
+  ask patches [
+    (ifelse
+      pcolor = green - 1 [
+        set abundance 2
+      ]
+      [
+        set abundance 0
+      ])
+  ]
 end
 
 to setup-turtles

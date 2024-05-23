@@ -12,11 +12,20 @@ to go
       random-turn-turtle ;; krawędź świata
     ]
     
+    move-towards-attractive-patch
+    
     let direction decide-direction
     move-along-fencing direction
   ]
   tick
 end 
+
+to move-towards-attractive-patch
+  let best-patch max-one-of neighbors [abundance]
+  if [abundance] of best-patch > [abundance] of patch-here [
+    face best-patch
+  ]
+end
 
 to move-along-fencing [direction]
   while [direction != 0] [

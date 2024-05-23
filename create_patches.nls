@@ -89,7 +89,7 @@ end
 
 to draw-random-diagonal-lines
 
-  let number-of-lines 8  ; liczba linii do narysowania
+  let number-of-lines 2 ; liczba linii do narysowania
   let max-line-length 8  ; maksymalna długość linii
   
   repeat number-of-lines [
