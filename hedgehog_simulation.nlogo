@@ -1,19 +1,32 @@
 __includes ["create_patches.nls" "go_procedures//go_procedure.nls"]
 
-globals [possible-angles fence]
+globals [
+  possible-angles
+  fence garden
+]
 
-turtles-own [speed]
-patches-own [abundance]
+turtles-own [
+  speed
+  last-target
+]
+
+patches-own [food]
 
 to setup
   clear-all
 
-  set possible-angles [0 45 90 135 180 225 270 315 360]
+  setup-variables
 
   setup-patches
   setup-turtles
 
   reset-ticks
+end
+
+to setup-variables
+  set possible-angles [0 45 90 135 180 225 270 315 360]
+  set fence blue
+  set garden green - 1
 end
 
 to setup-patches
@@ -25,18 +38,20 @@ to setup-patches
 
   ask patches [
     (ifelse
-      pcolor = green - 1 [
-        set abundance 2
+      pcolor = garden [
+        set food random 5 + 3
+      ]
+      pcolor = fence [
+        set food -1
       ]
       [
-        set abundance 0
-      ])
+        set food 0
+      ]
+    )
   ]
 end
 
 to setup-turtles
-  set fence blue
-
   let available-patches patches with [pcolor != fence and not any? neighbors with [pcolor = fence]]
 
   create-turtles 1 [
@@ -93,9 +108,9 @@ NIL
 1
 
 BUTTON
-64
+63
 162
-127
+126
 195
 NIL
 go
