@@ -1,6 +1,9 @@
 __includes ["go_procedures//fence_behavior.nls"]
 
-to go
+globals []
+
+to go 
+    
   ask turtles [
     ; if random-float 1 < 0.02 [ ;;2% szans że jednak zboczy z prostej drogi
     ;   ifelse random 2 = 0 [rt random 46 + 45] [lt random 46 + 45]
@@ -21,6 +24,21 @@ end
 to move-towards-attractive-patch
   let best-patch max-one-of neighbors [abundance]
   if [abundance] of best-patch > [abundance] of patch-here [
-    face best-patch
+    face-patch best-patch
   ]
+end
+
+to face-patch [patch-to-face]
+  face patch-to-face
+  let angle heading
+  let closest-angle first possible-angles
+  let min-difference abs (closest-angle - angle)
+  foreach possible-angles [ x ->
+    let difference abs (x - angle)
+    if difference < min-difference [
+      set min-difference difference
+      set closest-angle x
+    ]
+  ]
+  set heading closest-angle
 end

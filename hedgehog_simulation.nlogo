@@ -1,12 +1,14 @@
 __includes ["create_patches.nls" "go_procedures//go_procedure.nls"]
 
-globals [fence]
+globals [possible-angles fence]
 
 turtles-own [speed]
 patches-own [abundance]
 
 to setup
   clear-all
+
+  set possible-angles [0 45 90 135 180 225 270 315 360]
 
   setup-patches
   setup-turtles
@@ -37,7 +39,7 @@ to setup-turtles
 
   let available-patches patches with [pcolor != fence and not any? neighbors with [pcolor = fence]]
 
-  create-turtles 2 [
+  create-turtles 1 [
     move-to one-of available-patches
     random-turn-turtle
     set color brown - 2
@@ -91,10 +93,10 @@ NIL
 1
 
 BUTTON
-69
-159
-132
-192
+64
+162
+127
+195
 NIL
 go
 T

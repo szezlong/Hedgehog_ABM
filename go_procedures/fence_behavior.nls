@@ -3,6 +3,9 @@ to move-along-fencing [direction]
   while [direction != 0] [
     let closest-fence-patch patch-ahead 1 
     
+    if closest-fence-patch = patch-here [
+      rt 180
+    ]
     ifelse closest-fence-patch != patch-here and closest-fence-patch != nobody and direction = -2 [
       let direction-to-patch [towards myself] of closest-fence-patch
       let turtle-direction get-turtle-direction
@@ -146,6 +149,5 @@ to-report get-turtle-direction
 end
 
 to random-turn-turtle
-  let possible-angles [0 45 90 135 180 225 270 315 360]
   set heading one-of possible-angles
 end
