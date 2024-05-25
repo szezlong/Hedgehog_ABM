@@ -7,6 +7,8 @@ globals [
 
 turtles-own [
   speed
+
+  second-last-target
   last-target
 ]
 
@@ -60,6 +62,9 @@ to setup-turtles
     set color brown - 2
     set size 2
     set speed 1
+
+    set second-last-target nobody
+    set last-target nobody
   ]
 end
 @#$#@#$#@

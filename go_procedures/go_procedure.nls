@@ -9,28 +9,14 @@ to go
     while [not can-move? 1] [
       random-turn-turtle ;; krawędź świata
     ]
-    
-    ;print word "-- start of movement, heading: " heading
-    
+        
     ifelse [food] of patch-here > 0 [
-      ;print "-- żeruję --"
-      ;print  [food] of patch-here
       eat-food
     ] [
-      ;print "-- szukam jedzonka --"
-      ;print word "heading 1: " heading
       move-towards-food-patch
-      ;print word "heading towards best patch: " heading
-      ;print word "heading 5: " heading
       let direction decide-direction
-;print word "heading 6, after direction logic: " heading
-
       move-along-fencing direction
-
-      ;print word "heading 7, after fence logic: " heading 
-      
-      ;print word "final heading right before moving: " heading
-      fd 1
+      fd speed
     ]
   ]
   tick
@@ -44,33 +30,35 @@ end
 
 to move-towards-food-patch
 
-  let accessible-patches neighbors with [pcolor != fence] ;; or neighbors
+  let accessible-patches neighbors with [pcolor != fence] ;; or neighbors4  
   let sorted-patches reverse sort-on [food] accessible-patches
-  let best-patch nobody
+  let best-patch get-most-food sorted-patches
   
+  ;print " --- "
+  ;print patch-here
+  ;print second-last-target
+  ;print last-target
+  ;print best-patch
+  
+  if (best-patch != nobody) and ([food] of best-patch > [food] of patch-here) [
+    face-patch best-patch
+    
+    set second-last-target last-target
+    set last-target best-patch
+  ]
+end
+
+to-report get-most-food [sorted-patches]
   foreach sorted-patches [ x ->
-    if last-target != x [
-      set best-patch x
-      ;stop
+    if last-target = nobody or (x != last-target and x != second-last-target) [
+      report x
     ]
   ]
-  
-  if (best-patch != nobody) and ([food] of best-patch >[food] of patch-here)[
-    face-patch best-patch
-    ;ask best-patch [set pcolor yellow]
-    ;ask patch-here [set pcolor pink]
-    ;print [food] of patch-here
-    ;print patch-here
-    
-    ;print [food] of best-patch
-  ]
-  set last-target best-patch
 end
 
 to face-patch [patch-to-face]
   face patch-to-face
   let angle heading
-  ;print word "heading 2: " heading
   let closest-angle first possible-angles
   let min-difference abs (closest-angle - angle)
   foreach possible-angles [ x ->
@@ -80,6 +68,5 @@ to face-patch [patch-to-face]
       set closest-angle x
     ]
   ]
-  ;;print word "heading 3: " closest-angle
   set heading closest-angle
 end

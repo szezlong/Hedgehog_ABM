@@ -71,7 +71,7 @@ to move-along-fencing [direction]
 end
 
 to-report decide-direction
-  ifelse (any? patches in-cone 2 45 with [pcolor = fence])  
+  ifelse (any? patches in-cone 2 90 with [pcolor = fence])  
   or (patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = fence) 
   or (patch-ahead 2 != nobody and [pcolor] of patch-ahead 2 = fence)
   [  
