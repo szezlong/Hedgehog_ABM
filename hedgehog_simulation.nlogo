@@ -1,4 +1,4 @@
-__includes ["create_patches.nls" "go_procedures//go_procedure.nls"]
+__includes ["setup_world//create_patches.nls" "go_procedures//go_procedure.nls"]
 
 globals [
   possible-angles
