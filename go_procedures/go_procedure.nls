@@ -1,23 +1,41 @@
 __includes ["go_procedures//fence_behavior.nls" "go_procedures//food_behavior.nls"]
 
-to go     
-  ask turtles [
-    if random-float 1 < 0.02 [
-     random-turn-turtle
-    ] ;;2% szans że jednak zboczy z prostej drogi
-    
-    while [not can-move? 1] [
-      random-turn-turtle ;; krawędź świata
+to go   
+  ifelse current-time < night-duration [
+   ask turtles [
+      if random-float 1 < 0.02 [
+       random-turn-turtle
+      ]
+      while [not can-move? 1] [
+        random-turn-turtle ;; krawędź świata
+      ]
+          
+      ifelse [food] of patch-here > 0 [
+        eat-food
+      ] [
+        ;;if distance-traveled < max-distance [ ;; na razie tak, w przyszłości będzie do gniazda wracać
+          move-towards-food-patch
+          let direction decide-direction
+          move-along-fencing direction
+          fd speed
+          ;;set distance-traveled distance-traveled + 1
+        ;;]
+      ]
     ]
-        
-    ifelse [food] of patch-here > 0 [
-      eat-food
-    ] [
-      move-towards-food-patch
-      let direction decide-direction
-      move-along-fencing direction
-      fd speed
-    ]
+    set current-time current-time + 1
+    tick
+  ] [
+    stop
   ]
-  tick
 end 
+
+to next-night
+  while [current-time < night-duration] [
+    go
+  ]
+  set current-time 0
+  ask turtles [
+    set distance-traveled 0
+  ]
+  reset-ticks
+end

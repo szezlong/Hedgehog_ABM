@@ -1,15 +1,16 @@
 __includes ["setup_world//create_patches.nls" "go_procedures//go_procedure.nls"]
 
 globals [
-  possible-angles
+  night-duration current-time
+  max-distance possible-angles
+
   fence garden
 ]
 
 turtles-own [
-  speed
+  speed distance-traveled
 
-  second-last-target
-  last-target
+  second-last-target last-target
 ]
 
 patches-own [food]
@@ -26,6 +27,9 @@ to setup
 end
 
 to setup-variables
+  set night-duration 60 ;; 60 ticków na godzinę
+  set current-time 0
+  set max-distance 2000
   set possible-angles [0 45 90 135 180 225 270 315 360]
   set fence blue
   set garden green - 1
@@ -62,17 +66,17 @@ to setup-turtles
     set color brown - 2
     set size 2
     set speed 1
-
+    set distance-traveled 0
     set second-last-target nobody
     set last-target nobody
   ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
-10
-647
-448
+253
+38
+690
+476
 -1
 -1
 13.0
@@ -89,8 +93,8 @@ GRAPHICS-WINDOW
 16
 -16
 16
-1
-1
+0
+0
 1
 ticks
 30.0
@@ -113,13 +117,13 @@ NIL
 1
 
 BUTTON
-63
-162
-126
-195
+67
+232
+130
+265
+clear
+ca
 NIL
-go
-T
 1
 T
 OBSERVER
@@ -130,12 +134,12 @@ NIL
 1
 
 BUTTON
-70
-226
-133
-259
-clear
-ca
+69
+162
+158
+195
+NIL
+next-night
 NIL
 1
 T
