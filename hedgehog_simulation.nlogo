@@ -9,8 +9,8 @@ globals [
 
 turtles-own [
   speed distance-traveled
-
   second-last-target last-target
+  nest
 ]
 
 patches-own [food]
@@ -60,9 +60,12 @@ end
 to setup-turtles
   let available-patches patches with [pcolor != fence and not any? neighbors with [pcolor = fence]]
 
-  create-turtles 1 [
-    move-to one-of available-patches
+  create-turtles 3 [
+    set nest one-of available-patches
+    move-to nest
+    ask patch-here [ set plabel (word "Home of " [who] of myself) ]
     random-turn-turtle
+
     set color brown - 2
     set size 2
     set speed 1

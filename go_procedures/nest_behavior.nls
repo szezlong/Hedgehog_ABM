@@ -1,0 +1,9 @@
+to move-towards-nest
+  face-patch nest
+end
+
+to build-new-nest
+  ask nest [set plabel ""] 
+  set nest patch-here
+  ask nest [set plabel (word "Nest no. " who)]
+end

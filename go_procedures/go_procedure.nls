@@ -1,4 +1,4 @@
-__includes ["go_procedures//fence_behavior.nls" "go_procedures//food_behavior.nls"]
+__includes ["go_procedures//fence_behavior.nls" "go_procedures//food_behavior.nls" "go_procedures//nest_behavior.nls"]
 
 to go   
   ifelse current-time < night-duration [
@@ -35,7 +35,23 @@ to next-night
   ]
   set current-time 0
   ask turtles [
+    face-patch nest
     set distance-traveled 0
   ]
   reset-ticks
+end
+
+to face-patch [patch-to-face]
+  face patch-to-face
+  let angle heading
+  let closest-angle first possible-angles
+  let min-difference abs (closest-angle - angle)
+  foreach possible-angles [ x ->
+    let difference abs (x - angle)
+    if difference < min-difference [
+      set min-difference difference
+      set closest-angle x
+    ]
+  ]
+  set heading closest-angle
 end
