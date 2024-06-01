@@ -1,5 +1,8 @@
 to move-towards-nest
   face-patch nest
+  let direction decide-direction
+  move-along-fencing direction
+  fd speed ;;ta czesc jest podobna w food behavior, wydziel do go-ahead
 end
 
 to build-new-nest

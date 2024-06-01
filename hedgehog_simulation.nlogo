@@ -1,6 +1,8 @@
 __includes ["setup_world//create_patches.nls" "go_procedures//go_procedure.nls"]
 
 globals [
+  alpha gamma
+
   night-duration current-time
   max-distance possible-angles
 
@@ -8,6 +10,12 @@ globals [
 ]
 
 turtles-own [
+  q-table
+  state
+  action
+  reward
+  next-state
+  mass
   speed distance-traveled
   second-last-target last-target
   nest
@@ -17,16 +25,15 @@ patches-own [food]
 
 to setup
   clear-all
-
   setup-variables
-
   setup-patches
   setup-turtles
-
   reset-ticks
 end
 
 to setup-variables
+  set alpha 0.1
+  set gamma 0.9
   set night-duration 60 ;; 60 ticków na godzinę
   set current-time 0
   set max-distance 2000
@@ -66,6 +73,10 @@ to setup-turtles
     ask patch-here [ set plabel (word "Home of " [who] of myself) ]
     random-turn-turtle
 
+    set mass random-float 10 + 5
+    set q-table []
+    ;;setup-q-table
+
     set color brown - 2
     set size 2
     set speed 1
@@ -73,6 +84,10 @@ to setup-turtles
     set second-last-target nobody
     set last-target nobody
   ]
+end
+
+to setup-q-table
+  set q-table n-values (count patches * 4) [0] ;; Zakładamy 4 akcje (ruchy)
 end
 @#$#@#$#@
 GRAPHICS-WINDOW

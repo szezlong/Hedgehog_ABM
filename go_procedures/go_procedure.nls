@@ -3,24 +3,13 @@ __includes ["go_procedures//fence_behavior.nls" "go_procedures//food_behavior.nl
 to go   
   ifelse current-time < night-duration [
    ask turtles [
-      if random-float 1 < 0.02 [
-       random-turn-turtle
-      ]
-      while [not can-move? 1] [
-        random-turn-turtle ;; krawędź świata
-      ]
-          
-      ifelse [food] of patch-here > 0 [
-        eat-food
-      ] [
-        ;;if distance-traveled < max-distance [ ;; na razie tak, w przyszłości będzie do gniazda wracać
-          move-towards-food-patch
-          let direction decide-direction
-          move-along-fencing direction
-          fd speed
-          ;;set distance-traveled distance-traveled + 1
-        ;;]
-      ]
+       set state (list mass distance-from-home remaining-time)
+       set action choose-action state
+       perform-action action
+       set reward calculate-reward
+       set next-state (list mass distance-from-home remaining-time)
+       update-q-table state action reward next-state
+       set remaining-time remaining-time - 1
     ]
     set current-time current-time + 1
     tick
@@ -54,4 +43,92 @@ to face-patch [patch-to-face]
     ]
   ]
   set heading closest-angle
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; Q-TABLE PROCEDURES ;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+to-report distance-from-home
+  report distance home patch-here
+end
+
+to choose-action [state]
+  ;; Wybór akcji na podstawie Q-table
+  
+  let possible-actions ["go-ahead" "forage" "return-home" "build-new-home"]
+  let best-action one-of possible-actions
+  let max-q -99999
+  
+  ;; Priorytet dla powrotu do gniazda jeśli czas się kończy <-- dodać względem odległości od gniazda i pozostałego czasu
+  if remaining-time <= 10 [
+    set best-action "return-home"
+  ] else [
+    foreach possible-actions [
+      let q table:get q-table (list state ?)
+      if q = false [ set q 0 ]
+      if q > max-q [
+        set max-q q
+        set best-action ?
+      ]
+    ]
+    ;; Eksploracja nowych akcji
+    if random-float 1 < 0.1 [ set best-action one-of possible-actions ]
+  ]
+  report best-action
+end
+
+to perform-action [action]
+  if action = "go-ahead" [ go-ahead ]
+  if action = "forage" [ forage ]
+  if action = "return-home" [ move-towards-home ]
+  if action = "build-new-home" [ build-new-home ]
+end
+
+to go-ahead
+  ;; Dodać logikę unikania ogrodzenia i ruchu
+  if can-move? 1 [
+    forward 1
+  ] else [
+    ;; Logika unikania przeszkód
+    set heading (heading + 45)
+  ]
+end
+
+to-report calculate-reward
+  let reward 0
+  
+  ;; Nagroda za zebranie żywności
+  if [pcolor] of patch-here = green [
+    set reward reward + 10 ;; załóżmy, że zielone patche mają żywność
+    set pcolor black ;; Po zebraniu żywność znika
+  ]
+  
+  ;; Nagroda za powrót do gniazda przed końcem nocy
+  if remaining-time <= 10 and distance-from-home <= 1 [
+    set reward reward + 50
+  ]
+  
+  ;; Kara za zbyt duże oddalenie się od gniazda
+  if distance-from-home > 10 [
+    set reward reward - 5
+  ]
+  
+  report reward
+end
+
+to update-q-table [state action reward next-state]
+  let current-q table:get q-table (list state action)
+  if current-q = false [ set current-q 0 ]
+  
+  let max-next-q 0
+  let possible-actions ["go-ahead" "forage" "return-home" "build-new-home"]
+  foreach possible-actions [
+    let next-q table:get q-table (list next-state ?)
+    if next-q = false [ set next-q 0 ]
+    if next-q > max-next-q [ set max-next-q next-q ]
+  ]
+  
+  let new-q current-q + alpha * (reward + gamma * max-next-q - current-q)
+  table:put q-table (list state action) new-q
 end

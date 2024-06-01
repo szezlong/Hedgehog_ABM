@@ -1,3 +1,20 @@
+to forage
+  while [not can-move? 1] [
+    random-turn-turtle ;; krawędź świata
+  ]
+  ifelse [food] of patch-here > 0 [
+    eat-food
+  ] [
+  ;;if distance-traveled < max-distance [ ;; na razie tak, w przyszłości będzie do gniazda wracać
+    move-towards-food-patch
+    let direction decide-direction
+    move-along-fencing direction
+    fd speed
+    ;;set distance-traveled distance-traveled + 1
+  ;;]
+  ]
+end
+
 to eat-food
   ask patch-here [
     set food food - 1

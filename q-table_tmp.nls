@@ -1,0 +1,25 @@
+if random-float 1 < epsilon [
+        ;; Eksploracja: wybierz losową akcję
+        set last-action one-of [0 1 2 3] ;; Przykład: 0-north, 1-east, 2-south, 3-west
+      ] [
+        ;; Eksploatacja: wybierz najlepszą akcję na podstawie tablicy Q
+        set last-action max-one-of [0 1 2 3] [q-value state ?]
+      ]
+      
+      set last-state state
+      ;; Wykonaj akcję i przesuń jeża
+      if last-action = 0 [ set heading 0 fd 1 ]
+      if last-action = 1 [ set heading 90 fd 1 ]
+      if last-action = 2 [ set heading 180 fd 1 ]
+      if last-action = 3 [ set heading 270 fd 1 ]
+      
+      ;; Aktualizacja stanu
+      set state patch-here
+      
+      ;; Otrzymaj nagrodę
+      let reward [food] of patch-here
+      
+      ;; Aktualizacja wartości Q
+      let max-q max [q-value state ?] [0 1 2 3]
+      let q-update (1 - alpha) * q-value last-state last-action + alpha * (reward + gamma * max-q)
+      set q-table replace-item (q-index last-state last-action) q-table q-update
