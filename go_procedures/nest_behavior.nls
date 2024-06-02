@@ -8,6 +8,10 @@ to return-to-nest
   ] [
     set last-action-flag "go-to-nest-fail"
   ]
+  
+  ask patch-here [
+    set visit-count visit-count + 1
+  ]
 end
 
 to build-new-nest
@@ -22,6 +26,10 @@ to build-new-nest
     set last-action-flag "build-nest-fail"
     ;;let reward -1 ;;kara za nieudaną próbę budowy gniazda
     ;;update-q-table reward
+  ]
+  
+  ask patch-here [
+    set visit-count visit-count + 1
   ]
   ;;show (word "Action: " last-action-flag)
 end

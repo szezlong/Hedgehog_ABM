@@ -11,6 +11,11 @@ to forage
     move-along-fencing direction
     fd speed
   set last-action-flag "forage"
+  
+  ask patch-here [
+    set visit-count visit-count + 1
+  ]
+  
   ;;show (word "Action: flag set to " last-action-flag)
     ;;set distance-traveled distance-traveled + 1
   ;;]
@@ -27,6 +32,11 @@ to eat-food
     ;;let reward -1 ;;kara za żerowanie gdzie nie ma jedzenia
     ;;update-q-table reward
   ]
+  
+  ask patch-here [
+    set visit-count visit-count + 1
+  ]
+  
   ;;show (word "Action: " last-action-flag)
 end
 

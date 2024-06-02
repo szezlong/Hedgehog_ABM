@@ -24,7 +24,11 @@ hedgehogs-own [
   terrain-color food-nearby
 ]
 
-patches-own [food]
+patches-own [
+  food
+  visit-count
+  og-color
+]
 
 to setup
   clear-all
@@ -55,6 +59,8 @@ to setup-world
   draw-random-diagonal-lines
 
   ask patches [
+    set og-color pcolor
+    set visit-count 0
     (ifelse
       pcolor = garden [
         set food random 5 + 3
@@ -153,6 +159,20 @@ to reset-episode
   reset-ticks
   ;;reset rewards?
 end
+
+to draw-heatmap
+  ask patches [
+  if visit-count > 0 [
+        set pcolor scale-color red visit-count 0 (max [visit-count] of patches)
+      ]
+  ]
+end
+
+to restore-original-colors ;;to tymczasowe rozwiązanie, w przyszłości pewnie szybciej będzie wczytać mapę na nowo
+  ask patches [
+    set pcolor og-color
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 253
@@ -239,6 +259,40 @@ BUTTON
 195
 NIL
 next-night
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+68
+287
+180
+320
+NIL
+draw-heatmap
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+69
+332
+179
+365
+clear heatmap
+restore-original-colors\n
 NIL
 1
 T
