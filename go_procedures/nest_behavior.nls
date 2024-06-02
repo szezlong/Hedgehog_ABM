@@ -23,4 +23,5 @@ to build-new-nest
     ;;let reward -1 ;;kara za nieudaną próbę budowy gniazda
     ;;update-q-table reward
   ]
+  ;;show (word "Action: " last-action-flag)
 end

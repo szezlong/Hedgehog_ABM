@@ -13,6 +13,7 @@ to go
       ;update-q-table reward
       update-state-variables
       qlearningextension:learning
+      ;;show word "Selected action: " last-action-flag
     ]
     set current-time current-time + 1
     tick
@@ -26,7 +27,7 @@ to next-night
     go
   ]
   reset-episode 
-  ; Po zakończeniu nocy, reset epizodu powinien być automatyczny ale nie jest...
+  ; Po zakończeniu nocy reset epizodu powinien być automatyczny, ale nie jest...
 end
 
 to face-patch [patch-to-face]

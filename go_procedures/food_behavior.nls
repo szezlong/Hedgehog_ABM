@@ -11,6 +11,7 @@ to forage
     move-along-fencing direction
     fd speed
   set last-action-flag "forage"
+  ;;show (word "Action: flag set to " last-action-flag)
     ;;set distance-traveled distance-traveled + 1
   ;;]
   ;;]
@@ -26,6 +27,7 @@ to eat-food
     ;;let reward -1 ;;kara za żerowanie gdzie nie ma jedzenia
     ;;update-q-table reward
   ]
+  ;;show (word "Action: " last-action-flag)
 end
 
 to move-towards-food-patch

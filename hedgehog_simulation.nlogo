@@ -31,11 +31,6 @@ to setup
   setup-variables
   setup-world
   setup-hedgehogs
-
-  define-actions
-  define-reward
-  define-end-episode
-  define-parameters
   reset-ticks
 end
 
@@ -43,7 +38,8 @@ to setup-variables
   ;set alpha 0.1
   ;set gamma 0.9
   ;set possible-actions ["forage" "eat-food" "return-nest" "build-new-nest"]
-  set night-duration 20 ;; 60 ticków na godzinę
+
+  set night-duration 480 ;; 60 ticków na godzinę
   set current-time 0
   set max-distance 2000
   set possible-angles [0 45 90 135 180 225 270 315 360]
@@ -85,7 +81,7 @@ to setup-hedgehogs
     set mass random-float 10 + 5
 
     update-state-variables
-    qlearningextension:state-def ["terrain-color" "food-nearby"]
+
     set last-action-flag "none"
 
     set color brown - 2
@@ -94,6 +90,16 @@ to setup-hedgehogs
     set distance-traveled 0
     set second-last-target nobody
     set last-target nobody
+  ]
+
+  ask hedgehogs [
+    qlearningextension:state-def ["terrain-color" "food-nearby"]
+    (qlearningextension:actions [forage] [eat-food] [build-new-nest] [return-to-nest])
+    qlearningextension:reward [reward-func]
+    qlearningextension:end-episode [ end-state? ] reset-episode
+    qlearningextension:action-selection "e-greedy" [1 0.08]
+    qlearningextension:learning-rate 0.5
+    qlearningextension:discount-factor 0.75
   ]
 end
 
@@ -104,55 +110,32 @@ to update-state-variables
   ]
 end
 
-to define-actions
-  ask hedgehogs [
-    qlearningextension:actions [
-      forage
-      eat-food
-      build-new-nest
-      return-to-nest
-    ]
-  ]
-end
-
-to define-reward
-  ask hedgehogs [
-    qlearningextension:reward [reward-func]
-  ]
-end
-
 to-report reward-func
-  ifelse last-action-flag = "eat-food-fail" [
-    report -10
-  ] [
-    ifelse last-action-flag = "build-nest-fail" [
-      report -10
-    ] [
-      ifelse last-action-flag = "build-nest-success" [
-        report 10
-      ] [
-        ifelse last-action-flag = "go-to-nest-fail" [
-          report -10
-        ] [
-          report 0 ; Forage i inne akcje bez nagrody/kary
-        ]
-      ]
+  ;;show (word "Calculating reward for action: " last-action-flag)
+  (ifelse
+    last-action-flag = "eat-food-fail" [
+      report -20
     ]
-  ]
-end
-
-to define-parameters
-  ask hedgehogs [
-    qlearningextension:action-selection "e-greedy" [0.8 0.99995]
-    qlearningextension:learning-rate 0.1
-    qlearningextension:discount-factor 0.9
-  ]
-end
-
-to define-end-episode
-  ask hedgehogs [
-    qlearningextension:end-episode [-> end-state? ] [-> reset-episode]
-  ]
+    last-action-flag = "build-nest-fail" [
+      report -20
+    ]
+    last-action-flag = "go-to-nest-fail" [
+      report -10
+    ]
+    last-action-flag = "build-nest-success" [
+      report 5
+    ]
+    last-action-flag = "eat-food-success" [
+      report 50
+    ]
+    last-action-flag = "go-to-nest-success" [
+      report 0
+    ]
+    last-action-flag = "forage" [
+      report 30
+    ]
+    [ report 0 ]
+  )
 end
 
 to-report end-state?
@@ -167,8 +150,8 @@ to reset-episode
     set distance-traveled 0
   ]
   set current-time 0
-  print "RESET"
   reset-ticks
+  ;;reset rewards?
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
