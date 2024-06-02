@@ -3,6 +3,8 @@ __includes ["setup_world//create_patches.nls" "go_procedures//go_procedure.nls"]
 globals [
   alpha gamma
 
+  possible-actions
+
   night-duration current-time
   max-distance possible-angles
 
@@ -13,7 +15,6 @@ turtles-own [
   q-table
   state
   action
-  reward
   next-state
   mass
   speed distance-traveled
@@ -34,6 +35,7 @@ end
 to setup-variables
   set alpha 0.1
   set gamma 0.9
+  set possible-actions ["go-ahead" "forage" "return-nest" "build-new-nest"]
   set night-duration 60 ;; 60 ticków na godzinę
   set current-time 0
   set max-distance 2000

@@ -1,15 +1,16 @@
 __includes ["go_procedures//fence_behavior.nls" "go_procedures//food_behavior.nls" "go_procedures//nest_behavior.nls"]
 
+extensions [table]
+
 to go   
   ifelse current-time < night-duration [
    ask turtles [
-       set state (list mass distance-from-home remaining-time)
-       set action choose-action state
-       perform-action action
-       set reward calculate-reward
-       set next-state (list mass distance-from-home remaining-time)
-       update-q-table state action reward next-state
-       set remaining-time remaining-time - 1
+      set state (list mass distance-from-nest)
+      set action choose-action
+      perform-action
+      let reward calculate-reward
+      set next-state (list mass distance-from-nest)
+      update-q-table reward
     ]
     set current-time current-time + 1
     tick
@@ -49,22 +50,22 @@ end
 ;; Q-TABLE PROCEDURES ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
-to-report distance-from-home
-  report distance home patch-here
+to-report distance-from-nest
+  report distance nest
 end
 
-to choose-action [state]
+to-report choose-action
   ;; Wybór akcji na podstawie Q-table
-  
-  let possible-actions ["go-ahead" "forage" "return-home" "build-new-home"]
+    
   let best-action one-of possible-actions
   let max-q -99999
   
   ;; Priorytet dla powrotu do gniazda jeśli czas się kończy <-- dodać względem odległości od gniazda i pozostałego czasu
-  if remaining-time <= 10 [
-    set best-action "return-home"
-  ] else [
-    foreach possible-actions [
+  ;;if remaining-time <= 10 [
+    ;;set best-action "return-nest"
+  ;;] else 
+  ;;[
+    foreach possible-actions [ ? ->
       let q table:get q-table (list state ?)
       if q = false [ set q 0 ]
       if q > max-q [
@@ -74,22 +75,22 @@ to choose-action [state]
     ]
     ;; Eksploracja nowych akcji
     if random-float 1 < 0.1 [ set best-action one-of possible-actions ]
-  ]
+  ;;]
   report best-action
 end
 
-to perform-action [action]
+to perform-action
   if action = "go-ahead" [ go-ahead ]
   if action = "forage" [ forage ]
-  if action = "return-home" [ move-towards-home ]
-  if action = "build-new-home" [ build-new-home ]
+  if action = "return-nest" [ move-towards-nest ]
+  if action = "build-new-nest" [ build-new-nest ]
 end
 
 to go-ahead
   ;; Dodać logikę unikania ogrodzenia i ruchu
-  if can-move? 1 [
+  ifelse can-move? 1 [
     forward 1
-  ] else [
+  ] [
     ;; Logika unikania przeszkód
     set heading (heading + 45)
   ]
@@ -105,30 +106,32 @@ to-report calculate-reward
   ]
   
   ;; Nagroda za powrót do gniazda przed końcem nocy
-  if remaining-time <= 10 and distance-from-home <= 1 [
-    set reward reward + 50
-  ]
+  ;;if remaining-time <= 10 and distance-from-nest <= 1 [
+    ;;set reward reward + 50
+  ;;]
   
   ;; Kara za zbyt duże oddalenie się od gniazda
-  if distance-from-home > 10 [
+  if distance-from-nest > 10 [
     set reward reward - 5
   ]
   
   report reward
 end
 
-to update-q-table [state action reward next-state]
+to update-q-table [reward]
   let current-q table:get q-table (list state action)
   if current-q = false [ set current-q 0 ]
   
-  let max-next-q 0
-  let possible-actions ["go-ahead" "forage" "return-home" "build-new-home"]
-  foreach possible-actions [
+  ;;let max-next-q max [table:get q-table (list next-state ?1) 0] of possible-actions
+  let max-next-q -99999
+  foreach possible-actions [ ? ->
     let next-q table:get q-table (list next-state ?)
     if next-q = false [ set next-q 0 ]
-    if next-q > max-next-q [ set max-next-q next-q ]
+    if next-q > max-next-q [
+      set max-next-q next-q
+    ]
   ]
-  
+    
   let new-q current-q + alpha * (reward + gamma * max-next-q - current-q)
   table:put q-table (list state action) new-q
 end
