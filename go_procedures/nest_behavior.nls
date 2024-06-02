@@ -1,12 +1,26 @@
-to move-towards-nest
-  face-patch nest
-  let direction decide-direction
-  move-along-fencing direction
-  fd speed ;;ta czesc jest podobna w food behavior, wydziel do go-ahead
+to return-to-nest
+  ifelse nest != nobody [
+    face-patch nest
+    let direction decide-direction
+    move-along-fencing direction
+    fd speed
+    set last-action-flag "go-to-nest-success"
+  ] [
+    set last-action-flag "go-to-nest-fail"
+  ]
 end
 
 to build-new-nest
-  ask nest [set plabel ""] 
-  set nest patch-here
-  ask nest [set plabel (word "Nest no. " who)]
+  ifelse [pcolor] of patch-here = garden [
+    if nest != nobody [
+      ask nest [set plabel ""]
+    ]
+    set nest patch-here
+    ask nest [set plabel (word "Nest no. " [who] of myself)]
+    set last-action-flag "build-nest-success"
+  ] [
+    set last-action-flag "build-nest-fail"
+    ;;let reward -1 ;;kara za nieudaną próbę budowy gniazda
+    ;;update-q-table reward
+  ]
 end

@@ -7,16 +7,16 @@ to move-along-fencing [direction]
     ]
     ifelse closest-fence-patch != patch-here and closest-fence-patch != nobody and direction = -2 [
       let direction-to-patch [towards myself] of closest-fence-patch
-      let turtle-direction get-turtle-direction
+      let hedgehog-direction get-hedgehog-direction
      
       if direction = 2 [
-        random-turn-turtle
+        random-turn-hedgehog
       ]
       
       (ifelse
          (direction-to-patch > 315 or direction-to-patch <= 45) [
            ;; góra patcha
-           ifelse turtle-direction = 3 and (direction = -2 or direction = 1) [
+           ifelse hedgehog-direction = 3 and (direction = -2 or direction = 1) [
              set heading 270
            ] [
            ifelse direction = -1 [
@@ -28,7 +28,7 @@ to move-along-fencing [direction]
          ]
          (direction-to-patch > 45 and direction-to-patch <= 135) [
            ;; prawy bok patcha
-           ifelse turtle-direction = 2 and (direction = -2 or direction = 1)  [
+           ifelse hedgehog-direction = 2 and (direction = -2 or direction = 1)  [
              set heading 0
            ] [ 
             ifelse direction = -1 [
@@ -40,7 +40,7 @@ to move-along-fencing [direction]
          ]
          (direction-to-patch > 135 and direction-to-patch <= 225) [
            ;; dół patcha
-           ifelse turtle-direction = 4 and (direction = -2 or direction = -1) [  
+           ifelse hedgehog-direction = 4 and (direction = -2 or direction = -1) [  
              set heading 270
            ] [
             ifelse direction = 1 [
@@ -52,7 +52,7 @@ to move-along-fencing [direction]
          ] 
          (direction-to-patch > 225 and direction-to-patch <= 315) [
            ;; lewy bok patcha
-           ifelse turtle-direction = 1 and (direction = -2 or direction = -1) [
+           ifelse hedgehog-direction = 1 and (direction = -2 or direction = -1) [
              set heading 0
            ] [
             ifelse direction = 1 [ 
@@ -64,7 +64,7 @@ to move-along-fencing [direction]
          ]  
        )   
     ] [
-      random-turn-turtle
+      random-turn-hedgehog
     ] 
     set direction decide-direction
   ]
@@ -129,7 +129,7 @@ to-report search-for-gap
   ]
 end
 
-to-report get-turtle-direction
+to-report get-hedgehog-direction
   (ifelse
     heading >= 0 and heading <= 90 [
       report 1
@@ -146,6 +146,6 @@ to-report get-turtle-direction
   )
 end
 
-to random-turn-turtle
+to random-turn-hedgehog
   set heading one-of possible-angles
 end

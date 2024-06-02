@@ -1,23 +1,30 @@
 to forage
   while [not can-move? 1] [
-    random-turn-turtle ;; krawędź świata
+    random-turn-hedgehog ;; krawędź świata
   ]
-  ifelse [food] of patch-here > 0 [
-    eat-food
-  ] [
+  ;;ifelse [food] of patch-here > 0 [
+    ;;eat-food
+  ;;] [
   ;;if distance-traveled < max-distance [ ;; na razie tak, w przyszłości będzie do gniazda wracać
     move-towards-food-patch
     let direction decide-direction
     move-along-fencing direction
     fd speed
+  set last-action-flag "forage"
     ;;set distance-traveled distance-traveled + 1
   ;;]
-  ]
+  ;;]
 end
 
 to eat-food
-  ask patch-here [
-    set food food - 1
+  ifelse [food] of patch-here > 0 [
+    set mass mass + 1 ;; na razie +-1
+    ask patch-here [ set food food - 1 ]
+    set last-action-flag "eat-food-success"
+  ] [
+    set last-action-flag "eat-food-fail"
+    ;;let reward -1 ;;kara za żerowanie gdzie nie ma jedzenia
+    ;;update-q-table reward
   ]
 end
 

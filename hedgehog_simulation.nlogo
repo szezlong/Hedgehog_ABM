@@ -1,5 +1,9 @@
 __includes ["setup_world//create_patches.nls" "go_procedures//go_procedure.nls"]
 
+extensions[qlearningextension]
+
+breed [hedgehogs hedgehog]
+
 globals [
   alpha gamma
 
@@ -11,15 +15,13 @@ globals [
   fence garden
 ]
 
-turtles-own [
-  q-table
-  state
-  action
-  next-state
+hedgehogs-own [
   mass
   speed distance-traveled
   second-last-target last-target
   nest
+  last-action-flag
+  terrain-color food-nearby
 ]
 
 patches-own [food]
@@ -27,16 +29,21 @@ patches-own [food]
 to setup
   clear-all
   setup-variables
-  setup-patches
-  setup-turtles
+  setup-world
+  setup-hedgehogs
+
+  define-actions
+  define-reward
+  define-end-episode
+  define-parameters
   reset-ticks
 end
 
 to setup-variables
-  set alpha 0.1
-  set gamma 0.9
-  set possible-actions ["go-ahead" "forage" "return-nest" "build-new-nest"]
-  set night-duration 60 ;; 60 ticków na godzinę
+  ;set alpha 0.1
+  ;set gamma 0.9
+  ;set possible-actions ["forage" "eat-food" "return-nest" "build-new-nest"]
+  set night-duration 20 ;; 60 ticków na godzinę
   set current-time 0
   set max-distance 2000
   set possible-angles [0 45 90 135 180 225 270 315 360]
@@ -44,7 +51,7 @@ to setup-variables
   set garden green - 1
 end
 
-to setup-patches
+to setup-world
   create-light-green-patches
   create-dark-green-clusters 5
   setup-lines 10
@@ -66,18 +73,20 @@ to setup-patches
   ]
 end
 
-to setup-turtles
+to setup-hedgehogs
   let available-patches patches with [pcolor != fence and not any? neighbors with [pcolor = fence]]
 
-  create-turtles 3 [
+  create-hedgehogs 1 [
     set nest one-of available-patches
     move-to nest
-    ask patch-here [ set plabel (word "Home of " [who] of myself) ]
-    random-turn-turtle
+    ask nest [ set plabel (word "Home of " [who] of myself) ]
+    random-turn-hedgehog
 
     set mass random-float 10 + 5
-    set q-table []
-    ;;setup-q-table
+
+    update-state-variables
+    qlearningextension:state-def ["terrain-color" "food-nearby"]
+    set last-action-flag "none"
 
     set color brown - 2
     set size 2
@@ -88,8 +97,78 @@ to setup-turtles
   ]
 end
 
-to setup-q-table
-  set q-table n-values (count patches * 4) [0] ;; Zakładamy 4 akcje (ruchy)
+to update-state-variables
+  ask hedgehogs [
+    set terrain-color [pcolor] of patch-here
+    set food-nearby [food] of patch-here
+  ]
+end
+
+to define-actions
+  ask hedgehogs [
+    qlearningextension:actions [
+      forage
+      eat-food
+      build-new-nest
+      return-to-nest
+    ]
+  ]
+end
+
+to define-reward
+  ask hedgehogs [
+    qlearningextension:reward [reward-func]
+  ]
+end
+
+to-report reward-func
+  ifelse last-action-flag = "eat-food-fail" [
+    report -10
+  ] [
+    ifelse last-action-flag = "build-nest-fail" [
+      report -10
+    ] [
+      ifelse last-action-flag = "build-nest-success" [
+        report 10
+      ] [
+        ifelse last-action-flag = "go-to-nest-fail" [
+          report -10
+        ] [
+          report 0 ; Forage i inne akcje bez nagrody/kary
+        ]
+      ]
+    ]
+  ]
+end
+
+to define-parameters
+  ask hedgehogs [
+    qlearningextension:action-selection "e-greedy" [0.8 0.99995]
+    qlearningextension:learning-rate 0.1
+    qlearningextension:discount-factor 0.9
+  ]
+end
+
+to define-end-episode
+  ask hedgehogs [
+    qlearningextension:end-episode [-> end-state? ] [-> reset-episode]
+  ]
+end
+
+to-report end-state?
+  ; Koniec epizodu
+  report current-time >= night-duration
+end
+
+to reset-episode
+  ; Resetowanie stanu na początku nowej nocy
+  ask hedgehogs [
+    face-patch nest
+    set distance-traveled 0
+  ]
+  set current-time 0
+  print "RESET"
+  reset-ticks
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -113,8 +192,8 @@ GRAPHICS-WINDOW
 16
 -16
 16
-0
-0
+1
+1
 1
 ticks
 30.0
@@ -154,9 +233,26 @@ NIL
 1
 
 BUTTON
-69
+145
+115
+208
+148
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+146
 162
-158
+235
 195
 NIL
 next-night
