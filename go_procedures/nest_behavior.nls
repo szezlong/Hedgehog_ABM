@@ -1,12 +1,12 @@
-to return-to-nest
+to go-to-nest
   ifelse nest != nobody [
     face-patch nest
     let direction decide-direction
     move-along-fencing direction
     fd speed
-    set last-action-flag "go-to-nest-success"
+    set flags lput "go-to-nest-success" flags
   ] [
-    set last-action-flag "go-to-nest-fail"
+    set flags lput "go-to-nest-fail" flags
   ]
   
   ask patch-here [
@@ -21,9 +21,9 @@ to build-new-nest
     ]
     set nest patch-here
     ask nest [set plabel (word "Nest no. " [who] of myself)]
-    set last-action-flag "build-nest-success"
+    set flags lput "build-nest-success" flags
   ] [
-    set last-action-flag "build-nest-fail"
+    set flags lput "build-nest-fail" flags
     ;;let reward -1 ;;kara za nieudaną próbę budowy gniazda
     ;;update-q-table reward
   ]

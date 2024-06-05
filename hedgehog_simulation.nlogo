@@ -18,9 +18,9 @@ globals [
 hedgehogs-own [
   mass
   speed distance-traveled
-  second-last-target last-target
+  second-last-target last-target last-heading
   nest
-  last-action-flag
+  flags
   terrain-color food-nearby
 ]
 
@@ -88,7 +88,7 @@ to setup-hedgehogs
 
     update-state-variables
 
-    set last-action-flag "none"
+    set flags []
 
     set color brown - 2
     set size 2
@@ -96,11 +96,12 @@ to setup-hedgehogs
     set distance-traveled 0
     set second-last-target nobody
     set last-target nobody
+    set last-heading heading
   ]
 
   ask hedgehogs [
     qlearningextension:state-def ["terrain-color" "food-nearby"]
-    (qlearningextension:actions [forage] [eat-food] [build-new-nest] [return-to-nest])
+    (qlearningextension:actions [forage] [eat-food] [build-new-nest] [go-to-nest])
     qlearningextension:reward [reward-func]
     qlearningextension:end-episode [ end-state? ] reset-episode
     qlearningextension:action-selection "e-greedy" [1 0.08]
@@ -111,6 +112,7 @@ end
 
 to update-state-variables
   ask hedgehogs [
+    set flags []
     set terrain-color [pcolor] of patch-here
     set food-nearby [food] of patch-here
   ]
@@ -118,29 +120,35 @@ end
 
 to-report reward-func
   ;;show (word "Calculating reward for action: " last-action-flag)
+
+  let penalty 0
+  if member? "rotated-180" flags [
+    set penalty -15  ; przykładowa kara za obrót o 180 stopni
+  ]
+
   (ifelse
-    last-action-flag = "eat-food-fail" [
-      report -20
+    member? "eat-food-fail" flags [
+      report (-5 + penalty)
     ]
-    last-action-flag = "build-nest-fail" [
-      report -20
+    member? "build-nest-fail" flags [
+      report (-10 + penalty)
     ]
-    last-action-flag = "go-to-nest-fail" [
-      report -10
+    member? "go-to-nest-fail" flags [
+      report (-5 + penalty)
     ]
-    last-action-flag = "build-nest-success" [
-      report 5
+    member? "build-nest-success" flags [
+      report (5 + penalty)
     ]
-    last-action-flag = "eat-food-success" [
-      report 50
+    member? "eat-food-success" flags [
+      report (10 + penalty)
     ]
-    last-action-flag = "go-to-nest-success" [
-      report 0
+    member? "go-to-nest-success" flags [
+      report (5 + penalty)
     ]
-    last-action-flag = "forage" [
-      report 30
+    member? "forage" flags [
+      report (10 + penalty)
     ]
-    [ report 0 ]
+    [ report (0 + penalty) ]
   )
 end
 

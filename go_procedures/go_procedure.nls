@@ -11,8 +11,17 @@ to go
       ;let reward calculate-reward
       ;set next-state (list mass distance-from-nest)
       ;update-q-table reward
+            
       update-state-variables
       qlearningextension:learning
+      
+      ifelse abs (heading - last-heading) = 180 [
+        set flags lput "rotated-180" flags
+      ] [
+        set flags remove "rotated-180" flags
+      ]
+      set last-heading heading
+      
       ;;show word "Selected action: " last-action-flag
     ]
     set current-time current-time + 1

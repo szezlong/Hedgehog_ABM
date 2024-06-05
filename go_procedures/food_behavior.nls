@@ -10,7 +10,8 @@ to forage
     let direction decide-direction
     move-along-fencing direction
     fd speed
-  set last-action-flag "forage"
+
+  set flags lput "forage" flags
   
   ask patch-here [
     set visit-count visit-count + 1
@@ -26,9 +27,10 @@ to eat-food
   ifelse [food] of patch-here > 0 [
     set mass mass + 1 ;; na razie +-1
     ask patch-here [ set food food - 1 ]
-    set last-action-flag "eat-food-success"
+    set flags lput "eat-food-success" flags
+
   ] [
-    set last-action-flag "eat-food-fail"
+    set flags lput "eat-food-fail" flags
     ;;let reward -1 ;;kara za żerowanie gdzie nie ma jedzenia
     ;;update-q-table reward
   ]
