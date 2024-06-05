@@ -17,10 +17,12 @@ end
 to build-new-nest
   ifelse [pcolor] of patch-here = garden [
     if nest != nobody [
-      ask nest [set plabel ""]
+      ;ask nest [set plabel ""]
+      ask nest [ set pcolor og-color ]
     ]
     set nest patch-here
-    ask nest [set plabel (word "Nest no. " [who] of myself)]
+    ;ask nest [set plabel (word "Nest no. " [who] of myself)]
+    ask nest [ set pcolor brown ]
     set flags lput "build-nest-success" flags
   ] [
     set flags lput "build-nest-fail" flags

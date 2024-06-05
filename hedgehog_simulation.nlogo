@@ -84,7 +84,8 @@ to setup-hedgehogs
 
     set nest one-of available-patches
     move-to nest
-    ask nest [ set plabel (word "Home of " [who] of myself) ]
+    ;ask nest [ set plabel (word "Home of " [who] of myself) ]
+    ask nest [ set pcolor brown ]
     set visited-patches (list nest)
     random-turn-hedgehog
     set flags []
