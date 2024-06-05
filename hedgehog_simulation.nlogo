@@ -10,7 +10,7 @@ globals [
   possible-actions
 
   night-duration current-time
-  max-distance possible-angles
+  max-distance possible-angles hedgehog-memory
 
   fence garden
 ]
@@ -18,7 +18,7 @@ globals [
 hedgehogs-own [
   mass
   speed distance-traveled
-  second-last-target last-target last-heading
+  visited-patches last-heading
   nest
   flags
   terrain-color food-nearby
@@ -47,6 +47,7 @@ to setup-variables
   set current-time 0
   set max-distance 2000
   set possible-angles [0 45 90 135 180 225 270 315 360]
+  set hedgehog-memory 10
   set fence blue
   set garden green - 1
 end
@@ -63,7 +64,7 @@ to setup-world
     set visit-count 0
     (ifelse
       pcolor = garden [
-        set food random 5 + 3
+        set food random 5 + 2
       ]
       pcolor = fence [
         set food -1
@@ -79,24 +80,20 @@ to setup-hedgehogs
   let available-patches patches with [pcolor != fence and not any? neighbors with [pcolor = fence]]
 
   create-hedgehogs 1 [
-    set nest one-of available-patches
-    move-to nest
-    ask nest [ set plabel (word "Home of " [who] of myself) ]
-    random-turn-hedgehog
-
     set mass random-float 10 + 5
-
-    update-state-variables
-
-    set flags []
-
     set color brown - 2
     set size 2
     set speed 1
     set distance-traveled 0
-    set second-last-target nobody
-    set last-target nobody
+
+    set nest one-of available-patches
+    move-to nest
+    ask nest [ set plabel (word "Home of " [who] of myself) ]
+    set visited-patches (list nest)
+    random-turn-hedgehog
+    set flags []
     set last-heading heading
+    update-state-variables
   ]
 
   ask hedgehogs [
@@ -112,55 +109,72 @@ end
 
 to update-state-variables
   ask hedgehogs [
-    set flags []
     set terrain-color [pcolor] of patch-here
     set food-nearby [food] of patch-here
+    update-visited-patches
+    set flags []
+  ]
+end
+
+to update-visited-patches
+  ask hedgehogs [
+    let current-patch patch-here
+    if not member? current-patch visited-patches [
+      set visited-patches lput current-patch visited-patches
+      if length visited-patches > hedgehog-memory [
+        set visited-patches but-first visited-patches
+      ]
+    ]
   ]
 end
 
 to-report reward-func
-  ;;show (word "Calculating reward for action: " last-action-flag)
+  ;show (word "Calculating reward for actions: " flags)
 
   let penalty 0
   if member? "rotated-180" flags [
-    set penalty -15  ; przykładowa kara za obrót o 180 stopni
+    set penalty -50
   ]
 
+  let reward 0
   (ifelse
     member? "eat-food-fail" flags [
-      report (-5 + penalty)
+       set reward (-1 + penalty)
     ]
     member? "build-nest-fail" flags [
-      report (-10 + penalty)
+       set reward (-5 + penalty)
     ]
     member? "go-to-nest-fail" flags [
-      report (-5 + penalty)
+       set reward (-1 + penalty)
     ]
     member? "build-nest-success" flags [
-      report (5 + penalty)
+       set reward (0 + penalty)
     ]
     member? "eat-food-success" flags [
-      report (10 + penalty)
+       set reward (10 + penalty)
     ]
     member? "go-to-nest-success" flags [
-      report (5 + penalty)
+       set reward (0 + penalty)
     ]
     member? "forage" flags [
-      report (10 + penalty)
+       set reward (10 + penalty)
     ]
-    [ report (0 + penalty) ]
+    [  set reward (0 + penalty) ]
   )
+  if not member? patch-here visited-patches [
+    set reward (reward + 20)
+  ]
+  ;show reward
+  report reward
 end
 
 to-report end-state?
-  ; Koniec epizodu
   report current-time >= night-duration
 end
 
 to reset-episode
-  ; Resetowanie stanu na początku nowej nocy
   ask hedgehogs [
-    face-patch nest
+    ;face-patch nest
     set distance-traveled 0
   ]
   set current-time 0
@@ -203,17 +217,17 @@ GRAPHICS-WINDOW
 16
 -16
 16
-1
-1
+0
+0
 1
 ticks
 30.0
 
 BUTTON
-69
-114
-132
-147
+52
+142
+115
+175
 NIL
 setup
 NIL
@@ -227,10 +241,10 @@ NIL
 1
 
 BUTTON
-67
-232
-130
-265
+49
+259
+112
+292
 clear
 ca
 NIL
@@ -244,27 +258,10 @@ NIL
 1
 
 BUTTON
-145
-115
-208
-148
-NIL
-go
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-146
-162
-235
-195
+125
+141
+214
+174
 NIL
 next-night
 NIL
@@ -278,10 +275,10 @@ NIL
 1
 
 BUTTON
-68
-287
-180
-320
+50
+314
+162
+347
 NIL
 draw-heatmap
 NIL
@@ -295,10 +292,10 @@ NIL
 1
 
 BUTTON
-69
-332
-179
-365
+51
+359
+161
+392
 clear heatmap
 restore-original-colors\n
 NIL

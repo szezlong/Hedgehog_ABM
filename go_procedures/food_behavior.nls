@@ -49,15 +49,18 @@ to move-towards-food-patch
   
   if (best-patch != nobody) and ([food] of best-patch > [food] of patch-here) [
     face-patch best-patch
-    
-    set second-last-target last-target
-    set last-target best-patch
   ]
 end
 
 to-report get-most-food [sorted-patches]
+  let length_of_list length visited-patches
+  let last_visited item (length_of_list - 1) visited-patches
+  let second_last_visited nobody
+  
+  if length_of_list > 2 [ set second_last_visited item (length_of_list - 2) visited-patches ]
+
   foreach sorted-patches [ x ->
-    if last-target = nobody or (x != last-target and x != second-last-target) [
+    if second_last_visited = nobody or (x != last_visited and x != second_last_visited) [
       report x
     ]
   ]

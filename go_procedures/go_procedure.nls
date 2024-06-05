@@ -13,7 +13,6 @@ to go
       ;update-q-table reward
             
       update-state-variables
-      qlearningextension:learning
       
       ifelse abs (heading - last-heading) = 180 [
         set flags lput "rotated-180" flags
@@ -21,6 +20,8 @@ to go
         set flags remove "rotated-180" flags
       ]
       set last-heading heading
+
+     qlearningextension:learning
       
       ;;show word "Selected action: " last-action-flag
     ]
