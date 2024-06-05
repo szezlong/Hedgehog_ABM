@@ -21,7 +21,7 @@ hedgehogs-own [
   visited-patches last-heading
   nest
   flags
-  terrain-color food-nearby
+  terrain-color food-here fence-ahead
 ]
 
 patches-own [
@@ -39,14 +39,10 @@ to setup
 end
 
 to setup-variables
-  ;set alpha 0.1
-  ;set gamma 0.9
-  ;set possible-actions ["forage" "eat-food" "return-nest" "build-new-nest"]
-
-  set night-duration 480 ;; 60 ticków na godzinę
+  set night-duration 20 ;; 60 ticków na godzinę
   set current-time 0
   set max-distance 2000
-  set possible-angles [0 45 90 135 180 225 270 315 360]
+  set possible-angles [0 45 90 135 180 225 270 315]
   set hedgehog-memory 10
   set fence blue
   set garden green - 1
@@ -97,22 +93,24 @@ to setup-hedgehogs
   ]
 
   ask hedgehogs [
-    qlearningextension:state-def ["terrain-color" "food-nearby"]
-    (qlearningextension:actions [forage] [eat-food] [build-new-nest] [go-to-nest])
+    qlearningextension:state-def ["terrain-color" "food-here" "fence-ahead"]
+    (qlearningextension:actions [forage] [eat-food] [build-new-nest])
     qlearningextension:reward [reward-func]
     qlearningextension:end-episode [ end-state? ] reset-episode
     qlearningextension:action-selection "e-greedy" [1 0.08]
-    qlearningextension:learning-rate 0.5
-    qlearningextension:discount-factor 0.75
+    qlearningextension:learning-rate 0.7
+    qlearningextension:discount-factor 0.9
   ]
 end
 
 to update-state-variables
   ask hedgehogs [
     set terrain-color [pcolor] of patch-here
-    set food-nearby [food] of patch-here
-    update-visited-patches
+    set food-here [food] of patch-here
+    let ahead-patch patch-ahead 1
+    set fence-ahead ifelse-value (ahead-patch != nobody and [pcolor] of ahead-patch = fence) [1] [0]
     set flags []
+    update-visited-patches
   ]
 end
 
@@ -133,7 +131,7 @@ to-report reward-func
 
   let penalty 0
   if member? "rotated-180" flags [
-    set penalty -50
+    set penalty -100
   ]
 
   let reward 0
@@ -217,8 +215,8 @@ GRAPHICS-WINDOW
 16
 -16
 16
-0
-0
+1
+1
 1
 ticks
 30.0

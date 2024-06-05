@@ -3,7 +3,7 @@ to move-along-fencing [direction]
     let closest-fence-patch patch-ahead 1 
     
     if closest-fence-patch = patch-here [
-      rt 180
+      rt 90
     ]
     ifelse closest-fence-patch != patch-here and closest-fence-patch != nobody and direction = -2 [
       let direction-to-patch [towards myself] of closest-fence-patch

@@ -2,9 +2,7 @@ to forage
   while [not can-move? 1] [
     random-turn-hedgehog ;; krawędź świata
   ]
-  ;;ifelse [food] of patch-here > 0 [
-    ;;eat-food
-  ;;] [
+
   ;;if distance-traveled < max-distance [ ;; na razie tak, w przyszłości będzie do gniazda wracać
     move-towards-food-patch
     let direction decide-direction
@@ -17,7 +15,6 @@ to forage
     set visit-count visit-count + 1
   ]
   
-  ;;show (word "Action: flag set to " last-action-flag)
     ;;set distance-traveled distance-traveled + 1
   ;;]
   ;;]
@@ -31,19 +28,15 @@ to eat-food
 
   ] [
     set flags lput "eat-food-fail" flags
-    ;;let reward -1 ;;kara za żerowanie gdzie nie ma jedzenia
-    ;;update-q-table reward
   ]
   
   ask patch-here [
     set visit-count visit-count + 1
   ]
-  
-  ;;show (word "Action: " last-action-flag)
 end
 
 to move-towards-food-patch
-  let accessible-patches neighbors with [pcolor != fence] ;; or neighbors4  
+  let accessible-patches neighbors with [pcolor != fence]
   let sorted-patches reverse sort-on [food] accessible-patches
   let best-patch get-most-food sorted-patches
   

@@ -5,12 +5,6 @@ extensions [table]
 to go   
   if not end-state? [
    ask hedgehogs [
-      ;set state (list mass distance-from-nest)
-      ;set action choose-action
-      ;perform-action
-      ;let reward calculate-reward
-      ;set next-state (list mass distance-from-nest)
-      ;update-q-table reward
             
       update-state-variables
       
@@ -21,9 +15,8 @@ to go
       ]
       set last-heading heading
 
-     qlearningextension:learning
+     (qlearningextension:learning true)
       
-      ;;show word "Selected action: " last-action-flag
     ]
     set current-time current-time + 1
     tick
@@ -37,7 +30,6 @@ to next-night
     go
   ]
   reset-episode 
-  ; Po zakończeniu nocy reset epizodu powinien być automatyczny, ale nie jest...
 end
 
 to face-patch [patch-to-face]
