@@ -16,7 +16,6 @@ to go
       set last-heading heading
 
      (qlearningextension:learning true)
-      
     ]
     set current-time current-time + 1
     tick

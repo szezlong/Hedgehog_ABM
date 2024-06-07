@@ -5,8 +5,6 @@ extensions[qlearningextension]
 breed [hedgehogs hedgehog]
 
 globals [
-  alpha gamma
-
   possible-actions
 
   night-duration current-time
@@ -39,7 +37,7 @@ to setup
 end
 
 to setup-variables
-  set night-duration 20 ;; 60 ticków na godzinę
+  set night-duration 60 ;; 60 ticków na godzinę
   set current-time 0
   set max-distance 2000
   set possible-angles [0 45 90 135 180 225 270 315]
@@ -50,11 +48,12 @@ end
 
 to setup-world
   create-light-green-patches
-  create-dark-green-clusters 5
+  create-dark-green-clusters 2
   setup-lines 10
   create-rectangle
   draw-random-diagonal-lines
-
+  resize-world 0 30 0 30
+  set-patch-size 15
   ask patches [
     set og-color pcolor
     set visit-count 0
@@ -84,7 +83,7 @@ to setup-hedgehogs
 
     set nest one-of available-patches
     move-to nest
-    ;ask nest [ set plabel (word "Home of " [who] of myself) ]
+
     ask nest [ set pcolor brown ]
     set visited-patches (list nest)
     random-turn-hedgehog
@@ -98,9 +97,9 @@ to setup-hedgehogs
     (qlearningextension:actions [forage] [eat-food] [build-new-nest])
     qlearningextension:reward [reward-func]
     qlearningextension:end-episode [ end-state? ] reset-episode
-    qlearningextension:action-selection "e-greedy" [1 0.08]
-    qlearningextension:learning-rate 0.7
-    qlearningextension:discount-factor 0.9
+    qlearningextension:action-selection "e-greedy" [0.5 0.95]
+    qlearningextension:learning-rate 1
+    qlearningextension:discount-factor 0.75
   ]
 end
 
@@ -109,7 +108,7 @@ to update-state-variables
     set terrain-color [pcolor] of patch-here
     set food-here [food] of patch-here
     let ahead-patch patch-ahead 1
-    set fence-ahead ifelse-value (ahead-patch != nobody and [pcolor] of ahead-patch = fence) [1] [0]
+    set fence-ahead ifelse-value (ahead-patch != nobody and ( any? patches in-cone 2 90 with [pcolor = fence])) [1] [0]
     set flags []
     update-visited-patches
   ]
@@ -198,11 +197,11 @@ end
 GRAPHICS-WINDOW
 253
 38
-690
-476
+726
+512
 -1
 -1
-13.0
+15.0
 1
 10
 1
@@ -212,12 +211,12 @@ GRAPHICS-WINDOW
 0
 0
 1
--16
-16
--16
-16
-1
-1
+0
+30
+0
+30
+0
+0
 1
 ticks
 30.0
