@@ -3,7 +3,7 @@ __includes ["go_procedures//fence_behavior.nls" "go_procedures//food_behavior.nl
 extensions [table]
 
 to go   
-  if not end-state? [
+  if not isEndState [
    ask hedgehogs [
             
       update-state-variables
@@ -24,8 +24,8 @@ to go
   ]
 end 
 
-to next-night
-  while [not end-state?] [
+to next-night ;;czy nie jest zbędne mając już "reset-episode"?
+  while [not isEndState] [
     go
   ]
   reset-episode 

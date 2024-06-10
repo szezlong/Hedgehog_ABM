@@ -59,7 +59,7 @@ to setup-world
     set visit-count 0
     (ifelse
       pcolor = garden [
-        set food random 5 + 2
+        set food random 3 + 2
       ]
       pcolor = fence [
         set food -1
@@ -93,11 +93,12 @@ to setup-hedgehogs
   ]
 
   ask hedgehogs [
-    qlearningextension:state-def ["terrain-color" "food-here" "fence-ahead"]
+    qlearningextension:state-def ["terrain-color" "fence-ahead" "food-here" "mass"]
     (qlearningextension:actions [forage] [eat-food] [build-new-nest])
     qlearningextension:reward [reward-func]
-    qlearningextension:end-episode [ end-state? ] reset-episode
-    qlearningextension:action-selection "e-greedy" [0.5 0.95]
+    qlearningextension:end-episode [ isEndState ] reset-episode
+    qlearningextension:action-selection "e-greedy" [0.45 0.99]
+    ;qlearningextension:action-selection-egreedy 0.75 "rate" 0.95
     qlearningextension:learning-rate 1
     qlearningextension:discount-factor 0.75
   ]
@@ -107,6 +108,7 @@ to update-state-variables
   ask hedgehogs [
     set terrain-color [pcolor] of patch-here
     set food-here [food] of patch-here
+    set mass mass
     let ahead-patch patch-ahead 1
     set fence-ahead ifelse-value (ahead-patch != nobody and ( any? patches in-cone 2 90 with [pcolor = fence])) [1] [0]
     set flags []
@@ -139,6 +141,9 @@ to-report reward-func
     member? "eat-food-fail" flags [
        set reward (-1 + penalty)
     ]
+    member? "eat-food-big-fail" flags [
+       set reward (-10 + penalty)
+    ]
     member? "build-nest-fail" flags [
        set reward (-5 + penalty)
     ]
@@ -149,6 +154,9 @@ to-report reward-func
        set reward (0 + penalty)
     ]
     member? "eat-food-success" flags [
+       set reward (3 + penalty)
+    ]
+    member? "eat-food-big-success" flags [
        set reward (10 + penalty)
     ]
     member? "go-to-nest-success" flags [
@@ -166,7 +174,7 @@ to-report reward-func
   report reward
 end
 
-to-report end-state?
+to-report isEndState
   report current-time >= night-duration
 end
 
@@ -174,6 +182,8 @@ to reset-episode
   ask hedgehogs [
     ;face-patch nest
     set distance-traveled 0
+    set mass mass - 1
+    print mass
   ]
   set current-time 0
   reset-ticks
@@ -215,17 +225,17 @@ GRAPHICS-WINDOW
 30
 0
 30
-0
-0
+1
+1
 1
 ticks
 30.0
 
 BUTTON
 52
-142
+141
 115
-175
+174
 NIL
 setup
 NIL

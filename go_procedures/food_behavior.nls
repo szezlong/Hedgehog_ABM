@@ -2,8 +2,6 @@ to forage
   while [not can-move? 1] [
     random-turn-hedgehog ;; krawędź świata
   ]
-
-
   
   ;;if distance-traveled < max-distance [ ;; na razie tak, w przyszłości będzie do gniazda wracać
     move-towards-food-patch
@@ -28,12 +26,21 @@ end
 
 to eat-food
   ifelse [food] of patch-here > 0 [
-    set mass mass + 1 ;; na razie +-1
+    ifelse mass < 8 [
+      set mass mass + 1
+      set flags lput "eat-food-big-success" flags
+    ] [
+      set mass mass + 0.5
+      set flags lput "eat-food-success" flags
+    ]
     ask patch-here [ set food food - 1 ]
-    set flags lput "eat-food-success" flags
 
   ] [
-    set flags lput "eat-food-fail" flags
+    ifelse mass > 15 [
+      set flags lput "eat-food-big-fail" flags
+    ] [ 
+      set flags lput "eat-food-fail" flags
+    ]
   ]
   
   ask patch-here [
