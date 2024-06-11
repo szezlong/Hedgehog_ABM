@@ -1,10 +1,31 @@
 to go-to-nest
   ifelse nest != nobody [
-    face-patch nest
-    let direction decide-direction
-    move-along-fencing direction
-    fd speed
-    set flags lput "go-to-nest-success" flags
+    
+    if distance-to-nest < (world-width * 0.1) [ ;;do ustalenia
+      set return-probability return-probability * 1.25
+    ]
+    
+    if current-time > (night-duration * 0.7) [
+       ifelse any? patches in-radius 3 with [ self = [nest] of myself ] [
+          set return-probability 1
+          set stay-in-nest true
+        ] [
+          set return-probability 0.25
+        ]
+    ]
+    
+    ifelse random-float 1 < return-probability [
+      face-patch nest
+      let direction decide-direction
+      move-along-fencing direction
+      fd speed
+      set flags lput "go-to-nest-success" flags
+      if current-time > (night-duration * 0.85) [
+        set stay-in-nest true
+      ]
+    ] [
+      set flags lput "go-to-nest-fail" flags
+    ]
   ] [
     set flags lput "go-to-nest-fail" flags
   ]
@@ -17,11 +38,9 @@ end
 to build-new-nest
   ifelse [pcolor] of patch-here = garden [
     if nest != nobody [
-      ;ask nest [set plabel ""]
       ask nest [ set pcolor og-color ]
     ]
     set nest patch-here
-    ;ask nest [set plabel (word "Nest no. " [who] of myself)]
     ask nest [ set pcolor brown ]
     set flags lput "build-nest-success" flags
   ] [

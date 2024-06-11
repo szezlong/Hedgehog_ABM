@@ -4,8 +4,10 @@ extensions [table]
 
 to go   
   if not isEndState [
-   ask hedgehogs [
-            
+    ask hedgehogs [
+      if not stay-in-nest [
+      set distance-to-nest distance nest
+      
       update-state-variables
       
       ifelse abs (heading - last-heading) = 180 [
@@ -16,6 +18,7 @@ to go
       set last-heading heading
 
      (qlearningextension:learning true)
+    ]
     ]
     set current-time current-time + 1
     tick

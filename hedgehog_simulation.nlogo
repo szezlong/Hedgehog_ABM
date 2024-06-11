@@ -8,7 +8,8 @@ globals [
   possible-actions
 
   night-duration current-time
-  max-distance possible-angles hedgehog-memory
+  return-probability max-distance
+  possible-angles hedgehog-memory
 
   fence garden
 ]
@@ -19,7 +20,7 @@ hedgehogs-own [
   visited-patches last-heading
   nest
   flags
-  terrain-color food-here fence-ahead
+  terrain-color food-here fence-ahead distance-to-nest stay-in-nest
 ]
 
 patches-own [
@@ -39,7 +40,8 @@ end
 to setup-variables
   set night-duration 60 ;; 60 ticków na godzinę
   set current-time 0
-  set max-distance 2000
+  set return-probability 0.05
+  set max-distance 20
   set possible-angles [0 45 90 135 180 225 270 315]
   set hedgehog-memory 10
   set fence blue
@@ -89,15 +91,16 @@ to setup-hedgehogs
     random-turn-hedgehog
     set flags []
     set last-heading heading
+    set stay-in-nest false
     update-state-variables
   ]
 
   ask hedgehogs [
-    qlearningextension:state-def ["terrain-color" "fence-ahead" "food-here" "mass"]
-    (qlearningextension:actions [forage] [eat-food] [build-new-nest])
+    qlearningextension:state-def ["terrain-color" "fence-ahead" "food-here" "mass" "distance-to-nest"]
+    (qlearningextension:actions [forage] [eat-food] [build-new-nest] [go-to-nest])
     qlearningextension:reward [reward-func]
-    qlearningextension:end-episode [ isEndState ] reset-episode
-    qlearningextension:action-selection "e-greedy" [0.45 0.99]
+    qlearningextension:end-episode [isEndState] reset-episode
+    qlearningextension:action-selection "e-greedy" [0.25 0.99]
     ;qlearningextension:action-selection-egreedy 0.75 "rate" 0.95
     qlearningextension:learning-rate 1
     qlearningextension:discount-factor 0.75
@@ -111,6 +114,7 @@ to update-state-variables
     set mass mass
     let ahead-patch patch-ahead 1
     set fence-ahead ifelse-value (ahead-patch != nobody and ( any? patches in-cone 2 90 with [pcolor = fence])) [1] [0]
+    set distance-to-nest distance nest
     set flags []
     update-visited-patches
   ]
@@ -129,11 +133,9 @@ to update-visited-patches
 end
 
 to-report reward-func
-  ;show (word "Calculating reward for actions: " flags)
-
   let penalty 0
   if member? "rotated-180" flags [
-    set penalty -100
+    set penalty -10
   ]
 
   let reward 0
@@ -160,7 +162,7 @@ to-report reward-func
        set reward (10 + penalty)
     ]
     member? "go-to-nest-success" flags [
-       set reward (0 + penalty)
+       set reward (10 + penalty)
     ]
     member? "forage" flags [
        set reward (10 + penalty)
@@ -170,7 +172,6 @@ to-report reward-func
   if not member? patch-here visited-patches [
     set reward (reward + 20)
   ]
-  ;show reward
   report reward
 end
 
@@ -184,8 +185,11 @@ to reset-episode
     set distance-traveled 0
     set mass mass - 1
     print mass
+    set stay-in-nest false
   ]
   set current-time 0
+  set return-probability 0.05
+
   reset-ticks
   ;;reset rewards?
 end
