@@ -8,9 +8,11 @@ to go-to-nest
     if current-time > (night-duration * 0.7) [
        ifelse any? patches in-radius 3 with [ self = [nest] of myself ] [
           set return-probability 1
-          set stay-in-nest true
         ] [
           set return-probability 0.25
+        ]
+       if patch-here = nest [
+          set stay-in-nest true
         ]
     ]
     
