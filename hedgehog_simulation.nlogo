@@ -27,6 +27,7 @@ patches-own [
   food
   visit-count
   og-color
+  ;isNest
 ]
 
 to setup
@@ -74,20 +75,22 @@ to setup-world
 end
 
 to setup-hedgehogs
-  let available-patches patches with [pcolor != fence and not any? neighbors with [pcolor = fence]]
+  let available-patches patches with [pcolor != fence and not any? neighbors4 with [pcolor = fence]]
 
-  create-hedgehogs 1 [
+  create-hedgehogs 3 [
     set mass random-float 10 + 5
     set color brown - 2
     set size 2
     set speed 1
     set distance-traveled 0
 
+    ;let nearest-nest min-one-of available-patches with [is-nest?] [distance self]
+    ;set nest nearest-nest
     set nest one-of available-patches
     move-to nest
-
     ask nest [ set pcolor brown ]
     set visited-patches (list nest)
+
     random-turn-hedgehog
     set flags []
     set last-heading heading
@@ -114,9 +117,9 @@ to update-state-variables
     set mass mass
     let ahead-patch patch-ahead 1
     set fence-ahead ifelse-value (ahead-patch != nobody and ( any? patches in-cone 2 90 with [pcolor = fence])) [1] [0]
-    set distance-to-nest distance nest
+    set distance-to-nest distance [nest] of myself
     set flags []
-    update-visited-patches
+    ;update-visited-patches
   ]
 end
 

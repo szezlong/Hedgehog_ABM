@@ -20,6 +20,8 @@ to go
      (qlearningextension:learning true)
     ]
     ]
+    update-visited-patches
+    
     set current-time current-time + 1
     tick
   ;;] [
