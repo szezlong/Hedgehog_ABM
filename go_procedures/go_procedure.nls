@@ -2,39 +2,35 @@ __includes ["go_procedures//fence_behavior.nls" "go_procedures//food_behavior.nl
 
 extensions [table]
 
-to go   
+to go
   if not isEndState [
     ask hedgehogs [
       if not stay-in-nest [
         let old-position patch-here
-      set distance-to-nest distance nest
-      
-      update-state-variables
-      
-      ifelse abs (heading - last-heading) = 180 [
-        set flags lput "rotated-180" flags
-      ] [
-        set flags remove "rotated-180" flags
-      ]
-      set last-heading heading
-
-     (qlearningextension:learning true)
+        set distance-to-nest distance nest
+        
+        update-state-variables
+        
+        ifelse abs (heading - last-heading) = 180 [
+          set flags lput "rotated-180" flags
+        ] [
+          set flags remove "rotated-180" flags
+        ]
+        set last-heading heading
+        (qlearningextension:learning true)
         
         ask patch-here [
-    set visit-count visit-count + 1
-  ]
+          set visit-count visit-count + 1
+        ]
         set distance-traveled distance-traveled + distance old-position
-        print word "DISTANCE: " distance-traveled 
-    ]
+        print word "DISTANCE: " distance-traveled
+      ]
     ]
     update-visited-patches
-    
     set current-time current-time + 1
     tick
-  ;;] [
-  ;;  stop
-  ]
-end 
+    ]
+end
 
 to update-visited-patches
   ask hedgehogs [

@@ -4,24 +4,16 @@ to forage
   ]
   
   ;;if distance-traveled < max-distance [ ;; na razie tak, w przyszłości będzie do gniazda wracać
-    move-towards-food-patch
-    if random-float 1 < 0.1 [
-      random-turn-hedgehog
-    ]
+  move-towards-food-patch
   
-    let direction decide-direction
-    move-along-fencing direction
-    fd speed
-
+  if random-float 1 < 0.1 [
+    random-turn-hedgehog
+  ]
+  
+  let direction decide-direction
+  move-along-fencing direction
+  fd speed
   set flags lput "forage" flags
-  
-;  ask patch-here [
-;    set visit-count visit-count + 1
-;  ]
-  
-    ;;set distance-traveled distance-traveled + 1
-  ;;]
-  ;;]
 end
 
 to eat-food
@@ -42,10 +34,6 @@ to eat-food
       set flags lput "eat-food-fail" flags
     ]
   ]
-  
-;  ask patch-here [
-;    set visit-count visit-count + 1
-;  ]
 end
 
 to move-towards-food-patch
