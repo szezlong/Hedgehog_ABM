@@ -123,18 +123,6 @@ to update-state-variables
   ]
 end
 
-to update-visited-patches
-  ask hedgehogs [
-    let current-patch patch-here
-    if not member? current-patch visited-patches [
-      set visited-patches lput current-patch visited-patches
-      if length visited-patches > hedgehog-memory [
-        set visited-patches but-first visited-patches
-      ]
-    ]
-  ]
-end
-
 to-report reward-func
   let penalty 0
   if member? "rotated-180" flags [

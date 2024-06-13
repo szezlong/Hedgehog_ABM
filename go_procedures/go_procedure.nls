@@ -6,6 +6,7 @@ to go
   if not isEndState [
     ask hedgehogs [
       if not stay-in-nest [
+        let old-position patch-here
       set distance-to-nest distance nest
       
       update-state-variables
@@ -18,6 +19,12 @@ to go
       set last-heading heading
 
      (qlearningextension:learning true)
+        
+        ask patch-here [
+    set visit-count visit-count + 1
+  ]
+        set distance-traveled distance-traveled + distance old-position
+        print word "DISTANCE: " distance-traveled 
     ]
     ]
     update-visited-patches
@@ -28,6 +35,18 @@ to go
   ;;  stop
   ]
 end 
+
+to update-visited-patches
+  ask hedgehogs [
+    let current-patch patch-here
+    if not member? current-patch visited-patches [
+      set visited-patches lput current-patch visited-patches
+      if length visited-patches > hedgehog-memory [
+        set visited-patches but-first visited-patches
+      ]
+    ]
+  ]
+end
 
 to next-night ;;czy nie jest zbędne mając już "reset-episode"?
   while [not isEndState] [

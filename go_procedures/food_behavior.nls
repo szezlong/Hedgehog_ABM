@@ -15,9 +15,9 @@ to forage
 
   set flags lput "forage" flags
   
-  ask patch-here [
-    set visit-count visit-count + 1
-  ]
+;  ask patch-here [
+;    set visit-count visit-count + 1
+;  ]
   
     ;;set distance-traveled distance-traveled + 1
   ;;]
@@ -43,9 +43,9 @@ to eat-food
     ]
   ]
   
-  ask patch-here [
-    set visit-count visit-count + 1
-  ]
+;  ask patch-here [
+;    set visit-count visit-count + 1
+;  ]
 end
 
 to move-towards-food-patch

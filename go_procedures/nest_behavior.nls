@@ -31,10 +31,6 @@ to go-to-nest
   ] [
     set flags lput "go-to-nest-fail" flags
   ]
-  
-  ask patch-here [
-    set visit-count visit-count + 1
-  ]
 end
 
 to build-new-nest
@@ -47,9 +43,5 @@ to build-new-nest
     set flags lput "build-nest-success" flags
   ] [
     set flags lput "build-nest-fail" flags
-  ]
-  
-  ask patch-here [
-    set visit-count visit-count + 1
   ]
 end
