@@ -197,6 +197,11 @@ to restore-original-colors ;;to tymczasowe rozwiązanie, w przyszłości pewnie 
   ask patches [
     set pcolor og-color
   ]
+  ask hedgehogs [
+    ask nest [
+      set pcolor brown
+    ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
