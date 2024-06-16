@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,13 +16,15 @@ def add_gradient_legend_to_image(image_path, legend_csv_path, output_path):
         next(reader)
         for row in reader:
             if len(row) >= 3:
-                color_floats = tuple(map(float, row[0][1:-1].split(',')))
-                color = tuple(int(c * 255) for c in color_floats)
-                visits = float(row[1])
-                percentage = float(row[2])
-                legend_data.append((color, visits, percentage))
-                if visits > max_visits:
-                    max_visits = visits
+                try:
+                    color = float(row[0])
+                    visits = float(row[1])
+                    percentage = float(row[2])
+                    legend_data.append((color, visits, percentage))
+                    if visits > max_visits:
+                        max_visits = visits
+                except ValueError as e:
+                    print(f"Error processing row {row}: {e}")
 
     legend_data.sort(key=lambda x: x[2], reverse=True)
 

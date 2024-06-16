@@ -34,7 +34,7 @@ to setup
   setup-variables
   setup-world
   setup-hedgehogs
-  if file-exists? "hedgehog-data.csv" [ file-delete "hedgehog-data.csv" ]
+  if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
   set hedgehog-data array:from-list n-values 6 [0]
   collect-hedgehog-data
   reset-ticks
@@ -199,8 +199,8 @@ to collect-hedgehog-data
 end
 
 to export-data
-  file-open "hedgehog-data.csv"
-  if not file-exists? "hedgehog-data.csv" [
+  file-open "results//hedgehog-data.csv"
+  if not file-exists? "results//hedgehog-data.csv" [
     file-print "Tick,Total Mass,Average Mass,Total Distance,Average Distance,Hedgehog Count"
   ]
 
@@ -234,7 +234,7 @@ to export-result-map
   ask links [ hide-link ]
 
   draw-heatmap
-  export-view "result-map.png"
+  export-view "results//result-map.png"
   export-legend
 
   restore-original-colors
@@ -246,7 +246,7 @@ end
 
 to export-legend
   let max-visit-count max [visit-count] of patches
-  file-open "legend.csv"
+  file-open "results//legend.csv"
   file-print "Color,Visits,Percentage"
   ask patches [
     if visit-count > 0 [
@@ -303,12 +303,12 @@ NIL
 1
 
 BUTTON
-49
-259
-112
-292
-clear
-ca
+53
+551
+174
+584
+clear everything
+ca\nif file-exists? \"results//hedgehog-data.csv\" [ file-delete \"results//hedgehog-data.csv\" ]\nif file-exists? \"results//legend.csv\" [ file-delete \"results//legend.csv\" ]\nif file-exists? \"results//result-map.png\" [ file-delete \"results//result-map.png\" ]
 NIL
 1
 T
