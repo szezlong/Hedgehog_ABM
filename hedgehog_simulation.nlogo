@@ -34,7 +34,7 @@ to setup
   setup-variables
   setup-world
   setup-hedgehogs
-  file-delete "hedgehog-data.csv"
+  if file-exists? "hedgehog-data.csv" [ file-delete "hedgehog-data.csv" ]
   set hedgehog-data array:from-list n-values 6 [0]
   collect-hedgehog-data
   reset-ticks
@@ -228,6 +228,19 @@ to restore-original-colors ;;to tymczasowe rozwiązanie, w przyszłości pewnie 
   ]
 end
 
+to export-result-map
+  no-display
+  ask turtles [ hide-turtle ]
+  ask links [ hide-link ]
+
+  draw-heatmap
+  export-view "result-map.png"
+  restore-original-colors
+
+  ask turtles [ show-turtle ]
+  ask links [ show-link ]
+  display
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 253
@@ -373,6 +386,23 @@ array:item hedgehog-data 5
 0
 1
 11
+
+BUTTON
+52
+406
+161
+439
+export results
+export-result-map
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
