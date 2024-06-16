@@ -34,6 +34,7 @@ to setup
   setup-variables
   setup-world
   setup-hedgehogs
+  file-delete "hedgehog-data.csv"
   set hedgehog-data array:from-list n-values 6 [0]
   collect-hedgehog-data
   reset-ticks
@@ -173,6 +174,7 @@ end
 
 to reset-episode
   collect-hedgehog-data
+  export-data
   ask hedgehogs [
     ;face-patch nest
     set distance-traveled 0
@@ -196,6 +198,17 @@ to collect-hedgehog-data
   array:set hedgehog-data 5 count hedgehogs
 end
 
+to export-data
+  file-open "hedgehog-data.csv"
+  if not file-exists? "hedgehog-data.csv" [
+    file-print "Tick,Total Mass,Average Mass,Total Distance,Average Distance,Hedgehog Count"
+  ]
+
+  file-print (word array:item hedgehog-data 0 "," array:item hedgehog-data 1 "," array:item hedgehog-data 2 "," array:item hedgehog-data 3 "," array:item hedgehog-data 4 "," array:item hedgehog-data 5)
+  file-close
+end
+
+
 to draw-heatmap
   ask patches [
   if visit-count > 0 [
@@ -214,7 +227,6 @@ to restore-original-colors ;;to tymczasowe rozwiązanie, w przyszłości pewnie 
     ]
   ]
 end
-
 
 @#$#@#$#@
 GRAPHICS-WINDOW
