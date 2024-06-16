@@ -235,11 +235,27 @@ to export-result-map
 
   draw-heatmap
   export-view "result-map.png"
+  export-legend
+
   restore-original-colors
 
   ask turtles [ show-turtle ]
   ask links [ show-link ]
   display
+end
+
+to export-legend
+  let max-visit-count max [visit-count] of patches
+  file-open "legend.csv"
+  file-print "Color,Visits,Percentage"
+  ask patches [
+    if visit-count > 0 [
+      let color-value scale-color red visit-count 0 max-visit-count
+      let percentage (visit-count / max-visit-count) * 100
+      file-print (word color-value "," visit-count "," percentage)
+    ]
+  ]
+  file-close
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -263,8 +279,8 @@ GRAPHICS-WINDOW
 30
 0
 30
-1
-1
+0
+0
 1
 ticks
 30.0
