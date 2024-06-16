@@ -1,17 +1,16 @@
 __includes ["setup_world//create_patches.nls" "go_procedures//go_procedure.nls"]
 
-extensions[qlearningextension]
+extensions[qlearningextension array]
 
 breed [hedgehogs hedgehog]
 
 globals [
   possible-actions
-
   night-duration current-time
   return-probability max-distance
   possible-angles hedgehog-memory
-
   fence garden
+  hedgehog-data
 ]
 
 hedgehogs-own [
@@ -35,6 +34,8 @@ to setup
   setup-variables
   setup-world
   setup-hedgehogs
+  set hedgehog-data array:from-list n-values 6 [0]
+  collect-hedgehog-data
   reset-ticks
 end
 
@@ -171,6 +172,7 @@ to-report isEndState
 end
 
 to reset-episode
+  collect-hedgehog-data
   ask hedgehogs [
     ;face-patch nest
     set distance-traveled 0
@@ -183,6 +185,15 @@ to reset-episode
 
   reset-ticks
   ;;reset rewards?
+end
+
+to collect-hedgehog-data
+  array:set hedgehog-data 0 ticks
+  array:set hedgehog-data 1 sum [mass] of hedgehogs
+  array:set hedgehog-data 2 mean [mass] of hedgehogs
+  array:set hedgehog-data 3 sum [distance-traveled] of hedgehogs
+  array:set hedgehog-data 4 mean [distance-traveled] of hedgehogs
+  array:set hedgehog-data 5 count hedgehogs
 end
 
 to draw-heatmap
@@ -203,6 +214,8 @@ to restore-original-colors ;;to tymczasowe rozwiązanie, w przyszłości pewnie 
     ]
   ]
 end
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 253
@@ -315,6 +328,39 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+308
+540
+400
+585
+Average Mass
+array:item hedgehog-data 2
+2
+1
+11
+
+MONITOR
+415
+541
+526
+586
+Average Distance
+array:item hedgehog-data 4
+2
+1
+11
+
+MONITOR
+538
+541
+644
+586
+Hedgehog Count
+array:item hedgehog-data 5
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
