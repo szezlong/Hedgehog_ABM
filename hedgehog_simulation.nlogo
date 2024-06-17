@@ -5,10 +5,11 @@ extensions[qlearningextension array]
 breed [hedgehogs hedgehog]
 
 globals [
-  possible-actions
+  possible-actions possible-angles
   night-duration current-time
   return-probability max-distance
-  possible-angles hedgehog-memory
+  avg-mass std-dev low-mass-threshold high-mass-threshold
+  hedgehog-memory
   fence garden
   hedgehog-data
 ]
@@ -23,6 +24,7 @@ hedgehogs-own [
 ]
 
 patches-own [
+  environment-type
   food
   visit-count
   og-color
@@ -47,6 +49,10 @@ to setup-variables
   set max-distance 20
   set possible-angles [0 45 90 135 180 225 270 315]
   set hedgehog-memory 10
+  set avg-mass 846
+  set std-dev 119
+  set low-mass-threshold avg-mass * 0.6
+  set high-mass-threshold avg-mass * 1.5
   set fence blue
   set garden green - 1
 end
@@ -64,7 +70,9 @@ to setup-world
     set visit-count 0
     (ifelse
       pcolor = garden [
-        set food random 3 + 2
+        ;;na razie losowo
+        set environment-type one-of ["ogrod-tylny-domu-blizniaczego" "ogrod-frontowy-domu-blizniaczego" "ogrod-tylny-domu-wolnostojacego" "ogrod-frontowy-domu-wolnostojacego"]
+        set food random 21 + 30
       ]
       pcolor = fence [
         set food -1
@@ -80,7 +88,7 @@ to setup-hedgehogs
   let available-patches patches with [pcolor != fence and not any? neighbors4 with [pcolor = fence]]
 
   create-hedgehogs 3 [
-    set mass random-float 10 + 5
+    set mass random-normal avg-mass std-dev
     set color brown - 2
     set size 2
     set speed 1

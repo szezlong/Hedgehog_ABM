@@ -18,17 +18,25 @@ end
 
 to eat-food
   ifelse [food] of patch-here > 0 [
-    ifelse mass < 8 [
-      set mass mass + 1
+    let environment-factor 1
+    if [environment-type] of patch-here = "ogrod-tylny-domu-blizniaczego" [ set environment-factor 1.2 ]
+    if [environment-type] of patch-here = "ogrod-frontowy-domu-blizniaczego" [ set environment-factor 1.1 ]
+    if [environment-type] of patch-here = "ogrod-tylny-domu-wolnostojacego" [ set environment-factor 0.9 ]
+    if [environment-type] of patch-here = "ogrod-frontowy-domu-wolnostojacego" [ set environment-factor 0.95 ]
+
+    let available-food [food] of patch-here
+    let max-gain ifelse-value (mass < low-mass-threshold) [25] [12.5]
+    let gain min list (max-gain * environment-factor) available-food
+    set mass mass + gain
+    ask patch-here [ set food food - gain ]
+    
+    ifelse mass < low-mass-threshold [
       set flags lput "eat-food-big-success" flags
     ] [
-      set mass mass + 0.5
       set flags lput "eat-food-success" flags
     ]
-    ask patch-here [ set food food - 1 ]
-
   ] [
-    ifelse mass > 15 [
+    ifelse mass > high-mass-threshold [
       set flags lput "eat-food-big-fail" flags
     ] [ 
       set flags lput "eat-food-fail" flags
