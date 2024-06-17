@@ -6,7 +6,7 @@ breed [hedgehogs hedgehog]
 
 globals [
   possible-actions possible-angles
-  night-duration current-time
+  night-duration current-time episode-counter
   return-probability max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
   hedgehog-memory
@@ -45,12 +45,13 @@ end
 to setup-variables
   set night-duration 60 ;; 60 ticków na godzinę
   set current-time 0
+  set episode-counter 0
   set return-probability 0.05
   set max-distance 20
   set possible-angles [0 45 90 135 180 225 270 315]
   set hedgehog-memory 10
-  set avg-mass 846
-  set std-dev 119
+  set avg-mass 846 ;;na razie dla samców
+  set std-dev 119  ;;na razie dla samców
   set low-mass-threshold avg-mass * 0.6
   set high-mass-threshold avg-mass * 1.5
   set fence blue
@@ -136,7 +137,7 @@ end
 to-report reward-func
   let penalty 0
   if member? "rotated-180" flags [
-    set penalty -10
+    set penalty -20
   ]
 
   let reward 0
@@ -163,7 +164,7 @@ to-report reward-func
        set reward (10 + penalty)
     ]
     member? "go-to-nest-success" flags [
-       set reward (10 + penalty)
+       set reward (5 + penalty)
     ]
     member? "forage" flags [
        set reward (10 + penalty)
@@ -185,16 +186,25 @@ to reset-episode
   export-data
   ask hedgehogs [
     ;face-patch nest
-    set distance-traveled 0
-    set mass mass - 1
+    set mass mass - ((random-float 5 + 5) + (floor (distance-traveled / 500) * 5)) ;;tracą 5-10g dziennie i 5g za każde przebyte 500m
     print mass
     set stay-in-nest false
+    set distance-traveled 0
   ]
   set current-time 0
   set return-probability 0.05
-
+  set episode-counter episode-counter + 1
+  if episode-counter mod 7 = 0 [
+    renew-resources
+  ]
   reset-ticks
   ;;reset rewards?
+end
+
+to renew-resources
+  ask patches [
+    set food food + random 5 + 3
+  ]
 end
 
 to collect-hedgehog-data
