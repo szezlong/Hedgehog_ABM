@@ -207,6 +207,10 @@ to renew-resources
   ]
 end
 
+to-report count-hedgehogs-in-environment [env-type]
+  report count hedgehogs with [ [environment-type] of patch-here = env-type ]
+end
+
 to collect-hedgehog-data
   array:set hedgehog-data 0 ticks
   array:set hedgehog-data 1 sum [mass] of hedgehogs
@@ -225,7 +229,6 @@ to export-data
   file-print (word array:item hedgehog-data 0 "," array:item hedgehog-data 1 "," array:item hedgehog-data 2 "," array:item hedgehog-data 3 "," array:item hedgehog-data 4 "," array:item hedgehog-data 5)
   file-close
 end
-
 
 to draw-heatmap
   ask patches [
@@ -277,10 +280,10 @@ to export-legend
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-253
-38
-726
-512
+263
+40
+736
+514
 -1
 -1
 15.0
@@ -304,10 +307,10 @@ ticks
 30.0
 
 BUTTON
-52
-141
-115
-174
+47
+40
+110
+73
 NIL
 setup
 NIL
@@ -321,10 +324,10 @@ NIL
 1
 
 BUTTON
-53
-551
-174
-584
+59
+478
+180
+511
 clear everything
 ca\nif file-exists? \"results//hedgehog-data.csv\" [ file-delete \"results//hedgehog-data.csv\" ]\nif file-exists? \"results//legend.csv\" [ file-delete \"results//legend.csv\" ]\nif file-exists? \"results//result-map.png\" [ file-delete \"results//result-map.png\" ]
 NIL
@@ -338,10 +341,10 @@ NIL
 1
 
 BUTTON
-125
-141
-214
-174
+120
+40
+209
+73
 NIL
 next-night
 NIL
@@ -355,10 +358,10 @@ NIL
 1
 
 BUTTON
-50
-314
-162
-347
+54
+219
+166
+252
 NIL
 draw-heatmap
 NIL
@@ -372,10 +375,10 @@ NIL
 1
 
 BUTTON
-51
-359
-161
-392
+55
+264
+165
+297
 clear heatmap
 restore-original-colors\n
 NIL
@@ -389,10 +392,10 @@ NIL
 1
 
 MONITOR
-308
-540
-400
-585
+437
+534
+529
+579
 Average Mass
 array:item hedgehog-data 2
 2
@@ -400,10 +403,10 @@ array:item hedgehog-data 2
 11
 
 MONITOR
-415
-541
-526
-586
+544
+535
+655
+580
 Average Distance
 array:item hedgehog-data 4
 2
@@ -411,10 +414,10 @@ array:item hedgehog-data 4
 11
 
 MONITOR
-538
-541
-644
-586
+667
+535
+773
+580
 Hedgehog Count
 array:item hedgehog-data 5
 0
@@ -422,10 +425,10 @@ array:item hedgehog-data 5
 11
 
 BUTTON
-52
-406
-161
-439
+56
+311
+165
+344
 export results
 export-result-map
 NIL
@@ -437,6 +440,24 @@ NIL
 NIL
 NIL
 1
+
+PLOT
+48
+566
+396
+691
+Średnia masa jeży podczas symulacji
+Noc
+Masa (g)
+0.0
+10.0
+0.0
+10.0
+true
+false
+"set-current-plot \"Średnia masa jeży podczas symulacji\"\nset-current-plot-pen \"avg-mass\"\n" "ifelse any? hedgehogs [\n  plot mean [mass] of hedgehogs\n] [ plot 0 ]\n"
+PENS
+"avg-mass" 1.0 0 -16777216 true "" "ifelse any? hedgehogs [\n  plot mean [mass] of hedgehogs\n] [ plot 0 ]\n"
 
 @#$#@#$#@
 ## WHAT IS IT?
