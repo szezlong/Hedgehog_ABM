@@ -60,14 +60,13 @@ end
 
 to setup-world
   create-light-green-patches
-  create-dark-green-clusters 2
+  create-dark-green-clusters 5
   setup-lines 10
   create-rectangle
   draw-random-diagonal-lines
   resize-world 0 30 0 30
   set-patch-size 15
   ask patches [
-    set og-color pcolor
     set visit-count 0
     (ifelse
       pcolor = garden [
@@ -82,6 +81,21 @@ to setup-world
         set food 0
       ]
     )
+    (ifelse
+      environment-type = "ogrod-tylny-domu-blizniaczego" [
+        set pcolor green + 1
+      ]
+      environment-type = "ogrod-frontowy-domu-blizniaczego" [
+        set pcolor green
+      ]
+      environment-type = "ogrod-tylny-domu-wolnostojacego" [
+        set pcolor green - 1
+      ]
+      environment-type = "ogrod-frontowy-domu-wolnostojacego" [
+        set pcolor green - 2
+      ]
+    )
+    set og-color pcolor
   ]
 end
 

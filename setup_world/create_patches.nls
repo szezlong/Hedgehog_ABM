@@ -13,7 +13,7 @@ end
 
 to create-light-green-patches
   ask patches [
-    set pcolor green ;
+    set pcolor green + 2
   ]
 end
 
