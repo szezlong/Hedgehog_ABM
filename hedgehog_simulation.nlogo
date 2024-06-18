@@ -207,7 +207,7 @@ to reset-episode
     set distance-traveled 0
   ]
   set current-time 0
-  set return-probability 0.05
+  set return-probability 0
   set episode-counter episode-counter + 1
   if episode-counter mod 7 = 0 [
     renew-resources
@@ -222,8 +222,10 @@ to renew-resources
   ]
 end
 
-to-report count-hedgehogs-in-environment [env-type]
-  report count hedgehogs with [ [environment-type] of patch-here = env-type ]
+to-report time-percent-in-env [env-type]
+  let total-visits sum [visit-count] of patches
+  let visits-in-env sum [visit-count] of patches with [environment-type = env-type]
+  report (visits-in-env / total-visits) * 100
 end
 
 to collect-hedgehog-data
@@ -293,10 +295,10 @@ to export-legend
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-263
-40
-736
-514
+234
+39
+707
+513
 -1
 -1
 15.0
@@ -405,10 +407,10 @@ NIL
 1
 
 MONITOR
-437
-534
-529
-579
+235
+525
+327
+570
 Average Mass
 array:item hedgehog-data 2
 2
@@ -416,10 +418,10 @@ array:item hedgehog-data 2
 11
 
 MONITOR
-544
-535
-655
-580
+342
+526
+453
+571
 Average Distance
 array:item hedgehog-data 4
 2
@@ -427,10 +429,10 @@ array:item hedgehog-data 4
 11
 
 MONITOR
-667
-535
-773
-580
+465
+526
+571
+571
 Hedgehog Count
 array:item hedgehog-data 5
 0
@@ -455,10 +457,10 @@ NIL
 1
 
 PLOT
-48
-566
-396
-691
+730
+268
+1064
+393
 Średnia masa jeży podczas symulacji
 Noc
 Masa (g)
@@ -471,6 +473,60 @@ false
 "set-current-plot \"Średnia masa jeży podczas symulacji\"\nset-current-plot-pen \"avg-mass\"\n" "ifelse any? hedgehogs [\n  plot mean [mass] of hedgehogs\n] [ plot 0 ]\n"
 PENS
 "avg-mass" 1.0 0 -16777216 true "" "ifelse any? hedgehogs [\n  plot mean [mass] of hedgehogs\n] [ plot 0 ]\n"
+
+MONITOR
+909
+80
+1081
+125
+Frontowym domu blizniaczego
+time-percent-in-env \"ogrod-frontowy-domu-blizniaczego\"
+2
+1
+11
+
+MONITOR
+725
+139
+895
+184
+Tylnym domu wolnostojącego
+time-percent-in-env \"ogrod-tylny-domu-wolnostojacego\"
+2
+1
+11
+
+MONITOR
+907
+140
+1082
+185
+Frontowym domu wolnostojącego
+time-percent-in-env \"ogrod-frontowy-domu-wolnostojacego\"
+2
+1
+11
+
+TEXTBOX
+728
+48
+878
+66
+Procent czasu w ogrodzie:
+12
+0.0
+1
+
+MONITOR
+726
+80
+895
+125
+Tylnym domu bliźniaczego
+time-percent-in-env \"ogrod-tylny-domu-blizniaczego\"
+2
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?

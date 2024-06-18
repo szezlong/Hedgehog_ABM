@@ -1,9 +1,9 @@
 to go-to-nest
   ifelse nest != 0 [
     
-    if distance-to-nest < (world-width * 0.1) [ ;;do ustalenia
-      set return-probability return-probability * 1.25
-    ]
+;    if distance-to-nest < (world-width * 0.1) [ ;;do ustalenia
+;      set return-probability return-probability * 1.25
+;    ]
     
     if current-time > (night-duration * 0.7) [
        ifelse any? patches in-radius 3 with [ self = [nest] of myself ] [
