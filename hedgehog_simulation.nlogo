@@ -113,7 +113,7 @@ to setup-hedgehogs
 
   ask hedgehogs [
     qlearningextension:state-def ["terrain-color" "fence-ahead" "food-here" "mass" "distance-to-nest"]
-    (qlearningextension:actions [forage] [eat-food] [build-new-nest] [go-to-nest])
+    (qlearningextension:actions [forage] [eat-food] [go-to-nest])
     qlearningextension:reward [reward-func]
     qlearningextension:end-episode [isEndState] reset-episode
     qlearningextension:action-selection "e-greedy" [0.25 0.99]
@@ -139,7 +139,7 @@ end
 to-report reward-func
   let penalty 0
   if member? "rotated-180" flags [
-    set penalty -20
+    set penalty -50
   ]
 
   let reward 0
@@ -148,13 +148,13 @@ to-report reward-func
        set reward (-1 + penalty)
     ]
     member? "eat-food-big-fail" flags [
-       set reward (-10 + penalty)
+       set reward (-20 + penalty)
     ]
     member? "build-nest-fail" flags [
        set reward (-5 + penalty)
     ]
     member? "go-to-nest-fail" flags [
-       set reward (-1 + penalty)
+       set reward (-5 + penalty)
     ]
     member? "build-nest-success" flags [
        set reward (0 + penalty)
@@ -166,7 +166,7 @@ to-report reward-func
        set reward (10 + penalty)
     ]
     member? "go-to-nest-success" flags [
-       set reward (5 + penalty)
+       set reward (3 + penalty)
     ]
     member? "forage" flags [
        set reward (10 + penalty)
@@ -189,7 +189,6 @@ to reset-episode
   ask hedgehogs [
     ;face-patch nest
     set mass mass - ((random-float 5 + 5) + (floor (distance-traveled / 500) * 5)) ;;tracą 5-10g dziennie i 5g za każde przebyte 500m
-    print mass
     set stay-in-nest false
     set distance-traveled 0
   ]
@@ -245,9 +244,7 @@ to restore-original-colors ;;to tymczasowe rozwiązanie, w przyszłości pewnie 
     set pcolor og-color
   ]
   ask hedgehogs [
-    ask nest [
-      set pcolor brown
-    ]
+    if nest != 0 [ ask nest [ set pcolor brown ] ]
   ]
 end
 
