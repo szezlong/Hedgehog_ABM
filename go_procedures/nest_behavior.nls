@@ -1,5 +1,5 @@
 to go-to-nest
-  ifelse nest != nobody [
+  ifelse nest != 0 [
     
     if distance-to-nest < (world-width * 0.1) [ ;;do ustalenia
       set return-probability return-probability * 1.25
@@ -35,7 +35,7 @@ end
 
 to build-new-nest
   ifelse [pcolor] of patch-here = garden [
-    if nest != nobody [
+    if nest != 0 [
       ask nest [ set pcolor og-color ]
     ]
     set nest patch-here

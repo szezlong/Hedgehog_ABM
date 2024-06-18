@@ -95,12 +95,14 @@ to setup-hedgehogs
     set speed 1
     set distance-traveled 0
 
+    move-to one-of available-patches
     ;let nearest-nest min-one-of available-patches with [is-nest?] [distance self]
     ;set nest nearest-nest
-    set nest one-of available-patches
-    move-to nest
-    ask nest [ set pcolor brown ]
-    set visited-patches (list nest)
+    ;set nest one-of available-patches
+    ;move-to nest
+    ;ask nest [ set pcolor brown ]
+    ;set nest nobody
+    set visited-patches (list patch-here)
 
     random-turn-hedgehog
     set flags []
@@ -128,7 +130,7 @@ to update-state-variables
     set mass mass
     let ahead-patch patch-ahead 1
     set fence-ahead ifelse-value (ahead-patch != nobody and ( any? patches in-cone 2 90 with [pcolor = fence])) [1] [0]
-    set distance-to-nest distance [nest] of myself
+    ifelse [nest] of myself != 0 [ set distance-to-nest distance [nest] of myself ] [ set distance-to-nest -1 ]
     set flags []
     ;update-visited-patches
   ]

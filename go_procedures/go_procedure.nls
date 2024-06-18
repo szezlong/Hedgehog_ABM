@@ -7,7 +7,7 @@ to go
     ask hedgehogs [
       if not stay-in-nest [
         let old-position patch-here
-        set distance-to-nest distance nest
+        ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
         
         update-state-variables
         
