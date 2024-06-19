@@ -71,9 +71,9 @@ to move-along-fencing [direction]
 end
 
 to-report decide-direction
-  ifelse (any? patches in-cone 2 90 with [pcolor = fence])  
-  or (patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = fence) 
-  or (patch-ahead 2 != nobody and [pcolor] of patch-ahead 2 = fence)
+  ifelse (any? patches in-cone 2 90 with [member? pcolor avoided-patches])  
+  or (patch-ahead 1 != nobody and member? ([pcolor] of patch-ahead 1) avoided-patches) 
+  or (patch-ahead 2 != nobody and member? ([pcolor] of patch-ahead 2) avoided-patches)
   [  
     let direction search-for-gap
     report direction   
@@ -96,16 +96,16 @@ to-report search-for-gap
   if right-patch = nobody or left-patch = nobody [
     report 2 ;; na krawędzi świata
   ]
-  
-  ifelse [pcolor] of right-patch = fence 
-  or (right-patch-far != nobody and [pcolor] of right-patch-far = fence)
+
+  ifelse member? ([pcolor] of right-patch) avoided-patches
+  or (right-patch-far != nobody and member? ([pcolor] of right-patch-far) avoided-patches)
   [
-    ifelse [pcolor] of left-patch = fence 
-    or (left-patch-far != nobody and [pcolor] of left-patch-far = fence) 
+    ifelse member? ([pcolor] of left-patch) avoided-patches
+    or (left-patch-far != nobody and member? ([pcolor] of left-patch-far) avoided-patches) 
     [
       report 2 ;; Jest otoczony ogrodzeniem
-    ] [
-      ifelse (left-diagonal != nobody and [pcolor] of left-diagonal != fence) [
+    ] [ 
+      ifelse (left-diagonal != nobody and member? ([pcolor] of left-diagonal) avoided-patches) [
         lt 45
         report 0 
       ] [
@@ -113,13 +113,13 @@ to-report search-for-gap
       ]
     ]   
   ] [ 
-    ;; możesz skręcić w prawo, sprawdź czy nie pod kątem + 45
-    ifelse right-diagonal != nobody and [pcolor] of right-diagonal != fence [
+    ;; możesz skręcić w prawo, sprawdź czy nie pod kątem + 45  
+    ifelse right-diagonal != nobody and member? ([pcolor] of right-diagonal) avoided-patches [
       rt 45
       report 0
     ] [
-      ifelse [pcolor] of left-patch = fence 
-        or (left-patch-far != nobody and [pcolor] of left-patch-far = fence) 
+      ifelse member? ([pcolor] of left-patch) avoided-patches
+        or (left-patch-far != nobody and member? ([pcolor] of left-patch-far) avoided-patches) 
       [
         report 1 ;; luka po prawo
       ] [

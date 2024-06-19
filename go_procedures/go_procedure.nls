@@ -28,7 +28,7 @@ to go
       
       if current-time > (night-duration * 0.8) [
         if any? patches in-radius 4 with [ self = [nest] of myself ] [
-          move-to nest ;;zakładam że zdążyłby wrócić
+          move-to nest ;;zakładam że zdążyłby wrócić <-- chyba że dzieli go jezdnia, to powinien podjąć ryzyko przejścia przez ulicę
         ]
         set stay-in-nest true
       ]
@@ -66,6 +66,7 @@ to check-cross-street
 end
 
 to cross-street
+  print "I'm crossing the street!"
   ask hedgehogs [
     if random-float 1 < 0.5 [
       die

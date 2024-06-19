@@ -12,6 +12,7 @@ globals [
   hedgehog-memory hedgehog-data
   fence garden street
   environment-types
+  avoided-patches
 ]
 
 hedgehogs-own [
@@ -58,6 +59,7 @@ to setup-variables
   set garden green - 1
   set street gray
   set environment-types ["ogrod-tylny-domu-blizniaczego" "ogrod-frontowy-domu-blizniaczego" "ogrod-tylny-domu-wolnostojacego" "ogrod-frontowy-domu-wolnostojacego"]
+  set avoided-patches list fence street
 end
 
 to setup-world
@@ -207,7 +209,7 @@ to reset-episode
   collect-hedgehog-data
   export-data
   if not any? hedgehogs [
-      user-message "Wszystkie jeże zginęły. Symulacja została przerwana."
+      user-message "Wszystkie jeże nie żyją. Symulacja została przerwana."
       stop
   ]
   ask hedgehogs [
