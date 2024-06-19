@@ -72,7 +72,6 @@ to setup-world
       pcolor = garden [
         ;;na razie losowo
         set environment-type one-of ["ogrod-tylny-domu-blizniaczego" "ogrod-frontowy-domu-blizniaczego" "ogrod-tylny-domu-wolnostojacego" "ogrod-frontowy-domu-wolnostojacego"]
-        set food random 21 + 30
       ]
       pcolor = fence [
         set food -1
@@ -84,15 +83,19 @@ to setup-world
     (ifelse
       environment-type = "ogrod-tylny-domu-blizniaczego" [
         set pcolor green + 1
+        set food random 40 + 15
       ]
       environment-type = "ogrod-frontowy-domu-blizniaczego" [
         set pcolor green
+        set food random 30 + 15
       ]
       environment-type = "ogrod-tylny-domu-wolnostojacego" [
         set pcolor green - 1
+        set food random 20 + 5
       ]
       environment-type = "ogrod-frontowy-domu-wolnostojacego" [
         set pcolor green - 2
+        set food random 10 + 5
       ]
     )
     set og-color pcolor
@@ -322,10 +325,10 @@ ticks
 30.0
 
 BUTTON
-47
-40
-110
-73
+48
+63
+111
+96
 NIL
 setup
 NIL
@@ -356,10 +359,10 @@ NIL
 1
 
 BUTTON
-120
-40
-209
-73
+121
+63
+210
+96
 NIL
 next-night
 NIL
@@ -546,6 +549,8 @@ time-percent-in-env \"ogrod-tylny-domu-blizniaczego\"
 (suggested things for the user to notice while running the model)
 
 ## THINGS TO TRY
+
+zamiast akcji "go-to-nest" zcentralizować powrót do gniazda i budowę gniazda w funkcji "go" ?
 
 (suggested things for the user to try to do (move sliders, switches, etc.) with the model)
 
