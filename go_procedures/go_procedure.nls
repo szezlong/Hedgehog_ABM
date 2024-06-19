@@ -5,11 +5,11 @@ extensions [table]
 to go
   if not isEndState [
     ask hedgehogs [
+      update-state-variables
+      
       if not stay-in-nest [
         let old-position patch-here
         ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
-        
-        update-state-variables
         
         if abs (heading - last-heading) = 180 [
           set flags lput "rotated-180" flags
@@ -20,7 +20,6 @@ to go
 
         (qlearningextension:learning)
 
-        
         ask patch-here [
           set visit-count visit-count + 1
         ]
@@ -36,7 +35,7 @@ to go
       if current-time + 1 >= night-duration and patch-here != nest[
         build-new-nest
       ]
-          ;;show flags
+      ;show flags
       
     ]
     update-visited-patches

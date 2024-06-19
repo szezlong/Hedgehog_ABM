@@ -206,6 +206,10 @@ end
 to reset-episode
   collect-hedgehog-data
   export-data
+  if not any? hedgehogs [
+      user-message "Wszystkie jeże zginęły. Symulacja została przerwana."
+      stop
+  ]
   ask hedgehogs [
     ;face-patch nest
     set mass mass - ((random-float 5 + 5) + (floor (distance-traveled / 500) * 5)) ;;tracą 5-10g dziennie i 5g za każde przebyte 500m
@@ -238,11 +242,19 @@ end
 
 to collect-hedgehog-data
   array:set hedgehog-data 0 ticks
-  array:set hedgehog-data 1 sum [mass] of hedgehogs ;;co jeśli wszystkie zdechną
-  array:set hedgehog-data 2 mean [mass] of hedgehogs
-  array:set hedgehog-data 3 sum [distance-traveled] of hedgehogs
-  array:set hedgehog-data 4 mean [distance-traveled] of hedgehogs
-  array:set hedgehog-data 5 count hedgehogs
+  ifelse any? hedgehogs [
+    array:set hedgehog-data 1 sum [mass] of hedgehogs
+    array:set hedgehog-data 2 mean [mass] of hedgehogs
+    array:set hedgehog-data 3 sum [distance-traveled] of hedgehogs
+    array:set hedgehog-data 4 mean [distance-traveled] of hedgehogs
+    array:set hedgehog-data 5 count hedgehogs
+  ] [
+    array:set hedgehog-data 1 0
+    array:set hedgehog-data 2 0
+    array:set hedgehog-data 3 0
+    array:set hedgehog-data 4 0
+    array:set hedgehog-data 5 0
+  ]
 end
 
 to export-data
