@@ -33,14 +33,14 @@ to eat-food
     ifelse mass < low-mass-threshold [
       set flags lput "eat-food-big-success" flags
     ] [
-      set flags lput "eat-food-success" flags
+      ifelse mass > high-mass-threshold [
+        set flags lput "eat-food-big-fail" flags
+      ] [
+        set flags lput "eat-food-success" flags
+      ]
     ]
   ] [
-    ifelse mass > high-mass-threshold [
-      set flags lput "eat-food-big-fail" flags
-    ] [ 
-      set flags lput "eat-food-fail" flags
-    ]
+    set flags lput "eat-food-fail" flags
   ]
 end
 
