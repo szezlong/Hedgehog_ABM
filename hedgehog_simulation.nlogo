@@ -132,7 +132,7 @@ to setup-hedgehogs
 
   ask hedgehogs [
     qlearningextension:state-def ["terrain-color" "fence-ahead" "food-here" "mass" "distance-to-nest"]
-    (qlearningextension:actions [forage] [eat-food] [go-to-nest] [cross-street])
+    (qlearningextension:actions [forage] [eat-food] [go-to-nest])
     qlearningextension:reward [reward-func]
     qlearningextension:end-episode [isEndState] reset-episode
     qlearningextension:action-selection "e-greedy" [0.25 0.99]
@@ -187,12 +187,6 @@ to-report reward-func
     member? "go-to-nest-success" flags [
        set reward (3 + penalty)
     ]
-    member? "cross-street-success" flags [
-      set reward (5 + penalty)
-    ]
-    member? "cross-street-fail" flags [
-      set penalty (-70 + penalty)
-    ]
     member? "forage" flags [
        set reward (10 + penalty)
     ]
@@ -241,7 +235,7 @@ end
 
 to collect-hedgehog-data
   array:set hedgehog-data 0 ticks
-  array:set hedgehog-data 1 sum [mass] of hedgehogs
+  array:set hedgehog-data 1 sum [mass] of hedgehogs ;;co jeśli wszystkie zdechną
   array:set hedgehog-data 2 mean [mass] of hedgehogs
   array:set hedgehog-data 3 sum [distance-traveled] of hedgehogs
   array:set hedgehog-data 4 mean [distance-traveled] of hedgehogs

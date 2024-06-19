@@ -16,9 +16,7 @@ to go
         ]
         set last-heading heading
         
-        if patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = gray [
-          set flags lput "road-ahead" flags
-        ]
+        check-cross-street
 
         (qlearningextension:learning)
 
@@ -48,16 +46,34 @@ to go
     ]
 end
 
+to check-cross-street
+  ask hedgehogs [
+    if patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = gray [
+      
+      ;; Warunki przejścia przez drogę:
+      ;; 1. Jeż ma niską masę ciała i potrzebuje jedzenia.
+      ;; 2. Jeż zdąży wrócić do gniazda.
+      ;; 3. Prawdopodobieństwo ruchu samochodowego (ryzyko).
+      
+      if (mass < low-mass-threshold and current-time < (night-duration * 0.6)) [
+        ifelse random-float 1 > 0.3 [
+          cross-street ;;na razie to się bardzo rzadko zdarza w symulacji
+        ] [
+          ;;podobnie jak fence-behavior ale ma ominąć szare patche
+        ]
+      ]
+    ]
+  ]
+end
+
 to cross-street
   ask hedgehogs [
-    ifelse member? "road-ahead" flags [
-      let direction decide-direction
-      move-along-fencing direction
-      fd 0.1
-      set flags lput "cross-street-success" flags
-    ] [
-      set flags lput "cross-street-fail" flags
+    if random-float 1 < 0.5 [
+      die
     ]
+    let direction decide-direction
+    move-along-fencing direction
+    fd speed * 0.15
   ]
 end
 
