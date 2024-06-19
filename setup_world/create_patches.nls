@@ -33,17 +33,17 @@ to create-dark-green-cluster [cluster-size]
   ]
 end
 
-to setup-lines [num]
+to setup-lines [num col len]
   repeat num [
-    let line-length random 10 + 5
+    let line-length random 5 + len
     let start-x random (world-width + 1)
     let start-y random (world-height + 1)
     let direction one-of [0 90] ;; 0 oznacza ruch w prawo, 90 - ruch do góry
-    create-line start-x start-y direction line-length
+    create-line start-x start-y direction line-length col
   ]
 end
 
-to create-line [x y direction line-length]
+to create-line [x y direction line-length col]
   let end-x x
   let end-y y
 
@@ -74,7 +74,7 @@ to create-line [x y direction line-length]
       if end-x <= world-width and end-y <= world-height [       
         let target-patch patch end-x end-y
         if is-patch? target-patch [
-          ask target-patch [ set pcolor blue ]
+          ask target-patch [ set pcolor col ]
         ]
       ]
     ]

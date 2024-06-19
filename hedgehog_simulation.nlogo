@@ -10,7 +10,7 @@ globals [
   return-probability max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
   hedgehog-memory
-  fence garden
+  fence garden street
   hedgehog-data
 ]
 
@@ -56,12 +56,14 @@ to setup-variables
   set high-mass-threshold avg-mass * 1.5
   set fence blue
   set garden green - 1
+  set street gray
 end
 
 to setup-world
   create-light-green-patches
-  create-dark-green-clusters 5
-  setup-lines 10
+  create-dark-green-clusters 2
+  setup-lines 3 fence 3
+  setup-lines 5 street 8
   create-rectangle
   draw-random-diagonal-lines
   resize-world 0 30 0 30
@@ -105,7 +107,7 @@ end
 to setup-hedgehogs
   let available-patches patches with [pcolor != fence and not any? neighbors4 with [pcolor = fence]]
 
-  create-hedgehogs 3 [
+  create-hedgehogs 1 [
     set mass random-normal avg-mass std-dev
     set color brown - 2
     set size 2
@@ -130,7 +132,7 @@ to setup-hedgehogs
 
   ask hedgehogs [
     qlearningextension:state-def ["terrain-color" "fence-ahead" "food-here" "mass" "distance-to-nest"]
-    (qlearningextension:actions [forage] [eat-food] [go-to-nest])
+    (qlearningextension:actions [forage] [eat-food] [go-to-nest] [cross-street])
     qlearningextension:reward [reward-func]
     qlearningextension:end-episode [isEndState] reset-episode
     qlearningextension:action-selection "e-greedy" [0.25 0.99]
@@ -156,22 +158,22 @@ end
 to-report reward-func
   let penalty 0
   if member? "rotated-180" flags [
-    set penalty -50
+    set penalty -100
   ]
 
   let reward 0
   (ifelse
     member? "eat-food-fail" flags [
-       set reward (-1 + penalty)
+       set penalty (-1 + penalty)
     ]
     member? "eat-food-big-fail" flags [
-       set reward (-20 + penalty)
+       set penalty (-20 + penalty)
     ]
     member? "build-nest-fail" flags [
-       set reward (-5 + penalty)
+       set penalty (-5 + penalty)
     ]
     member? "go-to-nest-fail" flags [
-       set reward (-5 + penalty)
+       set penalty (-5 + penalty)
     ]
     member? "build-nest-success" flags [
        set reward (0 + penalty)
@@ -185,6 +187,12 @@ to-report reward-func
     member? "go-to-nest-success" flags [
        set reward (3 + penalty)
     ]
+    member? "cross-street-success" flags [
+      set reward (5 + penalty)
+    ]
+    member? "cross-street-fail" flags [
+      set penalty (-70 + penalty)
+    ]
     member? "forage" flags [
        set reward (10 + penalty)
     ]
@@ -193,7 +201,7 @@ to-report reward-func
   if not member? patch-here visited-patches [
     set reward (reward + 20)
   ]
-  report reward
+  report (reward + penalty)
 end
 
 to-report isEndState
@@ -318,8 +326,8 @@ GRAPHICS-WINDOW
 30
 0
 30
-0
-0
+1
+1
 1
 ticks
 30.0

@@ -41,7 +41,6 @@ to build-new-nest
     ]
     set nest patch-here
     ask nest [ set pcolor brown ]
-    print nest
     set flags lput "build-nest-success" flags
   ] [
     set flags lput "build-nest-fail" flags

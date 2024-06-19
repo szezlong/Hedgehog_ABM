@@ -11,13 +11,17 @@ to go
         
         update-state-variables
         
-        ifelse abs (heading - last-heading) = 180 [
+        if abs (heading - last-heading) = 180 [
           set flags lput "rotated-180" flags
-        ] [
-          set flags remove "rotated-180" flags
         ]
         set last-heading heading
-        (qlearningextension:learning true)
+        
+        if patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = gray [
+          set flags lput "road-ahead" flags
+        ]
+
+        (qlearningextension:learning)
+
         
         ask patch-here [
           set visit-count visit-count + 1
@@ -28,19 +32,33 @@ to go
       if current-time > (night-duration * 0.8) [
         if any? patches in-radius 4 with [ self = [nest] of myself ] [
           move-to nest ;;zakładam że zdążyłby wrócić
-          ;ask patches in-radius 4 [ set pcolor yellow ]
         ]
         set stay-in-nest true
       ]
       if current-time + 1 >= night-duration and patch-here != nest[
         build-new-nest
       ]
+          show flags
       
     ]
     update-visited-patches
     set current-time current-time + 1
+
     tick
     ]
+end
+
+to cross-street
+  ask hedgehogs [
+    ifelse member? "road-ahead" flags [
+      let direction decide-direction
+      move-along-fencing direction
+      fd 0.1
+      set flags lput "cross-street-success" flags
+    ] [
+      set flags lput "cross-street-fail" flags
+    ]
+  ]
 end
 
 to update-visited-patches
