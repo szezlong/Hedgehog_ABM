@@ -9,9 +9,9 @@ globals [
   night-duration current-time episode-counter
   return-probability max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
-  hedgehog-memory
+  hedgehog-memory hedgehog-data
   fence garden street
-  hedgehog-data
+  environment-types
 ]
 
 hedgehogs-own [
@@ -57,6 +57,7 @@ to setup-variables
   set fence blue
   set garden green - 1
   set street gray
+  set environment-types ["ogrod-tylny-domu-blizniaczego" "ogrod-frontowy-domu-blizniaczego" "ogrod-tylny-domu-wolnostojacego" "ogrod-frontowy-domu-wolnostojacego"]
 end
 
 to setup-world
@@ -73,7 +74,7 @@ to setup-world
     (ifelse
       pcolor = garden [
         ;;na razie losowo
-        set environment-type one-of ["ogrod-tylny-domu-blizniaczego" "ogrod-frontowy-domu-blizniaczego" "ogrod-tylny-domu-wolnostojacego" "ogrod-frontowy-domu-wolnostojacego"]
+        set environment-type one-of environment-types
       ]
       pcolor = fence [
         set food -1
@@ -223,7 +224,9 @@ end
 
 to renew-resources
   ask patches [
-    set food food + random 5 + 3
+    if member? self environment-types [
+      set food food + random 5 + 3 ;;różne środowiska może z inną prędkością powinny?
+    ]
   ]
 end
 

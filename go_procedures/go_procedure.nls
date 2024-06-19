@@ -36,7 +36,7 @@ to go
       if current-time + 1 >= night-duration and patch-here != nest[
         build-new-nest
       ]
-          show flags
+          ;;show flags
       
     ]
     update-visited-patches
@@ -55,8 +55,8 @@ to check-cross-street
       ;; 2. Jeż zdąży wrócić do gniazda.
       ;; 3. Prawdopodobieństwo ruchu samochodowego (ryzyko).
       
-      if (mass < low-mass-threshold and current-time < (night-duration * 0.6)) [
-        ifelse random-float 1 > 0.3 [
+      if (mass < low-mass-threshold and current-time < (night-duration * 0.5)) [
+        ifelse random-float 1 > 0.1 [
           cross-street ;;na razie to się bardzo rzadko zdarza w symulacji
         ] [
           ;;podobnie jak fence-behavior ale ma ominąć szare patche
@@ -73,7 +73,7 @@ to cross-street
     ]
     let direction decide-direction
     move-along-fencing direction
-    fd speed * 0.15
+    fd speed * 0.15 ;;po drodze poruszają się wolniej
   ]
 end
 
