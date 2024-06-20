@@ -260,14 +260,17 @@ to collect-hedgehog-data
 end
 
 to export-data
-  file-open "results//hedgehog-data.csv"
-  if not file-exists? "results//hedgehog-data.csv" [
+  let file-path "results//hedgehog-data.csv"
+  if not file-exists? file-path [
+    file-open file-path
     file-print "Tick,Total Mass,Average Mass,Total Distance,Average Distance,Hedgehog Count"
+    file-close
   ]
-
+  file-open file-path
   file-print (word array:item hedgehog-data 0 "," array:item hedgehog-data 1 "," array:item hedgehog-data 2 "," array:item hedgehog-data 3 "," array:item hedgehog-data 4 "," array:item hedgehog-data 5)
   file-close
 end
+
 
 to draw-heatmap
   ask patches [
