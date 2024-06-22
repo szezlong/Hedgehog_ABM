@@ -33,6 +33,9 @@ to go
         set stay-in-nest true
       ]
       if current-time + 1 >= night-duration and patch-here != nest[
+        if patch-here = street [
+          die ;;nie zdążył wrócić
+        ]
         build-new-nest
       ]
       ;show flags
@@ -55,10 +58,8 @@ to check-cross-street
       ;; 3. Prawdopodobieństwo ruchu samochodowego (ryzyko).
       
       if (mass < low-mass-threshold and current-time < (night-duration * 0.5)) [
-        ifelse random-float 1 > 0.1 [
+        if random-float 1 > 0.1 [
           cross-street ;;na razie to się bardzo rzadko zdarza w symulacji
-        ] [
-          ;;podobnie jak fence-behavior ale ma ominąć szare patche
         ]
       ]
     ]
