@@ -16,6 +16,7 @@ globals [
 ]
 
 hedgehogs-own [
+  sex
   mass
   speed distance-traveled
   visited-patches last-heading
@@ -110,9 +111,10 @@ end
 to setup-hedgehogs
   let available-patches patches with [pcolor != fence and not any? neighbors4 with [pcolor = fence]]
 
-  create-hedgehogs 1 [
+  create-hedgehogs 4 [
+    set sex ifelse-value (random-float 1 > 0.5) [0] [1] ;;50% szans że samica=1
+    set color ifelse-value (sex = 0) [brown - 2] [brown + 1]
     set mass random-normal avg-mass std-dev
-    set color brown - 2
     set size 2
     set speed 1
     set distance-traveled 0
