@@ -1,4 +1,4 @@
-__includes ["setup_world//create_patches.nls" "go_procedures//go_procedure.nls"]
+__includes ["setup_world//setup_world.nls" "go_procedures//go_procedure.nls"]
 
 extensions[qlearningextension array]
 
@@ -38,28 +38,14 @@ to setup
   reset-ticks
 
   setup-variables
-  setup-world-from-image "D:/GitHub/Hedgehog_ABM/setup_world/maps/map_small.png" 571 302 ;857 453
-  ;;setup-world
+  setup-world
   setup-hedgehogs
+
   if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
   set hedgehog-data array:from-list n-values 6 [0]
   collect-hedgehog-data
 
   count-unique-colors
-end
-
-
-to count-unique-colors
-  let unique-colors []
-  ask patches [
-    let pcolor-value pcolor
-    if not member? pcolor-value unique-colors [
-      set unique-colors lput pcolor-value unique-colors
-    ]
-  ]
-  ; Liczba unikalnych kolorów
-  let number-of-unique-colors length unique-colors
-  print (word "Number of unique colors: " number-of-unique-colors)
 end
 
 to setup-variables
@@ -79,51 +65,6 @@ to setup-variables
   set street gray
   set environment-types ["ogrod-tylny-domu-blizniaczego" "ogrod-frontowy-domu-blizniaczego" "ogrod-tylny-domu-wolnostojacego" "ogrod-frontowy-domu-wolnostojacego"]
   set avoided-patches list fence street
-end
-
-to setup-world
-  create-light-green-patches
-  create-dark-green-clusters 2
-  setup-lines 3 fence 3
-  setup-lines 5 street 8
-  create-rectangle
-  draw-random-diagonal-lines
-  resize-world 0 30 0 30
-  set-patch-size 1
-  ask patches [
-    set visit-count 0
-    (ifelse
-      pcolor = garden [
-        ;;na razie losowo
-        set environment-type one-of environment-types
-      ]
-      pcolor = fence [
-        set food -1
-      ]
-      [
-        set food 0
-      ]
-    )
-    (ifelse
-      environment-type = "ogrod-tylny-domu-blizniaczego" [
-        set pcolor green + 1
-        set food random 40 + 15
-      ]
-      environment-type = "ogrod-frontowy-domu-blizniaczego" [
-        set pcolor green
-        set food random 30 + 15
-      ]
-      environment-type = "ogrod-tylny-domu-wolnostojacego" [
-        set pcolor green - 1
-        set food random 20 + 5
-      ]
-      environment-type = "ogrod-frontowy-domu-wolnostojacego" [
-        set pcolor green - 2
-        set food random 10 + 5
-      ]
-    )
-    set og-color pcolor
-  ]
 end
 
 to setup-hedgehogs
@@ -337,6 +278,21 @@ to export-legend
     ]
   ]
   file-close
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Sprawdzenie wgranej mapy ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+to count-unique-colors
+  let unique-colors []
+  ask patches [
+    let pcolor-value pcolor
+    if not member? pcolor-value unique-colors [
+      set unique-colors lput pcolor-value unique-colors
+    ]
+  ]
+  let number-of-unique-colors length unique-colors
+  print (word "Number of unique colors: " number-of-unique-colors)
 end
 @#$#@#$#@
 GRAPHICS-WINDOW

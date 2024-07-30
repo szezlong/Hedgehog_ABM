@@ -1,14 +1,4 @@
 ;;;;;;;;;;;;;;;;;;;;;;
-;;; Import drawing ;;;
-;;;;;;;;;;;;;;;;;;;;;;
-
-to setup-world-from-image [image-file width height]
-  resize-world 0 (width - 1) 0 (height - 1)
-  import-pcolors image-file
-  set-patch-size 1.5
-end
-
-;;;;;;;;;;;;;;;;;;;;;;
 ;;; Create patches ;;;
 ;;;;;;;;;;;;;;;;;;;;;;
 

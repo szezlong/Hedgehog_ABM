@@ -1,0 +1,46 @@
+to setup-world-from-image [image-file width height]
+  resize-world 0 (width - 1) 0 (height - 1)
+  import-pcolors image-file
+  set-patch-size 1.5
+end
+
+to setup-world
+  setup-world-from-image "D:/GitHub/Hedgehog_ABM/setup_world/maps/map_color_fixed.png" 571 302 ;857 453
+  
+  set environment-types ["garden-back-1" "garden-front-2" "garden-back-3" "garden-front-4" "lawn"]
+  
+  ask patches [
+    set visit-count 0
+    (ifelse
+      pcolor = green [
+        ;;na razie losowo
+        set environment-type one-of environment-types
+      ]
+      pcolor = fence [
+        set food -1
+      ]
+      [
+        set food 0
+      ]
+    )
+    (ifelse
+      environment-type = "ogrod-tylny-domu-blizniaczego" [
+        set pcolor green + 1
+        set food random 40 + 15
+      ]
+      environment-type = "ogrod-frontowy-domu-blizniaczego" [
+        set pcolor green
+        set food random 30 + 15
+      ]
+      environment-type = "ogrod-tylny-domu-wolnostojacego" [
+        set pcolor green - 1
+        set food random 20 + 5
+      ]
+      environment-type = "ogrod-frontowy-domu-wolnostojacego" [
+        set pcolor green - 2
+        set food random 10 + 5
+      ]
+    )
+    set og-color pcolor
+  ]
+end
