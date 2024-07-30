@@ -38,7 +38,7 @@ to setup
   reset-ticks
 
   setup-variables
-  setup-world-from-image "D:/GitHub/Hedgehog_ABM/helpers/map_small.png" 571 302 ;857 453
+  setup-world-from-image "D:/GitHub/Hedgehog_ABM/setup_world/maps/map_small.png" 571 302 ;857 453
   ;;setup-world
   setup-hedgehogs
   if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
@@ -342,11 +342,11 @@ end
 GRAPHICS-WINDOW
 239
 24
-818
-335
+1103
+486
 -1
 -1
-1.0
+1.5
 1
 10
 1
