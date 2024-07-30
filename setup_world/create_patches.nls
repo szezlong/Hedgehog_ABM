@@ -1,3 +1,52 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Create sandbox world ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to setup-sandbox 
+  create-light-green-patches
+  create-dark-green-clusters 2
+  setup-lines 3 fence 3
+  setup-lines 5 street 8
+  create-rectangle
+  draw-random-diagonal-lines
+  resize-world 0 30 0 30
+  set-patch-size 1
+  ask patches [
+    set visit-count 0
+    (ifelse
+      pcolor = green [
+        ;;na razie losowo
+        set environment-type one-of environment-types
+      ]
+      pcolor = fence [
+        set food -1
+      ]
+      [
+        set food 0
+      ]
+    )
+    (ifelse
+      environment-type = "ogrod-tylny-domu-blizniaczego" [
+        set pcolor green + 1
+        set food random 40 + 15
+      ]
+      environment-type = "ogrod-frontowy-domu-blizniaczego" [
+        set pcolor green
+        set food random 30 + 15
+      ]
+      environment-type = "ogrod-tylny-domu-wolnostojacego" [
+        set pcolor green - 1
+        set food random 20 + 5
+      ]
+      environment-type = "ogrod-frontowy-domu-wolnostojacego" [
+        set pcolor green - 2
+        set food random 10 + 5
+      ]
+    )
+    set og-color pcolor
+  ]
+end
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;; Create patches ;;;
 ;;;;;;;;;;;;;;;;;;;;;;
