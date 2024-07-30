@@ -12,7 +12,7 @@ globals [
   hedgehog-memory hedgehog-data
   fence garden street
   environment-types
-  avoided-patches
+  avoided-patches available-patches
 ]
 
 hedgehogs-own [
@@ -37,6 +37,7 @@ to setup
   clear-all
   reset-ticks
 
+  setup-world-from-image "D:/GitHub/Hedgehog_ABM/setup_world/maps/map_color_fixed.png" 571 302 ;857 453
   setup-variables
   setup-world
   setup-hedgehogs
@@ -44,8 +45,6 @@ to setup
   if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
   set hedgehog-data array:from-list n-values 6 [0]
   collect-hedgehog-data
-
-  count-unique-colors
 end
 
 to setup-variables
@@ -60,16 +59,22 @@ to setup-variables
   set std-dev 119  ;;na razie dla samców
   set low-mass-threshold avg-mass * 0.6
   set high-mass-threshold avg-mass * 1.5
-  set fence blue
+
+  set fence red
   set garden green - 1
-  set street gray
+  set street black
+
   set environment-types ["ogrod-tylny-domu-blizniaczego" "ogrod-frontowy-domu-blizniaczego" "ogrod-tylny-domu-wolnostojacego" "ogrod-frontowy-domu-wolnostojacego"]
-  set avoided-patches list fence street
+  set avoided-patches (list fence street)
+  show avoided-patches
+  set available-patches patches with [
+    not member? pcolor avoided-patches
+    and not any? neighbors4 with [member? pcolor avoided-patches]
+  ]
+  show available-patches
 end
 
 to setup-hedgehogs
-  let available-patches patches with [pcolor != fence and not any? neighbors4 with [pcolor = fence]]
-
   create-hedgehogs 4 [
     set sex ifelse-value (random-float 1 > 0.5) [0] [1] ;;50% szans że samica=1
     set color ifelse-value (sex = 0) [brown - 2] [brown + 1]

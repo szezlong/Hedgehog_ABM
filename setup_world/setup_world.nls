@@ -4,9 +4,7 @@ to setup-world-from-image [image-file width height]
   set-patch-size 1.5
 end
 
-to setup-world
-  setup-world-from-image "D:/GitHub/Hedgehog_ABM/setup_world/maps/map_color_fixed.png" 571 302 ;857 453
-  
+to setup-world 
   set environment-types ["garden-back-1" "garden-front-2" "garden-back-3" "garden-front-4" "lawn"]
   
   ask patches [
