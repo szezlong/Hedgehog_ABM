@@ -35,13 +35,31 @@ patches-own [
 
 to setup
   clear-all
+  reset-ticks
+
   setup-variables
-  setup-world
+  setup-world-from-image "D:/GitHub/Hedgehog_ABM/helpers/map_small.png" 571 302 ;857 453
+  ;;setup-world
   setup-hedgehogs
   if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
   set hedgehog-data array:from-list n-values 6 [0]
   collect-hedgehog-data
-  reset-ticks
+
+  count-unique-colors
+end
+
+
+to count-unique-colors
+  let unique-colors []
+  ask patches [
+    let pcolor-value pcolor
+    if not member? pcolor-value unique-colors [
+      set unique-colors lput pcolor-value unique-colors
+    ]
+  ]
+  ; Liczba unikalnych kolorów
+  let number-of-unique-colors length unique-colors
+  print (word "Number of unique colors: " number-of-unique-colors)
 end
 
 to setup-variables
@@ -71,7 +89,7 @@ to setup-world
   create-rectangle
   draw-random-diagonal-lines
   resize-world 0 30 0 30
-  set-patch-size 15
+  set-patch-size 1
   ask patches [
     set visit-count 0
     (ifelse
@@ -115,7 +133,7 @@ to setup-hedgehogs
     set sex ifelse-value (random-float 1 > 0.5) [0] [1] ;;50% szans że samica=1
     set color ifelse-value (sex = 0) [brown - 2] [brown + 1]
     set mass random-normal avg-mass std-dev
-    set size 2
+    set size 10
     set speed 1
     set distance-traveled 0
 
@@ -322,13 +340,13 @@ to export-legend
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-234
-39
-707
-513
+239
+24
+818
+335
 -1
 -1
-15.0
+1.0
 1
 10
 1
@@ -339,11 +357,11 @@ GRAPHICS-WINDOW
 0
 1
 0
-30
+570
 0
-30
-1
-1
+301
+0
+0
 1
 ticks
 30.0
@@ -484,10 +502,10 @@ NIL
 1
 
 PLOT
-730
-268
-1064
-393
+1148
+234
+1482
+359
 Średnia masa jeży podczas symulacji
 Noc
 Masa (g)
@@ -502,10 +520,10 @@ PENS
 "avg-mass" 1.0 0 -16777216 true "" "ifelse any? hedgehogs [\n  plot mean [mass] of hedgehogs\n] [ plot 0 ]\n"
 
 MONITOR
-909
-80
-1081
-125
+1327
+46
+1499
+91
 Frontowym domu blizniaczego
 time-percent-in-env \"ogrod-frontowy-domu-blizniaczego\"
 2
@@ -513,10 +531,10 @@ time-percent-in-env \"ogrod-frontowy-domu-blizniaczego\"
 11
 
 MONITOR
-725
-139
-895
-184
+1143
+105
+1313
+150
 Tylnym domu wolnostojącego
 time-percent-in-env \"ogrod-tylny-domu-wolnostojacego\"
 2
@@ -524,10 +542,10 @@ time-percent-in-env \"ogrod-tylny-domu-wolnostojacego\"
 11
 
 MONITOR
-907
-140
-1082
-185
+1325
+106
+1500
+151
 Frontowym domu wolnostojącego
 time-percent-in-env \"ogrod-frontowy-domu-wolnostojacego\"
 2
@@ -535,20 +553,20 @@ time-percent-in-env \"ogrod-frontowy-domu-wolnostojacego\"
 11
 
 TEXTBOX
-728
-48
-878
-66
+1146
+14
+1296
+32
 Procent czasu w ogrodzie:
 12
 0.0
 1
 
 MONITOR
-726
-80
-895
-125
+1144
+46
+1313
+91
 Tylnym domu bliźniaczego
 time-percent-in-env \"ogrod-tylny-domu-blizniaczego\"
 2
