@@ -9,15 +9,40 @@ to setup-world-from-image [image-file width height]
 end
 
 to setup-world
-  print "Resetting patch variables"
   let c 0
   ask patches [
-    if c = 0 [print "asking"]
-    ;set visit-count 0 <-- ustawianie zmiennych patchom za drugim razem wywoluje sie duzo duzo dluzej
-    ;set food 0
-    ;set og-color pcolor
+    if c = 0 [print "Setting patch variables"]
+    set visit-count 0 ;<-- ustawianie zmiennych patchom za drugim razem wywoluje sie duzo duzo dluzej
+    set og-color pcolor
+    
+    ;jeśli to wydluzy obliczenia o duzo, to mozna zrezygnowac z env-type i tylko kolory
+    (ifelse
+      pcolor = turquoise [
+        set environment-type "garden-back-1" 
+        set food random 40 + 15
+      ]
+      pcolor = turquoise + 1 [
+        set environment-type "garden-front-1" 
+        set food random 30 + 15
+      ]
+      pcolor = green [
+        set environment-type "garden-back-2"
+        set food random 20 + 5
+      ]
+      pcolor = green + 1 [
+        set environment-type "garden-front-2"
+        set food random 10 + 5
+      ]
+      pcolor = lime [
+        set environment-type "lawn"
+        set food random 3
+      ]
+      [
+        set food 0
+      ]
+    )    
+    
     set c c + 1
-
     if c mod 1000 = 0 [ print (word "Processed patches: " c) ]
   ]
   print "Patch variables reset"

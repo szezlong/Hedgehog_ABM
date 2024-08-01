@@ -48,11 +48,8 @@ to setup
   setup-variables
   print "Variables setup completed"
 
-
-
   setup-hedgehogs
   print "Hedgehogs setup completed"
-
 
   if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
   set hedgehog-data array:from-list n-values 6 [0]
@@ -78,7 +75,7 @@ to setup-variables
   set street black
   set urban yellow
 
-  set environment-types ["ogrod-tylny-domu-blizniaczego" "ogrod-frontowy-domu-blizniaczego" "ogrod-tylny-domu-wolnostojacego" "ogrod-frontowy-domu-wolnostojacego"]
+  set environment-types ["garden-back-1" "garden-front-1" "garden-back-2" "garden-front-2" "lawn"]
   set avoided-patches (list fence street urban)
   show avoided-patches
   set available-patches patches with [
@@ -194,7 +191,7 @@ to reset-episode
   ]
   ask hedgehogs [
     ;face-patch nest
-    set mass mass - ((random-float 5 + 5) + (floor (distance-traveled / 500) * 5)) ;;tracą 5-10g dziennie i 5g za każde przebyte 500m
+    set mass mass - ((random-float 25 + 10) + (floor (distance-traveled / 500) * 5)) ;;tracą 5-10g dziennie i 5g za każde przebyte 500m
     set stay-in-nest false
     set distance-traveled 0
   ]
@@ -500,7 +497,7 @@ MONITOR
 1499
 91
 Frontowym domu blizniaczego
-time-percent-in-env \"ogrod-frontowy-domu-blizniaczego\"
+time-percent-in-env \"garden-front-1\"
 2
 1
 11
@@ -511,7 +508,7 @@ MONITOR
 1313
 150
 Tylnym domu wolnostojącego
-time-percent-in-env \"ogrod-tylny-domu-wolnostojacego\"
+time-percent-in-env \"garden-back-2\"
 2
 1
 11
@@ -522,7 +519,7 @@ MONITOR
 1500
 151
 Frontowym domu wolnostojącego
-time-percent-in-env \"ogrod-frontowy-domu-wolnostojacego\"
+time-percent-in-env \"garden-front-2\"
 2
 1
 11
@@ -543,7 +540,7 @@ MONITOR
 1313
 91
 Tylnym domu bliźniaczego
-time-percent-in-env \"ogrod-tylny-domu-blizniaczego\"
+time-percent-in-env \"garden-back-1\"
 2
 1
 11
