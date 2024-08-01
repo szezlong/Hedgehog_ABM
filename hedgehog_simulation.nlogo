@@ -10,7 +10,7 @@ globals [
   return-probability max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
   hedgehog-memory hedgehog-data
-  fence street
+  fence street urban ;o to też można później uprościć
   environment-types
   avoided-patches available-patches
 ]
@@ -32,21 +32,6 @@ patches-own [
   og-color
   ;isNest
 ]
-
-to setup-world
-  print "Resetting patch variables"
-  let c 0
-  ask patches [
-    if c = 0 [print "asking"]
-    ;set visit-count 0 <-- ustawianie zmiennych patchom za drugim razem wywoluje sie duzo duzo dluzej
-    ;set food 0
-    ;set og-color pcolor
-    set c c + 1
-
-    if c mod 1000 = 0 [ print (word "Processed patches: " c) ]
-  ]
-  print "Patch variables reset"
-end
 
 to setup
   clear-all
@@ -91,9 +76,10 @@ to setup-variables
 
   set fence red
   set street black
+  set urban yellow
 
   set environment-types ["ogrod-tylny-domu-blizniaczego" "ogrod-frontowy-domu-blizniaczego" "ogrod-tylny-domu-wolnostojacego" "ogrod-frontowy-domu-wolnostojacego"]
-  set avoided-patches (list fence street)
+  set avoided-patches (list fence street urban)
   show avoided-patches
   set available-patches patches with [
     not member? pcolor avoided-patches

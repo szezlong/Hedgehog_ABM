@@ -7,3 +7,18 @@ to setup-world-from-image [image-file width height]
   set-patch-size 3
   print "World from image setup completed"
 end
+
+to setup-world
+  print "Resetting patch variables"
+  let c 0
+  ask patches [
+    if c = 0 [print "asking"]
+    ;set visit-count 0 <-- ustawianie zmiennych patchom za drugim razem wywoluje sie duzo duzo dluzej
+    ;set food 0
+    ;set og-color pcolor
+    set c c + 1
+
+    if c mod 1000 = 0 [ print (word "Processed patches: " c) ]
+  ]
+  print "Patch variables reset"
+end
