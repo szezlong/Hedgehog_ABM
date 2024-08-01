@@ -1,44 +1,9 @@
 to setup-world-from-image [image-file width height]
+  print "Resizing world"
   resize-world 0 (width - 1) 0 (height - 1)
+  print "Importing pcolors"
   import-pcolors image-file
-  set-patch-size 1.5
-end
-
-to setup-world 
-  set environment-types ["garden-back-1" "garden-front-2" "garden-back-3" "garden-front-4" "lawn"]
-  
-  ask patches [
-    set visit-count 0
-    (ifelse
-      pcolor = green [
-        ;;na razie losowo
-        set environment-type one-of environment-types
-      ]
-      pcolor = fence [
-        set food -1
-      ]
-      [
-        set food 0
-      ]
-    )
-    (ifelse
-      environment-type = "ogrod-tylny-domu-blizniaczego" [
-        set pcolor green + 1
-        set food random 40 + 15
-      ]
-      environment-type = "ogrod-frontowy-domu-blizniaczego" [
-        set pcolor green
-        set food random 30 + 15
-      ]
-      environment-type = "ogrod-tylny-domu-wolnostojacego" [
-        set pcolor green - 1
-        set food random 20 + 5
-      ]
-      environment-type = "ogrod-frontowy-domu-wolnostojacego" [
-        set pcolor green - 2
-        set food random 10 + 5
-      ]
-    )
-    set og-color pcolor
-  ]
+  print "Setting patch size"
+  set-patch-size 3
+  print "World from image setup completed"
 end

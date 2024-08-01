@@ -33,18 +33,47 @@ patches-own [
   ;isNest
 ]
 
+to setup-world
+  print "Resetting patch variables"
+  let c 0
+  ask patches [
+    if c = 0 [print "asking"]
+    ;set visit-count 0 <-- ustawianie zmiennych patchom za drugim razem wywoluje sie duzo duzo dluzej
+    ;set food 0
+    ;set og-color pcolor
+    set c c + 1
+
+    if c mod 1000 = 0 [ print (word "Processed patches: " c) ]
+  ]
+  print "Patch variables reset"
+end
+
 to setup
   clear-all
   reset-ticks
 
-  setup-world-from-image "D:/GitHub/Hedgehog_ABM/setup_world/maps/map_color_fixed.png" 571 302 ;857 453
-  setup-variables
+  print "Loading image"
+  setup-world-from-image "D:/GitHub/Hedgehog_ABM/setup_world/maps/map_2.png" 285 151 ;190 100 ;571 302 ;857 453
+  print "Image loaded"
+
+  print "Setting up world"
   setup-world
+  print "World setup completed" ;; <-- to się liczy najdłużej
+
+  setup-variables
+  print "Variables setup completed"
+
+
+
   setup-hedgehogs
+  print "Hedgehogs setup completed"
+
 
   if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
   set hedgehog-data array:from-list n-values 6 [0]
   collect-hedgehog-data
+
+  print "Setup completed."
 end
 
 to setup-variables
@@ -79,7 +108,7 @@ to setup-hedgehogs
     set sex ifelse-value (random-float 1 > 0.5) [0] [1] ;;50% szans że samica=1
     set color ifelse-value (sex = 0) [brown - 2] [brown + 1]
     set mass random-normal avg-mass std-dev
-    set size 10
+    set size 3.5
     set speed 1
     set distance-traveled 0
 
@@ -303,11 +332,11 @@ end
 GRAPHICS-WINDOW
 239
 24
-1103
+1102
 486
 -1
 -1
-1.5
+3.0
 1
 10
 1
@@ -318,9 +347,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-570
+284
 0
-301
+150
 0
 0
 1
