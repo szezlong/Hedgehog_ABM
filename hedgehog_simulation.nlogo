@@ -10,7 +10,7 @@ globals [
   return-probability max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
   hedgehog-memory hedgehog-data
-  fence garden street
+  fence street
   environment-types
   avoided-patches available-patches
 ]
@@ -90,7 +90,6 @@ to setup-variables
   set high-mass-threshold avg-mass * 1.5
 
   set fence red
-  set garden green - 1
   set street black
 
   set environment-types ["ogrod-tylny-domu-blizniaczego" "ogrod-frontowy-domu-blizniaczego" "ogrod-tylny-domu-wolnostojacego" "ogrod-frontowy-domu-wolnostojacego"]
@@ -379,7 +378,7 @@ BUTTON
 180
 511
 clear everything
-ca\nif file-exists? \"results//hedgehog-data.csv\" [ file-delete \"results//hedgehog-data.csv\" ]\nif file-exists? \"results//legend.csv\" [ file-delete \"results//legend.csv\" ]\nif file-exists? \"results//result-map.png\" [ file-delete \"results//result-map.png\" ]
+ask hedgehogs [ die ]\nca\nif file-exists? \"results//hedgehog-data.csv\" [ file-delete \"results//hedgehog-data.csv\" ]\nif file-exists? \"results//legend.csv\" [ file-delete \"results//legend.csv\" ]\nif file-exists? \"results//result-map.png\" [ file-delete \"results//result-map.png\" ]
 NIL
 1
 T

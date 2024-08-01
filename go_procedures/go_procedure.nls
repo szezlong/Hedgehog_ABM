@@ -50,7 +50,7 @@ end
 
 to check-cross-street
   ask hedgehogs [
-    if patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = gray [
+    if patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = street [
       
       ;; Warunki przejścia przez drogę:
       ;; 1. Jeż ma niską masę ciała i potrzebuje jedzenia.
