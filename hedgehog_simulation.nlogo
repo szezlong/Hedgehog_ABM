@@ -59,7 +59,7 @@ to setup
 end
 
 to setup-variables
-  set night-duration 60 ;; 60 ticków na godzinę
+  set night-duration 613  ;; 2.3m : 0.049 m/s  47 --> 8 * 60 * 60 s = 28800 s -> : 47
   set current-time 0
   set episode-counter 0
   set return-probability 0.05
@@ -86,12 +86,13 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  create-hedgehogs 4 [
-    set sex ifelse-value (random-float 1 > 0.5) [0] [1] ;;50% szans że samica=1
-    set color ifelse-value (sex = 0) [brown - 2] [brown + 1]
+  create-hedgehogs 10 [
+    set sex one-of [0 1] ;;50% szans że samica=1
+
+    set color ifelse-value (sex = 0) [brown - 2] [brown]
     set mass random-normal avg-mass std-dev
     set size 3.5
-    set speed 1
+    set speed (0.98 + random-float 0.04)
     set distance-traveled 0
 
     move-to one-of available-patches
@@ -120,6 +121,8 @@ to setup-hedgehogs
     qlearningextension:learning-rate 1
     qlearningextension:discount-factor 0.75
   ]
+
+      print count hedgehogs with [sex = 1]
 end
 
 to update-state-variables
@@ -224,8 +227,8 @@ to collect-hedgehog-data
   ifelse any? hedgehogs [
     array:set hedgehog-data 1 sum [mass] of hedgehogs
     array:set hedgehog-data 2 mean [mass] of hedgehogs
-    array:set hedgehog-data 3 sum [distance-traveled] of hedgehogs
-    array:set hedgehog-data 4 mean [distance-traveled] of hedgehogs
+    array:set hedgehog-data 3 (sum [distance-traveled] of hedgehogs * 2.3)
+    array:set hedgehog-data 4 (mean [distance-traveled] of hedgehogs * 2.3)
     array:set hedgehog-data 5 count hedgehogs
   ] [
     array:set hedgehog-data 1 0
@@ -437,19 +440,19 @@ array:item hedgehog-data 2
 MONITOR
 342
 526
-453
+477
 571
-Average Distance
+Average Distance [m]
 array:item hedgehog-data 4
 2
 1
 11
 
 MONITOR
-465
-526
-571
-571
+486
+525
+592
+570
 Hedgehog Count
 array:item hedgehog-data 5
 0

@@ -9,9 +9,9 @@ to setup-world-from-image [image-file width height]
 end
 
 to setup-world
-  let c 0
+  ;let c 0
   ask patches [
-    if c = 0 [print "Setting patch variables"]
+    ;if c = 0 [print "Setting patch variables"]
     set visit-count 0 ;<-- ustawianie zmiennych patchom za drugim razem wywoluje sie duzo duzo dluzej
     set og-color pcolor
     
@@ -42,8 +42,8 @@ to setup-world
       ]
     )    
     
-    set c c + 1
-    if c mod 1000 = 0 [ print (word "Processed patches: " c) ]
+    ;set c c + 1
+    ;if c mod 1000 = 0 [ print (word "Processed patches: " c) ]
   ]
   print "Patch variables reset"
 end
