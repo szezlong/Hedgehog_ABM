@@ -10,6 +10,7 @@ globals [
   return-probability max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
   hedgehog-memory hedgehog-data
+
   fence street urban ;o to też można później uprościć
   environment-types
   avoided-patches available-patches
@@ -19,7 +20,7 @@ hedgehogs-own [
   sex
   mass
   speed distance-traveled
-  visited-patches last-heading
+  visited-patches last-heading stuck-count
   nest
   flags
   terrain-color food-here fence-ahead distance-to-nest stay-in-nest
@@ -86,7 +87,7 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  create-hedgehogs 10 [
+  create-hedgehogs 5 [
     set sex one-of [0 1] ;;50% szans że samica=1
 
     set color ifelse-value (sex = 0) [brown - 2] [brown]
@@ -95,7 +96,7 @@ to setup-hedgehogs
     set speed (0.98 + random-float 0.04)
     set distance-traveled 0
 
-    move-to one-of available-patches
+    move-to one-of available-patches with [pcolor = turquoise]
     ;let nearest-nest min-one-of available-patches with [is-nest?] [distance self]
     ;set nest nearest-nest
     ;set nest one-of available-patches
@@ -107,6 +108,7 @@ to setup-hedgehogs
     random-turn-hedgehog
     set flags []
     set last-heading heading
+    set stuck-count 0
     set stay-in-nest false
     update-state-variables
   ]
@@ -547,6 +549,23 @@ time-percent-in-env \"garden-back-1\"
 2
 1
 11
+
+BUTTON
+116
+128
+210
+161
+run a week 
+let counter 0\nwhile [counter < 7] [\n next-night\n set counter counter + 1\n]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

@@ -1,9 +1,10 @@
 to move-along-fencing [direction]
-  while [direction != 0] [
+  let counter 0
+  while [direction != 0] [    
     let closest-fence-patch patch-ahead 1 
     
     if closest-fence-patch = patch-here [
-      rt 90
+      rt 180 
     ]
     ifelse closest-fence-patch != patch-here and closest-fence-patch != nobody and direction = -2 [
       let direction-to-patch [towards myself] of closest-fence-patch
@@ -67,6 +68,14 @@ to move-along-fencing [direction]
       random-turn-hedgehog
     ] 
     set direction decide-direction
+    
+    ;;tutaj jeśli sie zapetla to zabij
+    set counter counter + 1
+    if counter >= 10 [
+      set flags lput "die" flags
+      set direction 0
+    ]
+    ;show direction 
   ]
 end
 

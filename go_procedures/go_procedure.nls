@@ -6,20 +6,21 @@ to go
   if not isEndState [
     ask hedgehogs [
       update-state-variables
-      
+       
       if not stay-in-nest [
-        let old-position patch-here
+        let old-position patch-here ;;czemu taka nazwa niejasna?
         ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
+       
+        check-cross-street
+        
+        (qlearningextension:learning)
         
         if abs (heading - last-heading) = 180 [
-          set flags lput "rotated-180" flags
+          set flags lput "rotated-180" flags ;;sprawdz czy tego w ogole nie wywalic
         ]
+        check-stuck
         set last-heading heading
         
-        check-cross-street
-
-        (qlearningextension:learning)
-
         ask patch-here [
           set visit-count visit-count + 1
         ]
@@ -40,10 +41,9 @@ to go
       ]
       ;show flags
       
+      update-visited-patches
     ]
-    update-visited-patches
     set current-time current-time + 1
-
     tick
     ]
 end
@@ -59,6 +59,7 @@ to check-cross-street
       
       if (mass < low-mass-threshold and current-time < (night-duration * 0.5)) [
         if random-float 1 > 0.1 [
+          ;;powinien zwrocic flage ze chce przejsc i wtedy wywoluje sie cross-street zamiast qlearning
           cross-street ;;na razie to się bardzo rzadko zdarza w symulacji
         ]
       ]
@@ -71,24 +72,56 @@ to cross-street
   ask hedgehogs [
     if random-float 1 < 0.5 [
       die
-    ]
+    ] 
     let direction decide-direction
     move-along-fencing direction
     fd speed * 0.15 ;;po drodze poruszają się wolniej
   ]
 end
 
-to update-visited-patches
-  ask hedgehogs [
-    let current-patch patch-here
-    if not member? current-patch visited-patches [
-      set visited-patches lput current-patch visited-patches
-      if length visited-patches > hedgehog-memory [
-        set visited-patches but-first visited-patches
+to update-visited-patches 
+  let current-patch patch-here
+  set visited-patches lput current-patch visited-patches
+  if length visited-patches > hedgehog-memory [
+      set visited-patches but-first visited-patches
+  ] 
+end
+
+to check-stuck
+  let current-patch patch-here ;;czy qlearning cos da zeby tam nie szly?
+  
+  ifelse member? "die" flags [
+    ;15% szans że utknął i zginie
+    ifelse random-float 1 < 0.85 [
+      let available-patches-in-radius patches in-radius 3 with [member? self available-patches]
+       ifelse any? available-patches-in-radius [
+        let chosen-patch one-of available-patches-in-radius
+        move-to chosen-patch
+        show "One found a hole and saved itself"
+      ] [
+        show "One got stuck and died :("
+        die
       ]
+    ] [
+      show "One got stuck and died :("
+      die
+    ]
+  ] [
+    ifelse (not empty? visited-patches) and (current-patch = last visited-patches) [
+      ifelse (heading != last-heading) [
+        set stuck-count stuck-count + 1
+      ] [
+        set stuck-count 0
+      ]
+      if stuck-count > 10 [
+       die
+      ]
+    ] [
+      set stuck-count 0
     ]
   ]
 end
+
 
 to next-night ;;czy nie jest zbędne mając już "reset-episode"?
   while [not isEndState] [
