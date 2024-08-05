@@ -19,23 +19,23 @@ to setup-world
     (ifelse
       pcolor = turquoise [
         set environment-type "garden-back-1" 
-        set food random 40 + 15
+        set food random 30 + 20
       ]
       pcolor = turquoise + 1 [
         set environment-type "garden-front-1" 
-        set food random 30 + 15
+        set food random 20 + 15
       ]
       pcolor = green [
         set environment-type "garden-back-2"
-        set food random 20 + 5
+        set food random 10 + 10
       ]
       pcolor = green + 1 [
         set environment-type "garden-front-2"
-        set food random 10 + 5
+        set food random 5 + 5
       ]
       pcolor = lime [
         set environment-type "lawn"
-        set food random 3
+        set food random 2
       ]
       [
         set food 0

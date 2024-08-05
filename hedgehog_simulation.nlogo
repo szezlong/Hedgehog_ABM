@@ -56,7 +56,35 @@ to setup
   set hedgehog-data array:from-list n-values 6 [0]
   collect-hedgehog-data
 
+  ; check-food
   print "Setup completed."
+end
+
+to check-food
+   ask patches [
+    ;if c = 0 [print "Setting patch variables"]
+
+    (ifelse
+      food >= 45 [
+        set pcolor red
+      ]
+      food < 35 and food >= 20 [
+        set pcolor turquoise
+      ]
+      food < 20 and food > 10 [
+        set pcolor green
+      ]
+      food <= 10 and food > 0 [
+        set pcolor lime
+      ]
+      food <= 0 [
+        set pcolor 79
+      ]
+    )
+
+    ;set c c + 1
+    ;if c mod 1000 = 0 [ print (word "Processed patches: " c) ]
+  ]
 end
 
 to setup-variables
@@ -87,7 +115,7 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  create-hedgehogs 5 [
+  create-hedgehogs 3 [
     set sex one-of [0 1] ;;50% szans że samica=1
 
     set color ifelse-value (sex = 0) [brown - 2] [brown]
@@ -96,7 +124,7 @@ to setup-hedgehogs
     set speed (0.98 + random-float 0.04)
     set distance-traveled 0
 
-    move-to one-of available-patches with [pcolor = turquoise]
+    move-to one-of available-patches with [pcolor = turquoise] ;;na razie, do testowania
     ;let nearest-nest min-one-of available-patches with [is-nest?] [distance self]
     ;set nest nearest-nest
     ;set nest one-of available-patches
@@ -123,8 +151,6 @@ to setup-hedgehogs
     qlearningextension:learning-rate 1
     qlearningextension:discount-factor 0.75
   ]
-
-      print count hedgehogs with [sex = 1]
 end
 
 to update-state-variables
@@ -188,26 +214,48 @@ to-report isEndState
 end
 
 to reset-episode
+  ask hedgehogs [
+    ;; set mass mass - ((random-float 25 + 10) + (floor (distance-traveled / 500) * 5)) ;;tracą 5-10g dziennie i 5g za każde przebyte 500m
+    let metabolic-loss 150  ; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
+    let distance-loss ((random-float 15 + 5) + (floor (distance-traveled / 100) * 30))
+    print distance-traveled
+    show mass
+    set mass mass - (metabolic-loss + distance-loss)
+    show mass
+    if mass <= 450 [
+      kill-hedgehog
+    ]
+    if mass > 450 and mass <= 700 [
+      let survival-chance 0.9 * (mass - 450) / 250
+      if random-float 1 > survival-chance [
+        kill-hedgehog
+      ]
+    ]
+    set stay-in-nest false
+    set distance-traveled 0
+  ]
   collect-hedgehog-data
   export-data
   if not any? hedgehogs [
-      user-message "Wszystkie jeże nie żyją. Symulacja została przerwana."
-      stop
-  ]
-  ask hedgehogs [
-    ;face-patch nest
-    set mass mass - ((random-float 25 + 10) + (floor (distance-traveled / 500) * 5)) ;;tracą 5-10g dziennie i 5g za każde przebyte 500m
-    set stay-in-nest false
-    set distance-traveled 0
+    user-message "Wszystkie jeże nie żyją. Symulacja została przerwana."
+    stop
   ]
   set current-time 0
   set return-probability 0
   set episode-counter episode-counter + 1
-  if episode-counter mod 7 = 0 [
+  if episode-counter mod 30 = 0 [
     renew-resources
+    print "Nature is healing..."
   ]
   reset-ticks
   ;;reset rewards?
+end
+
+to next-night ;;czy nie jest zbędne mając już "reset-episode"?
+  while [not isEndState] [
+    go
+  ]
+  reset-episode
 end
 
 to renew-resources
@@ -218,6 +266,12 @@ to renew-resources
   ]
 end
 
+to kill-hedgehog
+  if nest != 0 [
+      ask nest [ set pcolor og-color ]
+    ]
+  die
+end
 to-report time-percent-in-env [env-type]
   let total-visits sum [visit-count] of patches
   let visits-in-env sum [visit-count] of patches with [environment-type = env-type]
@@ -252,7 +306,6 @@ to export-data
   file-print (word array:item hedgehog-data 0 "," array:item hedgehog-data 1 "," array:item hedgehog-data 2 "," array:item hedgehog-data 3 "," array:item hedgehog-data 4 "," array:item hedgehog-data 5)
   file-close
 end
-
 
 to draw-heatmap
   ask patches [

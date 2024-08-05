@@ -47,7 +47,7 @@ to build-new-nest
   ]
 end
 
-to-report isGarden [patch-color]
-  let green-range (range 51 59)
-  report member? patch-color green-range
-end
+;to-report isGarden [patch-color]
+;  let green-range (range 51 59)
+;  report member? patch-color green-range
+;end

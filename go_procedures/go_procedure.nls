@@ -48,7 +48,7 @@ to go
     ]
 end
 
-to check-cross-street
+to check-cross-street ;;można by też dodać hotspoty gdzie najczęściej jeże przechodzą przez ulicę
   ask hedgehogs [
     if patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = street [
       
@@ -120,14 +120,6 @@ to check-stuck
       set stuck-count 0
     ]
   ]
-end
-
-
-to next-night ;;czy nie jest zbędne mając już "reset-episode"?
-  while [not isEndState] [
-    go
-  ]
-  reset-episode 
 end
 
 to face-patch [patch-to-face]

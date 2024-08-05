@@ -22,13 +22,13 @@ to eat-food
     if [environment-type] of patch-here = "garden-back-1" [ set environment-factor 1.2 ]
     if [environment-type] of patch-here = "garden-front-1" [ set environment-factor 1.1 ]
     if [environment-type] of patch-here = "garden-back-2" [ set environment-factor 0.9 ]
-    if [environment-type] of patch-here = "garden-front-2" [ set environment-factor 0.95 ]
-    if [environment-type] of patch-here = "lawn" [ set environment-factor 0.5 ]
+    if [environment-type] of patch-here = "garden-front-2" [ set environment-factor 0.85 ]
+    if [environment-type] of patch-here = "lawn" [ set environment-factor 0.3 ]
 
     let available-food [food] of patch-here
-    let max-gain ifelse-value (mass < low-mass-threshold) [25] [12.5]
+    let max-gain ifelse-value (mass < low-mass-threshold) [1] [0]
     let gain min list (max-gain * environment-factor) available-food
-    set mass mass + gain
+    set mass mass + gain ;; jakoś ograniczyć do 200g dziennie?
     ask patch-here [ set food food - gain ]
     
     ifelse mass < low-mass-threshold [
