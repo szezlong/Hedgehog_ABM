@@ -35,7 +35,8 @@ to go
       ]
       if current-time + 1 >= night-duration and patch-here != nest[
         if patch-here = street [
-          die ;;nie zdążył wrócić
+          kill-hedgehog
+          ;;die ;;nie zdążył wrócić
         ]
         build-new-nest
       ]
@@ -71,7 +72,8 @@ to cross-street
   print "I'm crossing the street!"
   ask hedgehogs [
     if random-float 1 < 0.5 [
-      die
+      kill-hedgehog
+      ;;die
     ] 
     let direction decide-direction
     move-along-fencing direction
@@ -100,11 +102,13 @@ to check-stuck
         show "One found a hole and saved itself"
       ] [
         show "One got stuck and died :("
-        die
+        kill-hedgehog
+        ;;die
       ]
     ] [
       show "One got stuck and died :("
-      die
+      kill-hedgehog
+      ;;die
     ]
   ] [
     ifelse (not empty? visited-patches) and (current-patch = last visited-patches) [
@@ -114,7 +118,8 @@ to check-stuck
         set stuck-count 0
       ]
       if stuck-count > 10 [
-       die
+       kill-hedgehog
+        ;;die
       ]
     ] [
       set stuck-count 0
