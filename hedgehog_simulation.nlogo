@@ -236,6 +236,7 @@ to reset-episode
     set distance-traveled 0
     set daily-mass-gain 0
   ]
+  update-graph
   collect-hedgehog-data
   export-data
   if not any? hedgehogs [
@@ -274,6 +275,15 @@ to kill-hedgehog
     ]
   die
 end
+
+to update-graph
+  ifelse any? turtles [
+    set-current-plot "Średnia masa jeży podczas symulacji"
+    set-current-plot-pen "avg-mass"
+    plot mean [mass] of turtles
+  ] [ plot 0 ]
+end
+
 to-report time-percent-in-env [env-type]
   let total-visits sum [visit-count] of patches
   let visits-in-env sum [visit-count] of patches with [environment-type = env-type]
@@ -543,13 +553,13 @@ Noc
 Masa (g)
 0.0
 10.0
-0.0
+100.0
 10.0
 true
 false
-"set-current-plot \"Średnia masa jeży podczas symulacji\"\nset-current-plot-pen \"avg-mass\"\n" "ifelse any? hedgehogs [\n  plot mean [mass] of hedgehogs\n] [ plot 0 ]\n"
+"set-current-plot \"Średnia masa jeży podczas symulacji\"\nset-current-plot-pen \"avg-mass\"\n" ""
 PENS
-"avg-mass" 1.0 0 -16777216 true "" "ifelse any? hedgehogs [\n  plot mean [mass] of hedgehogs\n] [ plot 0 ]\n"
+"avg-mass" 1.0 0 -16777216 true "" "\n"
 
 MONITOR
 1327
