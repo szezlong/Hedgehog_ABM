@@ -26,10 +26,16 @@ to eat-food
     if [environment-type] of patch-here = "lawn" [ set environment-factor 0.3 ]
 
     let available-food [food] of patch-here
-    let max-gain ifelse-value (mass < low-mass-threshold) [1] [0]
+    let max-gain ifelse-value (mass < low-mass-threshold) [25] [12]
     let gain min list (max-gain * environment-factor) available-food
-    set mass mass + gain ;; jakoś ograniczyć do 200g dziennie?
-    ask patch-here [ set food food - gain ]
+    
+    ifelse daily-mass-gain + gain <= 200 [
+      set mass mass + gain
+      set daily-mass-gain daily-mass-gain + gain
+      ask patch-here [ set food food - gain ]
+    ] [
+      set flags lput "eat-food-big-fail" flags
+    ]
     
     ifelse mass < low-mass-threshold [
       set flags lput "eat-food-big-success" flags

@@ -18,7 +18,7 @@ globals [
 
 hedgehogs-own [
   sex
-  mass
+  mass daily-mass-gain
   speed distance-traveled
   visited-patches last-heading stuck-count
   nest
@@ -96,7 +96,7 @@ to setup-variables
   set possible-angles [0 45 90 135 180 225 270 315]
   set hedgehog-memory 10
   set avg-mass 846 ;;na razie dla samców
-  set std-dev 119  ;;na razie dla samców
+  set std-dev 319  ;;na razie dla samców
   set low-mass-threshold avg-mass * 0.6
   set high-mass-threshold avg-mass * 1.5
 
@@ -120,6 +120,7 @@ to setup-hedgehogs
 
     set color ifelse-value (sex = 0) [brown - 2] [brown]
     set mass random-normal avg-mass std-dev
+    set daily-mass-gain 0
     set size 3.5
     set speed (0.98 + random-float 0.04)
     set distance-traveled 0
@@ -216,23 +217,24 @@ end
 to reset-episode
   ask hedgehogs [
     ;; set mass mass - ((random-float 25 + 10) + (floor (distance-traveled / 500) * 5)) ;;tracą 5-10g dziennie i 5g za każde przebyte 500m
-    let metabolic-loss 150  ; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
-    let distance-loss ((random-float 15 + 5) + (floor (distance-traveled / 100) * 30))
-    print distance-traveled
-    show mass
+    let metabolic-loss 30 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
+    let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
+
     set mass mass - (metabolic-loss + distance-loss)
-    show mass
-    if mass <= 450 [
+    if mass <= 100 [
+      show mass
       kill-hedgehog
     ]
-    if mass > 450 and mass <= 700 [
+    if mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g
       let survival-chance 0.9 * (mass - 450) / 250
       if random-float 1 > survival-chance [
+        show mass
         kill-hedgehog
       ]
     ]
     set stay-in-nest false
     set distance-traveled 0
+    set daily-mass-gain 0
   ]
   collect-hedgehog-data
   export-data
@@ -610,6 +612,23 @@ BUTTON
 161
 run a week 
 let counter 0\nwhile [counter < 7] [\n next-night\n set counter counter + 1\n]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+28
+133
+117
+166
+NIL
+check-food
 NIL
 1
 T
