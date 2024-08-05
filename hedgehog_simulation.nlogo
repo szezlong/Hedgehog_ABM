@@ -327,6 +327,20 @@ to draw-heatmap
   ]
 end
 
+to draw-heatmap-with-threshold
+  let sorted-patches sort-on [visit-count] patches with [visit-count > 0]
+  let num-visited-patches length sorted-patches
+  let threshold-index floor (num-visited-patches * 0.1)  ; 5% najrzadziej odwiedzanych patchy
+  let visit-threshold [visit-count] of item threshold-index sorted-patches
+  print visit-threshold
+  ask patches [
+    if visit-count > visit-threshold [
+      set pcolor scale-color red visit-count visit-threshold (max [visit-count] of patches)
+    ]
+  ]
+end
+
+
 to restore-original-colors ;;to tymczasowe rozwiązanie, w przyszłości pewnie szybciej będzie wczytać mapę na nowo
   ask patches [
     set pcolor og-color
@@ -346,6 +360,11 @@ to export-result-map
   export-legend
 
   restore-original-colors
+
+  draw-heatmap-with-threshold
+  export-view "results//result-map-2.png"
+  restore-original-colors
+
 
   ask turtles [ show-turtle ]
   ask links [ show-link ]
@@ -382,10 +401,10 @@ to count-unique-colors
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-239
-24
-1102
-486
+261
+25
+1124
+487
 -1
 -1
 3.0
@@ -528,9 +547,9 @@ array:item hedgehog-data 5
 
 BUTTON
 56
-311
+358
 165
-344
+391
 export results
 export-result-map
 NIL
@@ -616,10 +635,10 @@ time-percent-in-env \"garden-back-1\"
 11
 
 BUTTON
-116
-128
-210
-161
+121
+104
+215
+137
 run a week 
 let counter 0\nwhile [counter < 7] [\n next-night\n set counter counter + 1\n]
 NIL
@@ -633,12 +652,29 @@ NIL
 1
 
 BUTTON
-28
-133
-117
-166
+1147
+367
+1236
+400
 NIL
 check-food
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+53
+311
+242
+344
+NIL
+draw-heatmap-with-threshold
 NIL
 1
 T
