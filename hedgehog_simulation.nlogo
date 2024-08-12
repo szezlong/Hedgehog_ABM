@@ -6,7 +6,7 @@ breed [hedgehogs hedgehog]
 
 globals [
   possible-actions possible-angles
-  night-duration current-time episode-counter
+  night-duration current-time current-month episode-counter
   max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
   hedgehog-memory hedgehog-data
@@ -85,6 +85,7 @@ end
 to setup-variables
   set night-duration 613  ;; 2.3m : 0.049 m/s  47 --> 8 * 60 * 60 s = 28800 s -> : 47
   set current-time 0
+  set current-month 1
   set episode-counter 0
 
   set max-distance 20
@@ -233,15 +234,18 @@ to reset-episode
   collect-hedgehog-data
   export-data
   if not any? hedgehogs [
-    user-message "Wszystkie jeże nie żyją. Symulacja została przerwana."
+    user-message "Wszystkie jeże nie żyją. Symulacja została przerwana." ;;ok nic nie daje
     stop
   ]
   set current-time 0
 
   set episode-counter episode-counter + 1
   if episode-counter mod 30 = 0 [
-    renew-resources
-    print "Nature is healing..."
+    renew-resources ;;trzeba dostosowac do sezonu
+    set current-month current-month + 1
+    if current-month > 12 [
+      set current-month 1
+    ]
   ]
   reset-ticks
   ;;reset rewards?
@@ -255,6 +259,7 @@ to next-night ;;czy nie jest zbędne mając już "reset-episode"?
 end
 
 to renew-resources
+  print "Nature is healing..."
   ask patches [
     if member? self environment-types [
       set food food + random 5 + 3 ;;różne środowiska może z inną prędkością powinny?
@@ -678,6 +683,17 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+996
+506
+1109
+551
+Month:
+item (current-month - 1) [\"January\" \"February\" \"March\" \"April\" \"May\" \"June\" \"July\" \"August\" \"September\" \"October\" \"November\" \"December\"]
+0
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
