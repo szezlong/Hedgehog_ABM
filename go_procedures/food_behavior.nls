@@ -6,9 +6,9 @@ to forage
   ;;if distance-traveled < max-distance [ ;; na razie tak, w przyszłości będzie do gniazda wracać
   move-towards-food-patch
   
-  if random-float 1 < 0.1 [
-    random-turn-hedgehog
-  ]
+;  if random-float 1 < 0.1 [
+;    random-turn-hedgehog
+;  ]
   
   let direction decide-direction
   move-along-fencing direction
@@ -29,23 +29,23 @@ to eat-food
     let max-gain ifelse-value (mass < low-mass-threshold) [25] [12]
     let gain min list (max-gain * environment-factor) available-food
     
-    ifelse daily-mass-gain + gain <= 200 [
-      set mass mass + gain
-      set daily-mass-gain daily-mass-gain + gain
-      ask patch-here [ set food food - gain ]
+    ifelse daily-mass-gain + gain <= 200 [ ;;
+     ifelse mass > high-mass-threshold [
+        set flags lput "eat-food-big-fail" flags ;;blokuję możliwosć roztycia się
+      ] [
+        ifelse mass < low-mass-threshold [
+          set flags lput "eat-food-big-success" flags
+        ] [
+          set flags lput "eat-food-success" flags
+        ]
+        set mass mass + gain
+        set daily-mass-gain daily-mass-gain + gain
+        ask patch-here [ set food food - gain ]
+      ]
     ] [
       set flags lput "eat-food-big-fail" flags
     ]
     
-    ifelse mass < low-mass-threshold [
-      set flags lput "eat-food-big-success" flags
-    ] [
-      ifelse mass > high-mass-threshold [
-        set flags lput "eat-food-big-fail" flags
-      ] [
-        set flags lput "eat-food-success" flags
-      ]
-    ]
   ] [
     set flags lput "eat-food-fail" flags
   ]

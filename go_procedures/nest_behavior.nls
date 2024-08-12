@@ -6,10 +6,10 @@ to go-to-nest
 ;    ]
     
     if current-time > (night-duration * 0.7) [
-       ifelse any? patches in-radius 3 with [ self = [nest] of myself ] [
+       ifelse any? patches in-radius 4 with [ self = [nest] of myself ] [
           set return-probability 0.8
         ] [
-        ifelse any? patches in-radius 8 with [ self = [nest] of myself ] [
+        ifelse any? patches in-radius 12 with [ self = [nest] of myself ] [
           set return-probability 1
         ] [
           set return-probability 0.25
@@ -20,15 +20,16 @@ to go-to-nest
         ]
     ]
     
-    ifelse random-float 1 <= return-probability [
+    if random-float 1 <= return-probability [
       face-patch nest
       let direction decide-direction
       move-along-fencing direction
       fd speed
       set flags lput "go-to-nest-success" flags
-    ] [
-      set flags lput "go-to-nest-fail" flags
-    ]
+    ] 
+;    [
+;      set flags lput "go-to-nest-fail" flags ;;???
+;    ]
   ] [
     set flags lput "go-to-nest-fail" flags
   ]

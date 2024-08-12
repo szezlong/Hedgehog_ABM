@@ -8,6 +8,10 @@ to go
       update-state-variables
        
       if not stay-in-nest [
+;        while [not can-move? 1] [ ;;co z tym ?
+;          random-turn-hedgehog ;; krawędź świata
+;        ]
+        
         let old-position patch-here ;;czemu taka nazwa niejasna?
         ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
        
@@ -35,6 +39,7 @@ to go
       ]
       if current-time + 1 >= night-duration and patch-here != nest[
         if patch-here = street [
+          show "didn't reach the nest on time - died"
           kill-hedgehog
           ;;die ;;nie zdążył wrócić
         ]
@@ -72,12 +77,13 @@ to cross-street
   print "I'm crossing the street!"
   ask hedgehogs [
     if random-float 1 < 0.5 [
+      show "died while crossing the street"
       kill-hedgehog
       ;;die
     ] 
     let direction decide-direction
     move-along-fencing direction
-    fd speed * 0.15 ;;po drodze poruszają się wolniej
+    fd speed * 0.6 ;;po drodze poruszają się wolniej
   ]
 end
 
@@ -92,14 +98,13 @@ end
 to check-stuck
   let current-patch patch-here ;;czy qlearning cos da zeby tam nie szly?
   
-  ifelse member? "die" flags [
+  if member? "die" flags [
     ;15% szans że utknął i zginie
     ifelse random-float 1 < 0.85 [
       let available-patches-in-radius patches in-radius 3 with [member? self available-patches]
        ifelse any? available-patches-in-radius [
         let chosen-patch one-of available-patches-in-radius
         move-to chosen-patch
-        show "One found a hole and saved itself"
       ] [
         show "One got stuck and died :("
         kill-hedgehog
@@ -110,20 +115,21 @@ to check-stuck
       kill-hedgehog
       ;;die
     ]
-  ] [
-    ifelse (not empty? visited-patches) and (current-patch = last visited-patches) [
-      ifelse (heading != last-heading) [
-        set stuck-count stuck-count + 1
-      ] [
-        set stuck-count 0
-      ]
-      if stuck-count > 10 [
-       kill-hedgehog
-        ;;die
-      ]
-    ] [
-      set stuck-count 0
-    ]
+;  ] [ TO JEDNAK NIE ZAWIESZA
+;    ifelse (not empty? visited-patches) and (current-patch = last visited-patches) [
+;      ifelse (heading != last-heading) [
+;        set stuck-count stuck-count + 1
+;      ] [
+;        set stuck-count 0
+;      ]
+;      if stuck-count > 10 [
+;        show "got stuck with heading"
+;       ;;kill-hedgehog
+;        ;;die
+;      ]
+;    ] [
+;      set stuck-count 0
+;    ]
   ]
 end
 

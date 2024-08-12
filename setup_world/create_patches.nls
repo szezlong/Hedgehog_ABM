@@ -9,8 +9,8 @@ to setup-sandbox
   setup-lines 5 street 8
   create-rectangle
   draw-random-diagonal-lines
-  resize-world 0 30 0 30
-  set-patch-size 1
+  resize-world 0 100 0 100
+  set-patch-size 3
   ask patches [
     set visit-count 0
     (ifelse

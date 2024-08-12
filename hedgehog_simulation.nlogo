@@ -7,7 +7,7 @@ breed [hedgehogs hedgehog]
 globals [
   possible-actions possible-angles
   night-duration current-time episode-counter
-  return-probability max-distance
+  max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
   hedgehog-memory hedgehog-data
 
@@ -19,7 +19,7 @@ globals [
 hedgehogs-own [
   sex
   mass daily-mass-gain
-  speed distance-traveled
+  speed distance-traveled return-probability
   visited-patches last-heading stuck-count
   nest
   flags
@@ -62,8 +62,6 @@ end
 
 to check-food
    ask patches [
-    ;if c = 0 [print "Setting patch variables"]
-
     (ifelse
       food >= 45 [
         set pcolor red
@@ -81,9 +79,6 @@ to check-food
         set pcolor 79
       ]
     )
-
-    ;set c c + 1
-    ;if c mod 1000 = 0 [ print (word "Processed patches: " c) ]
   ]
 end
 
@@ -91,7 +86,7 @@ to setup-variables
   set night-duration 613  ;; 2.3m : 0.049 m/s  47 --> 8 * 60 * 60 s = 28800 s -> : 47
   set current-time 0
   set episode-counter 0
-  set return-probability 0.05
+
   set max-distance 20
   set possible-angles [0 45 90 135 180 225 270 315]
   set hedgehog-memory 10
@@ -115,17 +110,18 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  create-hedgehogs 3 [
+  create-hedgehogs 5 [
     set sex one-of [0 1] ;;50% szans że samica=1
 
     set color ifelse-value (sex = 0) [brown - 2] [brown]
     set mass random-normal avg-mass std-dev
     set daily-mass-gain 0
     set size 3.5
-    set speed (0.98 + random-float 0.04)
+    set speed random-normal 1 0.02
     set distance-traveled 0
+    set return-probability 0.05
 
-    move-to one-of available-patches with [pcolor = turquoise] ;;na razie, do testowania
+    move-to one-of available-patches ;;with [pcolor = turquoise] ;;na razie, do testowania
     ;let nearest-nest min-one-of available-patches with [is-nest?] [distance self]
     ;set nest nearest-nest
     ;set nest one-of available-patches
@@ -147,10 +143,10 @@ to setup-hedgehogs
     (qlearningextension:actions [forage] [eat-food] [go-to-nest])
     qlearningextension:reward [reward-func]
     qlearningextension:end-episode [isEndState] reset-episode
-    qlearningextension:action-selection "e-greedy" [0.25 0.99]
+    qlearningextension:action-selection "e-greedy" [0.25 0.995]
     ;qlearningextension:action-selection-egreedy 0.75 "rate" 0.95
-    qlearningextension:learning-rate 1
-    qlearningextension:discount-factor 0.75
+    qlearningextension:learning-rate 0.95
+    qlearningextension:discount-factor 0.55
   ]
 end
 
@@ -169,7 +165,7 @@ end
 
 to-report reward-func
   let penalty 0
-  if member? "rotated-180" flags [
+  if member? "rotated-180" flags [ ;;sprawdz czy to potrzebne
     set penalty -100
   ]
 
@@ -179,7 +175,7 @@ to-report reward-func
        set penalty (-1 + penalty)
     ]
     member? "eat-food-big-fail" flags [
-       set penalty (-20 + penalty)
+       set penalty (-50 + penalty)
     ]
     member? "build-nest-fail" flags [
        set penalty (-5 + penalty)
@@ -191,16 +187,16 @@ to-report reward-func
        set reward (0 + penalty)
     ]
     member? "eat-food-success" flags [
-       set reward (3 + penalty)
+       set reward (5 + penalty)
     ]
     member? "eat-food-big-success" flags [
-       set reward (10 + penalty)
+       set reward (50 + penalty)
     ]
     member? "go-to-nest-success" flags [
        set reward (3 + penalty)
     ]
     member? "forage" flags [
-       set reward (10 + penalty)
+       set reward (20 + penalty)
     ]
     [  set reward (0 + penalty) ]
   )
@@ -221,20 +217,17 @@ to reset-episode
     let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
 
     set mass mass - (metabolic-loss + distance-loss)
-    if mass <= 100 [
-      show mass
-      kill-hedgehog
-    ]
     if mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g
-      let survival-chance 0.9 * (mass - 450) / 250
+      let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
       if random-float 1 > survival-chance [
-        show mass
+        print word "too small mass - died: " mass
         kill-hedgehog
       ]
     ]
     set stay-in-nest false
     set distance-traveled 0
     set daily-mass-gain 0
+    set return-probability 0.05
   ]
   update-graph
   collect-hedgehog-data
@@ -244,7 +237,7 @@ to reset-episode
     stop
   ]
   set current-time 0
-  set return-probability 0
+
   set episode-counter episode-counter + 1
   if episode-counter mod 30 = 0 [
     renew-resources
@@ -265,6 +258,7 @@ to renew-resources
   ask patches [
     if member? self environment-types [
       set food food + random 5 + 3 ;;różne środowiska może z inną prędkością powinny?
+      ;;trzeba tu jakos ograniczyc zeby nie odnawialo za duzo, zwlaszcza tam gdzie nic nie ma!
     ]
   ]
 end
@@ -401,10 +395,10 @@ to count-unique-colors
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-261
-25
-1124
-487
+250
+23
+1113
+485
 -1
 -1
 3.0
@@ -428,10 +422,10 @@ ticks
 30.0
 
 BUTTON
-48
-63
-111
-96
+26
+28
+89
+61
 NIL
 setup
 NIL
@@ -445,10 +439,10 @@ NIL
 1
 
 BUTTON
-59
-478
-180
-511
+37
+443
+158
+476
 clear everything
 ask hedgehogs [ die ]\nca\nif file-exists? \"results//hedgehog-data.csv\" [ file-delete \"results//hedgehog-data.csv\" ]\nif file-exists? \"results//legend.csv\" [ file-delete \"results//legend.csv\" ]\nif file-exists? \"results//result-map.png\" [ file-delete \"results//result-map.png\" ]
 NIL
@@ -462,10 +456,10 @@ NIL
 1
 
 BUTTON
-121
-63
-210
-96
+99
+28
+188
+61
 NIL
 next-night
 NIL
@@ -479,10 +473,10 @@ NIL
 1
 
 BUTTON
-54
-219
-166
-252
+32
+184
+144
+217
 NIL
 draw-heatmap
 NIL
@@ -496,10 +490,10 @@ NIL
 1
 
 BUTTON
-55
-264
-165
-297
+33
+229
+143
+262
 clear heatmap
 restore-original-colors\n
 NIL
@@ -546,10 +540,10 @@ array:item hedgehog-data 5
 11
 
 BUTTON
-56
-358
-165
-391
+34
+323
+143
+356
 export results
 export-result-map
 NIL
@@ -635,10 +629,10 @@ time-percent-in-env \"garden-back-1\"
 11
 
 BUTTON
-121
-104
-215
-137
+99
+69
+193
+102
 run a week 
 let counter 0\nwhile [counter < 7] [\n next-night\n set counter counter + 1\n]
 NIL
@@ -669,10 +663,10 @@ NIL
 1
 
 BUTTON
-53
-311
-242
-344
+31
+276
+220
+309
 NIL
 draw-heatmap-with-threshold
 NIL
