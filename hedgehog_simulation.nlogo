@@ -21,7 +21,7 @@ hedgehogs-own [
   mass daily-mass-gain
   speed distance-traveled return-probability
   visited-patches last-heading stuck-count
-  nest
+  nest mother
   flags
   terrain-color food-here fence-ahead distance-to-nest stay-in-nest
 ]
@@ -111,31 +111,41 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  create-hedgehogs 10 [
+  let counter 0
+  let total-count 20
+  create-hedgehogs total-count [
     set sex one-of [0 1] ;;50% szans że samica=1
-    ifelse random-float 1 < 0.7 [
+
+    ifelse counter < 0.7 * total-count [
       set age 365 + random 3650 ;;losowy wiek 1 - 10 lat
       set color ifelse-value (sex = 0) [brown - 2] [brown]
       set mass random-normal avg-mass std-dev
       set size 3.5
+      move-to one-of available-patches ;;with [pcolor = turquoise]
+      set nest patch-here
+      ask nest [ set pcolor brown ]
     ] [
       set age 42 + random 323 ;;wiek od 6 tyg do 1 rok
       set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
-      set mass 200 + random 50
+      set mass 200 + random 50 ;;niech wzrasta z wiekiem
       set size 2.5
+      set mother one-of turtles with [age >= 365 and sex = 1]
+      show mother
+      set nest [nest] of mother
+      move-to one-of ([neighbors] of [patch-here] of mother) with [member? self available-patches]
     ]
+    set counter counter + 1
 
     set daily-mass-gain 0
     set speed random-normal 1 0.02
     set distance-traveled 0
     set return-probability 0.05
 
-    move-to one-of available-patches ;;with [pcolor = turquoise] ;;na razie, do testowania
+
     ;let nearest-nest min-one-of available-patches with [is-nest?] [distance self]
     ;set nest nearest-nest
     ;set nest one-of available-patches
     ;move-to nest
-    ;ask nest [ set pcolor brown ]
     ;set nest nobody
     set visited-patches (list patch-here)
 
@@ -224,7 +234,10 @@ to reset-episode
     let metabolic-loss 30 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
     let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
     set mass mass - (metabolic-loss + distance-loss)
-    if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g
+    if age = 50 [ ;;powiedzmy ze osesek to 50 dni
+      come-of-age
+    ]
+    if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g/600g
       let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
       if random-float 1 > survival-chance [
         print word "too small mass - died: " mass
@@ -286,6 +299,12 @@ to kill-hedgehog
       ask nest [ set pcolor og-color ]
     ]
   die
+end
+
+to come-of-age
+  ;;umiera 1/4 miotu
+  ;;usuwane jest gniazdo rodzinne
+  ;;nowy kolor i wiekszy rozmiar
 end
 
 to update-graph
