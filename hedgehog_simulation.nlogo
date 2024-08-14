@@ -17,7 +17,7 @@ globals [
 ]
 
 hedgehogs-own [
-  sex
+  sex age
   mass daily-mass-gain
   speed distance-traveled return-probability
   visited-patches last-heading stuck-count
@@ -111,13 +111,21 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  create-hedgehogs 5 [
+  create-hedgehogs 10 [
     set sex one-of [0 1] ;;50% szans że samica=1
+    ifelse random-float 1 < 0.7 [
+      set age 365 + random 3650 ;;losowy wiek 1 - 10 lat
+      set color ifelse-value (sex = 0) [brown - 2] [brown]
+      set mass random-normal avg-mass std-dev
+      set size 3.5
+    ] [
+      set age 42 + random 323 ;;wiek od 6 tyg do 1 rok
+      set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
+      set mass 200 + random 50
+      set size 2.5
+    ]
 
-    set color ifelse-value (sex = 0) [brown - 2] [brown]
-    set mass random-normal avg-mass std-dev
     set daily-mass-gain 0
-    set size 3.5
     set speed random-normal 1 0.02
     set distance-traveled 0
     set return-probability 0.05
@@ -213,18 +221,22 @@ end
 
 to reset-episode
   ask hedgehogs [
-    ;; set mass mass - ((random-float 25 + 10) + (floor (distance-traveled / 500) * 5)) ;;tracą 5-10g dziennie i 5g za każde przebyte 500m
     let metabolic-loss 30 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
     let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
-
     set mass mass - (metabolic-loss + distance-loss)
-    if mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g
+    if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g
       let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
       if random-float 1 > survival-chance [
         print word "too small mass - died: " mass
         kill-hedgehog
       ]
     ]
+    if age > 2920 [
+      if random-float 1 < 0.9 [
+       kill-hedgehog
+      ]
+    ]
+    set age age + 1
     set stay-in-nest false
     set distance-traveled 0
     set daily-mass-gain 0
@@ -512,10 +524,10 @@ NIL
 1
 
 MONITOR
-235
-525
-327
-570
+249
+510
+341
+555
 Average Mass
 array:item hedgehog-data 2
 2
@@ -523,10 +535,10 @@ array:item hedgehog-data 2
 11
 
 MONITOR
-342
-526
-477
-571
+356
+511
+491
+556
 Average Distance [m]
 array:item hedgehog-data 4
 2
@@ -534,10 +546,10 @@ array:item hedgehog-data 4
 11
 
 MONITOR
-486
-525
-592
-570
+500
+510
+606
+555
 Hedgehog Count
 array:item hedgehog-data 5
 0

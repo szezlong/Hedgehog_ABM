@@ -66,7 +66,7 @@ to check-cross-street ;;można by też dodać hotspoty gdzie najczęściej jeże
       if (mass < low-mass-threshold and current-time < (night-duration * 0.5)) [
         if random-float 1 > 0.1 [
           ;;powinien zwrocic flage ze chce przejsc i wtedy wywoluje sie cross-street zamiast qlearning
-          cross-street ;;na razie to się bardzo rzadko zdarza w symulacji
+          cross-street
         ]
       ]
     ]
@@ -81,7 +81,7 @@ to cross-street
       kill-hedgehog
       ;;die
     ] 
-    let direction decide-direction
+    let direction decide-direction ;;albo przed siebie
     move-along-fencing direction
     fd speed * 0.6 ;;po drodze poruszają się wolniej
   ]
