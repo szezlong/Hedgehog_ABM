@@ -233,7 +233,8 @@ to reset-episode
     ]
     if age > 2920 [
       if random-float 1 < 0.9 [
-       kill-hedgehog
+        print word "Died of old age: " age
+        kill-hedgehog
       ]
     ]
     set age age + 1
