@@ -167,7 +167,7 @@ to setup-hedgehogs
     set sex one-of [0 1]
     set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
     set age 7 + random 43 ;;wiek od 1 tyg do 7 tyg
-    set mass 200 + random 50 ;;niech wzrasta z wiekiem
+    set mass 200 + (age / 49) * 35
     set size 2.5
     set mother one-of turtles with [age >= 50 and sex = 1] ;; +zabezpieczenie
     set nest [nest] of mother
@@ -315,10 +315,10 @@ to come-of-age
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-250
-23
-1113
-485
+249
+17
+1112
+479
 -1
 -1
 3.0
@@ -427,21 +427,10 @@ NIL
 1
 
 MONITOR
-249
-510
-359
-555
-Average Mass [g]
-array:item hedgehog-data 2
-2
-1
-11
-
-MONITOR
-371
-510
-506
-555
+517
+494
+640
+539
 Average Distance [m]
 array:item hedgehog-data 4
 2
@@ -449,10 +438,10 @@ array:item hedgehog-data 4
 11
 
 MONITOR
-515
-509
-631
-554
+249
+495
+365
+540
 Hedgehogs Count
 (word count hedgehogs \" : \" count hoglets)
 0
@@ -600,13 +589,24 @@ NIL
 1
 
 MONITOR
-996
-506
-1109
-551
+997
+494
+1110
+539
 Month:
 item (current-month - 1) [\"January\" \"February\" \"March\" \"April\" \"May\" \"June\" \"July\" \"August\" \"September\" \"October\" \"November\" \"December\"]
 0
+1
+11
+
+MONITOR
+380
+495
+504
+540
+Average mass [g]
+(word precision mean [mass] of hedgehogs 2 \" : \" precision mean [mass] of hoglets 2)
+2
 1
 11
 
