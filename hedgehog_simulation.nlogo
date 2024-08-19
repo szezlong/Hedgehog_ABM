@@ -1,8 +1,9 @@
-__includes ["setup_world//setup_world.nls" "go_procedures//go_procedure.nls"]
+__includes ["setup_world//setup_world.nls" "go_procedures//go_procedure.nls" "setup_world//data_and_interface.nls"]
 
 extensions[qlearningextension array]
 
 breed [hedgehogs hedgehog]
+breed [hoglets hoglet]
 
 globals [
   possible-actions possible-angles
@@ -21,9 +22,15 @@ hedgehogs-own [
   mass daily-mass-gain
   speed distance-traveled return-probability
   visited-patches last-heading stuck-count
-  nest mother
+  nest ;;mother
   flags
   terrain-color food-here fence-ahead distance-to-nest stay-in-nest
+]
+
+hoglets-own [
+  sex age
+  mass
+  nest mother
 ]
 
 patches-own [
@@ -111,30 +118,18 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  let counter 0
   let total-count 20
-  create-hedgehogs total-count [
+
+  create-hedgehogs round (0.7 * total-count) [
     set sex one-of [0 1] ;;50% szans że samica=1
 
-    ifelse counter < 0.7 * total-count [
-      set age random-normal 1095 730  ;; średnia 3 lata (1095 dni), odchylenie standardowe 2 lata (730 dni)
-      set color ifelse-value (sex = 0) [brown - 2] [brown]
-      set mass random-normal avg-mass std-dev
-      set size 3.5
-      move-to one-of available-patches ;;with [pcolor = turquoise]
-      set nest patch-here
-      ask nest [ set pcolor brown ]
-    ] [
-      set age 42 + random 323 ;;wiek od 6 tyg do 1 rok
-      set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
-      set mass 200 + random 50 ;;niech wzrasta z wiekiem
-      set size 2.5
-      set mother one-of turtles with [age >= 365 and sex = 1]
-      show mother
-      set nest [nest] of mother
-      move-to one-of ([neighbors] of [patch-here] of mother) with [member? self available-patches]
-    ]
-    set counter counter + 1
+    set age random-normal 1095 730  ;; średnia 3 lata (1095 dni), odchylenie standardowe 2 lata (730 dni)
+    set color ifelse-value (sex = 0) [brown - 2] [brown]
+    set mass random-normal avg-mass std-dev
+    set size 3.5
+    move-to one-of available-patches ;;with [pcolor = turquoise]
+    set nest patch-here
+    ask nest [ set pcolor brown ]
 
     set daily-mass-gain 0
     set speed random-normal 1 0.02
@@ -166,6 +161,17 @@ to setup-hedgehogs
     ;qlearningextension:action-selection-egreedy 0.75 "rate" 0.95
     qlearningextension:learning-rate 0.95
     qlearningextension:discount-factor 0.55
+  ]
+
+  create-hoglets round (0.3 * total-count) [
+    set sex one-of [0 1]
+    set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
+    set age 7 + random 43 ;;wiek od 1 tyg do 7 tyg
+    set mass 200 + random 50 ;;niech wzrasta z wiekiem
+    set size 2.5
+    set mother one-of turtles with [age >= 50 and sex = 1] ;; +zabezpieczenie
+    set nest [nest] of mother
+    move-to one-of ([neighbors] of [patch-here] of mother) with [member? self available-patches] ;; +zabezpieczenie
   ]
 end
 
@@ -234,7 +240,7 @@ to reset-episode
     let metabolic-loss 30 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
     let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
     set mass mass - (metabolic-loss + distance-loss)
-    if age = 50 [ ;;powiedzmy ze osesek to 50 dni
+    if age = 50 [ ;; osesek to 50 dni
       come-of-age
     ]
     if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g/600g
@@ -306,130 +312,6 @@ to come-of-age
   ;;umiera 1/4 miotu
   ;;usuwane jest gniazdo rodzinne
   ;;nowy kolor i wiekszy rozmiar
-end
-
-to update-graph
-  ifelse any? turtles [
-    set-current-plot "Średnia masa jeży podczas symulacji"
-    set-current-plot-pen "avg-mass"
-    plot mean [mass] of turtles
-  ] [ plot 0 ]
-end
-
-to-report time-percent-in-env [env-type]
-  let total-visits sum [visit-count] of patches
-  let visits-in-env sum [visit-count] of patches with [environment-type = env-type]
-  report (visits-in-env / total-visits) * 100
-end
-
-to collect-hedgehog-data
-  array:set hedgehog-data 0 ticks
-  ifelse any? hedgehogs [
-    array:set hedgehog-data 1 sum [mass] of hedgehogs
-    array:set hedgehog-data 2 mean [mass] of hedgehogs
-    array:set hedgehog-data 3 (sum [distance-traveled] of hedgehogs * 2.3)
-    array:set hedgehog-data 4 (mean [distance-traveled] of hedgehogs * 2.3)
-    array:set hedgehog-data 5 count hedgehogs
-  ] [
-    array:set hedgehog-data 1 0
-    array:set hedgehog-data 2 0
-    array:set hedgehog-data 3 0
-    array:set hedgehog-data 4 0
-    array:set hedgehog-data 5 0
-  ]
-end
-
-to export-data
-  let file-path "results//hedgehog-data.csv"
-  if not file-exists? file-path [
-    file-open file-path
-    file-print "Tick,Total Mass,Average Mass,Total Distance,Average Distance,Hedgehog Count"
-    file-close
-  ]
-  file-open file-path
-  file-print (word array:item hedgehog-data 0 "," array:item hedgehog-data 1 "," array:item hedgehog-data 2 "," array:item hedgehog-data 3 "," array:item hedgehog-data 4 "," array:item hedgehog-data 5)
-  file-close
-end
-
-to draw-heatmap
-  ask patches [
-  if visit-count > 0 [
-        set pcolor scale-color red visit-count 0 (max [visit-count] of patches)
-      ]
-  ]
-end
-
-to draw-heatmap-with-threshold
-  let sorted-patches sort-on [visit-count] patches with [visit-count > 0]
-  let num-visited-patches length sorted-patches
-  let threshold-index floor (num-visited-patches * 0.1)  ; 5% najrzadziej odwiedzanych patchy
-  let visit-threshold [visit-count] of item threshold-index sorted-patches
-  print visit-threshold
-  ask patches [
-    if visit-count > visit-threshold [
-      set pcolor scale-color red visit-count visit-threshold (max [visit-count] of patches)
-    ]
-  ]
-end
-
-
-to restore-original-colors ;;to tymczasowe rozwiązanie, w przyszłości pewnie szybciej będzie wczytać mapę na nowo
-  ask patches [
-    set pcolor og-color
-  ]
-  ask hedgehogs [
-    if nest != 0 [ ask nest [ set pcolor brown ] ]
-  ]
-end
-
-to export-result-map
-  no-display
-  ask turtles [ hide-turtle ]
-  ask links [ hide-link ]
-
-  draw-heatmap
-  export-view "results//result-map.png"
-  export-legend
-
-  restore-original-colors
-
-  draw-heatmap-with-threshold
-  export-view "results//result-map-2.png"
-  restore-original-colors
-
-
-  ask turtles [ show-turtle ]
-  ask links [ show-link ]
-  display
-end
-
-to export-legend
-  let max-visit-count max [visit-count] of patches
-  file-open "results//legend.csv"
-  file-print "Color,Visits,Percentage"
-  ask patches [
-    if visit-count > 0 [
-      let color-value scale-color red visit-count 0 max-visit-count
-      let percentage (visit-count / max-visit-count) * 100
-      file-print (word color-value "," visit-count "," percentage)
-    ]
-  ]
-  file-close
-end
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Sprawdzenie wgranej mapy ;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-to count-unique-colors
-  let unique-colors []
-  ask patches [
-    let pcolor-value pcolor
-    if not member? pcolor-value unique-colors [
-      set unique-colors lput pcolor-value unique-colors
-    ]
-  ]
-  let number-of-unique-colors length unique-colors
-  print (word "Number of unique colors: " number-of-unique-colors)
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -547,19 +429,19 @@ NIL
 MONITOR
 249
 510
-341
+359
 555
-Average Mass
+Average Mass [g]
 array:item hedgehog-data 2
 2
 1
 11
 
 MONITOR
-356
-511
-491
-556
+371
+510
+506
+555
 Average Distance [m]
 array:item hedgehog-data 4
 2
@@ -567,12 +449,12 @@ array:item hedgehog-data 4
 11
 
 MONITOR
-500
-510
-606
-555
-Hedgehog Count
-array:item hedgehog-data 5
+515
+509
+631
+554
+Hedgehogs Count
+(word count hedgehogs \" : \" count hoglets)
 0
 1
 11
