@@ -117,7 +117,7 @@ to setup-hedgehogs
     set sex one-of [0 1] ;;50% szans że samica=1
 
     ifelse counter < 0.7 * total-count [
-      set age 365 + random 3650 ;;losowy wiek 1 - 10 lat
+      set age random-normal 1095 730  ;; średnia 3 lata (1095 dni), odchylenie standardowe 2 lata (730 dni)
       set color ifelse-value (sex = 0) [brown - 2] [brown]
       set mass random-normal avg-mass std-dev
       set size 3.5
@@ -244,8 +244,9 @@ to reset-episode
         kill-hedgehog
       ]
     ]
-    if age > 2920 [
-      if random-float 1 < 0.9 [
+    if age > 2920 [ ;; ponad 8 lat
+      let mortality-risk (age - 2920) / 3650 ;; ryzyko śmierci rośnie z wiekiem, do 1 przy 15 latach
+      if random-float 1 < mortality-risk [
         print word "Died of old age: " age
         kill-hedgehog
       ]
