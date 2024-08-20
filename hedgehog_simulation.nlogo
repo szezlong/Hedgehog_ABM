@@ -118,7 +118,7 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  let total-count 20
+  let total-count 3
 
   create-hedgehogs round (0.7 * total-count) [
     set sex one-of [0 1] ;;50% szans że samica=1
@@ -240,9 +240,6 @@ to reset-episode
     let metabolic-loss 30 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
     let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
     set mass mass - (metabolic-loss + distance-loss)
-    if age = 50 [ ;; osesek to 50 dni
-      come-of-age
-    ]
     if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g/600g
       let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
       if random-float 1 > survival-chance [
@@ -263,10 +260,18 @@ to reset-episode
     set daily-mass-gain 0
     set return-probability 0.05
   ]
+
+  ask hoglets [
+    set age age + 1
+    if age = 50 [ ;; osesek to 50 dni
+      come-of-age
+    ]
+  ]
+
   update-graph
   collect-hedgehog-data
   export-data
-  if not any? hedgehogs [
+  if not any? turtles [
     user-message "Wszystkie jeże nie żyją. Symulacja została przerwana." ;;ok nic nie daje
     stop
   ]
@@ -309,7 +314,7 @@ to kill-hedgehog
 end
 
 to come-of-age
-  ;;umiera 1/4 miotu
+  ;;umiera 1/4 miotu <- najlepiej na podstawie masy
   ;;usuwane jest gniazdo rodzinne
   ;;nowy kolor i wiekszy rozmiar
 end
@@ -605,7 +610,7 @@ MONITOR
 504
 540
 Average mass [g]
-(word precision mean [mass] of hedgehogs 2 \" : \" precision mean [mass] of hoglets 2)
+(word (ifelse-value any? hedgehogs [ precision mean [mass] of hedgehogs 2 ] [ 0 ]) \" : \" (ifelse-value any? hoglets [ precision mean [mass] of hoglets 2 ] [ 0 ]))
 2
 1
 11
