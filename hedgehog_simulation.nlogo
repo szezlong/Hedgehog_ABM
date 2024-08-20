@@ -25,12 +25,14 @@ hedgehogs-own [
   nest ;;mother
   flags
   terrain-color food-here fence-ahead distance-to-nest stay-in-nest
+  family-color
 ]
 
 hoglets-own [
   sex age
   mass
   nest mother
+  come-of-age-done
 ]
 
 patches-own [
@@ -118,11 +120,10 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  let total-count 3
+  let total-count 10
 
-  create-hedgehogs round (0.7 * total-count) [
-    set sex one-of [0 1] ;;50% szans że samica=1
-
+  create-hedgehogs round (0.4 * total-count) [
+    set sex one-of [0 1] ;; samica=1
     set age random-normal 1095 730  ;; średnia 3 lata (1095 dni), odchylenie standardowe 2 lata (730 dni)
     set color ifelse-value (sex = 0) [brown - 2] [brown]
     set mass random-normal avg-mass std-dev
@@ -150,6 +151,9 @@ to setup-hedgehogs
     set stuck-count 0
     set stay-in-nest false
     update-state-variables
+
+    set family-color one-of base-colors
+    set color family-color
   ]
 
   ask hedgehogs [
@@ -163,15 +167,20 @@ to setup-hedgehogs
     qlearningextension:discount-factor 0.55
   ]
 
-  create-hoglets round (0.3 * total-count) [
+  create-hoglets round (0.6 * total-count) [
     set sex one-of [0 1]
     set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
-    set age 7 + random 43 ;;wiek od 1 tyg do 7 tyg
-    set mass 200 + (age / 49) * 35
+    set age 49
+    ;set age 7 + random 43 ;;wiek od 1 tyg do 7 tyg
+    set mass 200 + (age / 49) * 35 + random 20
     set size 2.5
     set mother one-of turtles with [age >= 50 and sex = 1] ;; +zabezpieczenie
-    set nest [nest] of mother
+    set nest [nest] of mother ;;
     move-to one-of ([neighbors] of [patch-here] of mother) with [member? self available-patches] ;; +zabezpieczenie
+    set come-of-age-done false
+
+
+    set color [family-color] of mother
   ]
 end
 
@@ -314,9 +323,52 @@ to kill-hedgehog
 end
 
 to come-of-age
-  ;;umiera 1/4 miotu <- najlepiej na podstawie masy
+  ifelse not come-of-age-done [
+    ;; pierwsze wywolanie
+    ask hoglets with [mother = [mother] of myself] [
+      set come-of-age-done true
+    ]
+    ;;umiera 1/4 miotu
+    let litter hoglets with [mother = [mother] of myself]
+    let num-to-die ceiling (count litter / 4)
+    print num-to-die
+    let sorted-litter sort-on [mass] litter
+    ask turtle-set (sublist sorted-litter 0 num-to-die) [
+      print word "Died during come-of-age: " [mass] of self
+      kill-hedgehog
+    ]
+  ] [
+    print word "I survived: " [mass] of self
+  ]
+
   ;;usuwane jest gniazdo rodzinne
   ;;nowy kolor i wiekszy rozmiar
+end
+
+to brudnopis
+create-hedgehogs 1 [
+    set sex one-of [0 1] ;;50% szans że samica=1
+    set age random-normal 1095 730  ;; średnia 3 lata (1095 dni), odchylenie standardowe 2 lata (730 dni)
+    set color ifelse-value (sex = 0) [brown - 2] [brown]
+    set mass random-normal avg-mass std-dev
+    set size 3.5
+    move-to one-of available-patches ;;with [pcolor = turquoise]
+    set nest patch-here
+    ask nest [ set pcolor brown ]
+
+    set daily-mass-gain 0
+    set speed random-normal 1 0.02
+    set distance-traveled 0
+    set return-probability 0.05
+    set visited-patches (list patch-here)
+
+    random-turn-hedgehog
+    set flags []
+    set last-heading heading
+    set stuck-count 0
+    set stay-in-nest false
+    update-state-variables
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
