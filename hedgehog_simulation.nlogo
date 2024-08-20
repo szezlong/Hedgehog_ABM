@@ -179,7 +179,6 @@ to setup-hedgehogs
     move-to one-of ([neighbors] of [patch-here] of mother) with [member? self available-patches] ;; +zabezpieczenie
     set come-of-age-done false
 
-
     set color [family-color] of mother
   ]
 end
@@ -323,8 +322,7 @@ to kill-hedgehog
 end
 
 to come-of-age
-  ifelse not come-of-age-done [
-    ;; pierwsze wywolanie
+  if not come-of-age-done [
     ask hoglets with [mother = [mother] of myself] [
       set come-of-age-done true
     ]
@@ -337,24 +335,15 @@ to come-of-age
       print word "Died during come-of-age: " [mass] of self
       kill-hedgehog
     ]
-  ] [
-    print word "I survived: " [mass] of self
   ]
 
-  ;;usuwane jest gniazdo rodzinne
-  ;;nowy kolor i wiekszy rozmiar
-end
-
-to brudnopis
-create-hedgehogs 1 [
-    set sex one-of [0 1] ;;50% szans że samica=1
-    set age random-normal 1095 730  ;; średnia 3 lata (1095 dni), odchylenie standardowe 2 lata (730 dni)
+  hatch-hedgehogs 1 [
+    set sex [sex] of myself
+    set age [age] of myself
     set color ifelse-value (sex = 0) [brown - 2] [brown]
-    set mass random-normal avg-mass std-dev
     set size 3.5
-    move-to one-of available-patches ;;with [pcolor = turquoise]
-    set nest patch-here
-    ask nest [ set pcolor brown ]
+    set mass [mass] of myself
+    ;set nest [nest] of myself
 
     set daily-mass-gain 0
     set speed random-normal 1 0.02
@@ -368,7 +357,18 @@ create-hedgehogs 1 [
     set stuck-count 0
     set stay-in-nest false
     update-state-variables
+
+    qlearningextension:state-def ["terrain-color" "fence-ahead" "food-here" "mass" "distance-to-nest"]
+    (qlearningextension:actions [forage] [eat-food] [go-to-nest])
+    qlearningextension:reward [reward-func]
+    qlearningextension:end-episode [isEndState] reset-episode
+    qlearningextension:action-selection "e-greedy" [0.25 0.995]
+    ;qlearningextension:action-selection-egreedy 0.75 "rate" 0.95
+    qlearningextension:learning-rate 0.95
+    qlearningextension:discount-factor 0.55
   ]
+
+  die
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
