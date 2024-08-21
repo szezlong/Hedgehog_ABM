@@ -8,7 +8,7 @@ breed [hoglets hoglet]
 globals [
   possible-actions possible-angles
   night-duration current-time current-month current-day episode-counter
-  max-distance
+  ;max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
   hedgehog-memory hedgehog-data
 
@@ -63,7 +63,7 @@ to setup
   print "Hedgehogs setup completed"
 
   if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
-  set hedgehog-data array:from-list n-values 6 [0]
+  set hedgehog-data array:from-list n-values 7 [0]
   collect-hedgehog-data
 
   ; check-food
@@ -77,7 +77,7 @@ to setup-variables
   set current-day 1
   set episode-counter 0
 
-  set max-distance 20
+  ;set max-distance 20
   set possible-angles [0 45 90 135 180 225 270 315]
   set hedgehog-memory 10
   set avg-mass 846 ;;na razie dla samców
@@ -479,12 +479,12 @@ NIL
 1
 
 MONITOR
-517
-494
-640
-539
-Average Distance [m]
-array:item hedgehog-data 4
+519
+522
+658
+567
+Average distance [m]
+word \"Males: \" precision (array:item hedgehog-data 4) 2
 2
 1
 11
@@ -678,6 +678,17 @@ NIL
 NIL
 NIL
 1
+
+MONITOR
+519
+495
+658
+540
+Average distance [m]
+word \"Females: \" precision (array:item hedgehog-data 5) 2
+2
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?

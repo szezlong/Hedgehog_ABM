@@ -3,7 +3,6 @@ to forage
     random-turn-hedgehog ;; krawędź świata
   ]
   
-  ;;if distance-traveled < max-distance [ ;; na razie tak, w przyszłości będzie do gniazda wracać
   move-towards-food-patch
   
 ;  if random-float 1 < 0.1 [

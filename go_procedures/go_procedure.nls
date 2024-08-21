@@ -8,9 +8,9 @@ to go
       update-state-variables
        
       if not stay-in-nest [
-;        while [not can-move? 1]
-;          random-turn-hedgehog ;; krawędź świata
-;        ]
+        while [not can-move? 1] [
+          random-turn-hedgehog ;; krawędź świata
+        ]
         
         let old-position patch-here
         ;;ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
