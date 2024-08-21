@@ -15,6 +15,12 @@ to go
         let old-position patch-here
         ;;ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
        
+        ;;rozmnazanie ale rozmnazanie tez moze sprawic ze przejdzie przez ulice
+        if current-month >= 3 and current-month <= 8 [
+          ask hedgehogs with [sex = 0] [
+            reproduce
+          ]
+        ]
         check-cross-street
         
         (qlearningextension:learning)
@@ -155,6 +161,35 @@ end
 ;; ROZMNAŻANIE ;;
 ;;;;;;;;;;;;;;;;;
 
+to reproduce
+  ;; 1. Sprawdź intensywność rozrodu
+  let intensity reproduction-intensity
+  
+  ;; 2. Prawdopodobieństwo rozpoczęcia poszukiwań
+  if random-float 1 < intensity [
+    
+    ;; 3. Sprawdź, czy w pobliżu jest samica w promieniu zależnym od intensywności
+    let search-radius ifelse-value (intensity > 0.7) [10] [5]  ;; Wyższa intensywność -> większy promień poszukiwań
+    let nearby-females turtles with [sex = 1] in-radius search-radius
+    
+    if any? nearby-females [
+      ;; 4. Zbliż się do samicy
+      let chosen-female min-one-of nearby-females [distance myself]
+      face-patch chosen-female
+      let direction decide-direction
+      move-along-fencing direction
+      fd speed
+      
+      ;; 5. Sprawdź, czy kopulacja jest udana
+      if random-float 1 < intensity [ ;; czy sa na tym samym patchu
+        ;; Sukces kopulacji
+        print (word "Samiec " who " skopił z samicą " [who] of chosen-female)
+        ;; Logika tworzenia miotu tutaj
+      ]
+    ]
+  ]
+end
+
 to-report reproduction-intensity
   ;; Faza 1: 21 marca - 30 marca (wzrost z 0 do 0.25)
   if current-month = 3 and current-day >= 21 [
@@ -189,5 +224,3 @@ to-report reproduction-intensity
   ;; Poza okresem rozrodu
   report 0
 end
-
-

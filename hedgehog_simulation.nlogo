@@ -99,9 +99,9 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  let total-count 10
+  let total-count 20
 
-  create-hedgehogs round (0.4 * total-count) [
+  create-hedgehogs round (0.7 * total-count) [
     set sex one-of [0 1] ;; samica=1
     set age random-normal 1095 730  ;; średnia 3 lata (1095 dni), odchylenie standardowe 2 lata (730 dni)
     set color ifelse-value (sex = 0) [brown - 2] [brown]
@@ -131,8 +131,8 @@ to setup-hedgehogs
     set stay-in-nest false
     update-state-variables
 
-    set family-color one-of base-colors
-    set color family-color
+    ;set family-color one-of base-colors
+    ;set color family-color
   ]
 
   ask hedgehogs [
@@ -146,7 +146,7 @@ to setup-hedgehogs
     qlearningextension:discount-factor 0.55
   ]
 
-  create-hoglets round (0.6 * total-count) [
+  create-hoglets round (0.3 * total-count) [
     set sex one-of [0 1]
     set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
     set age 49
@@ -158,7 +158,7 @@ to setup-hedgehogs
     move-to one-of ([neighbors] of [patch-here] of mother) with [member? self available-patches] ;; +zabezpieczenie
     set come-of-age-done false
 
-    set color [family-color] of mother
+    ;set color [family-color] of mother
   ]
 end
 
@@ -653,6 +653,23 @@ Average mass [g]
 2
 1
 11
+
+BUTTON
+100
+115
+196
+148
+run a month
+let counter 0\nwhile [counter < 30] [\n next-night\n set counter counter + 1\n]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
