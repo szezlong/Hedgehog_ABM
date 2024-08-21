@@ -164,7 +164,7 @@ end
 to reproduce
   let intensity reproduction-intensity
   if random-float 1 < intensity [
-    let search-radius ifelse-value (intensity > 0.7) [10] [5]  ;; Wyższa intensywność -> większy promień poszukiwań
+    let search-radius ifelse-value (intensity > 0.7) [10] [4]  ;; Wyższa intensywność -> większy promień poszukiwań
     let nearby-females turtles with [sex = 1 and remaining-days = 0] in-radius search-radius
     
     if any? nearby-females [
@@ -174,12 +174,12 @@ to reproduce
       move-along-fencing direction
       fd speed
       
-      ;; 5. Sprawdź, czy kopulacja jest udana
-      if random-float 1 < intensity [ ;; czy sa na tym samym patchu
-        ;; Sukces kopulacji
-        set remaining-days 3
-        print (word "Samiec " who " skopił z samicą " [who] of chosen-female)
-        ;; Logika tworzenia miotu tutaj
+      if [patch-here] of chosen-female = patch-here [
+        if random-float 1 < 0.65 [
+          set remaining-days 3
+          print (word "Samiec " who " pokrył samicę " [who] of chosen-female)
+          ;; Logika tworzenia miotu tutaj
+        ]
       ]
     ]
   ]
