@@ -107,6 +107,28 @@ to export-legend
   file-close
 end
 
+to check-food
+   ask patches [
+    (ifelse
+      food >= 45 [
+        set pcolor red
+      ]
+      food < 35 and food >= 20 [
+        set pcolor turquoise
+      ]
+      food < 20 and food > 10 [
+        set pcolor green
+      ]
+      food <= 10 and food > 0 [
+        set pcolor lime
+      ]
+      food <= 0 [
+        set pcolor 79
+      ]
+    )
+  ]
+end
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Sprawdzenie wgranej mapy ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;

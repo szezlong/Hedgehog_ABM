@@ -69,28 +69,6 @@ to setup
   print "Setup completed."
 end
 
-to check-food
-   ask patches [
-    (ifelse
-      food >= 45 [
-        set pcolor red
-      ]
-      food < 35 and food >= 20 [
-        set pcolor turquoise
-      ]
-      food < 20 and food > 10 [
-        set pcolor green
-      ]
-      food <= 10 and food > 0 [
-        set pcolor lime
-      ]
-      food <= 0 [
-        set pcolor 79
-      ]
-    )
-  ]
-end
-
 to setup-variables
   set night-duration 613  ;; 2.3m : 0.049 m/s  47 --> 8 * 60 * 60 s = 28800 s -> : 47
   set current-time 0
@@ -183,6 +161,9 @@ to setup-hedgehogs
   ]
 end
 
+;;;;;;;;;;;;;;;;
+;; to opisać? ;;
+;;;;;;;;;;;;;;;;
 to update-state-variables
   ask hedgehogs [
     set terrain-color [pcolor] of patch-here
@@ -262,11 +243,6 @@ to reset-episode
         kill-hedgehog
       ]
     ]
-    set age age + 1
-    set stay-in-nest false
-    set distance-traveled 0
-    set daily-mass-gain 0
-    set return-probability 0.05
   ]
 
   ask hoglets [
@@ -283,10 +259,18 @@ to reset-episode
     user-message "Wszystkie jeże nie żyją. Symulacja została przerwana." ;;ok nic nie daje
     stop
   ]
-  set current-time 0
 
+  ask hedgehogs [   ;;reset hedgehogs variables
+    set age age + 1
+    set stay-in-nest false
+    set distance-traveled 0
+    set daily-mass-gain 0
+    set return-probability 0.05
+  ]
+
+  set current-time 0
   set episode-counter episode-counter + 1
-  if episode-counter mod 30 = 0 [
+  if episode-counter mod 30 = 0 [ ;; uproszczenie
     renew-resources ;;trzeba dostosowac do sezonu
     set current-month current-month + 1
     if current-month > 12 [

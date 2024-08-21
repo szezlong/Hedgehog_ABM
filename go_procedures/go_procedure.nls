@@ -8,12 +8,12 @@ to go
       update-state-variables
        
       if not stay-in-nest [
-;        while [not can-move? 1] [ ;;co z tym ?
+;        while [not can-move? 1]
 ;          random-turn-hedgehog ;; krawędź świata
 ;        ]
         
-        let old-position patch-here ;;czemu taka nazwa niejasna?
-        ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
+        let old-position patch-here
+        ;;ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
        
         check-cross-street
         
@@ -33,6 +33,7 @@ to go
       
       if current-time > (night-duration * 0.8) [
         if any? patches in-radius 4 with [ self = [nest] of myself ] [
+          set distance-traveled distance-traveled + distance nest
           move-to nest ;;zakładam że zdążyłby wrócić <-- chyba że dzieli go jezdnia, to powinien podjąć ryzyko przejścia przez ulicę
         ]
         set stay-in-nest true
@@ -101,6 +102,7 @@ to check-stuck
       let available-patches-in-radius patches in-radius 3 with [member? self available-patches]
        ifelse any? available-patches-in-radius [
         let chosen-patch one-of available-patches-in-radius
+        set distance-traveled distance-traveled + distance chosen-patch
         move-to chosen-patch
       ] [
         show "One got stuck and died :("
@@ -130,6 +132,9 @@ to check-stuck
   ]
 end
 
+;;;;;;;;;;;;
+; to opisz ;
+;;;;;;;;;;;;
 to face-patch [patch-to-face]
   face patch-to-face
   let angle heading
