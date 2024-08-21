@@ -149,3 +149,45 @@ to face-patch [patch-to-face]
   ]
   set heading closest-angle
 end
+
+
+;;;;;;;;;;;;;;;;;
+;; ROZMNAŻANIE ;;
+;;;;;;;;;;;;;;;;;
+
+to-report reproduction-intensity
+  ;; Faza 1: 21 marca - 30 marca (wzrost z 0 do 0.25)
+  if current-month = 3 and current-day >= 21 [
+    report (current-day - 20) / 10
+  ]
+  
+  ;; Faza 1: 1 kwietnia - 30 kwietnia (wzrost z 0.25 do 1)
+  if current-month = 4 [
+    report 0.25 + (current-day / 30) * 0.75
+  ]
+  
+  ;; Faza 2: 1 maja - 15 czerwca (maksimum, intensywność 1)
+  if (current-month = 5) or (current-month = 6 and current-day <= 15) [
+    report 1
+  ]
+  
+  ;; Faza 3: 16 czerwca - 30 czerwca (spadek z 1 do 0.75)
+  if current-month = 6 and current-day > 15 [
+    report 1 - ((current-day - 15) / 15) * 0.25
+  ]
+  
+  ;; Faza 3: 1 lipca - 30 lipca (spadek z 0.75 do 0.25)
+  if current-month = 7 [
+    report 0.75 - (current-day / 30) * 0.5
+  ]
+  
+  ;; Faza 4: 1 sierpnia - 15 sierpnia (spadek z 0.25 do 0)
+  if current-month = 8 and current-day <= 15 [
+    report 0.25 - (current-day / 15) * 0.25
+  ]
+  
+  ;; Poza okresem rozrodu
+  report 0
+end
+
+
