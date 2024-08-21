@@ -7,7 +7,7 @@ breed [hoglets hoglet]
 
 globals [
   possible-actions possible-angles
-  night-duration current-time current-month episode-counter
+  night-duration current-time current-month current-day episode-counter
   max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
   hedgehog-memory hedgehog-data
@@ -73,6 +73,7 @@ to setup-variables
   set night-duration 613  ;; 2.3m : 0.049 m/s  47 --> 8 * 60 * 60 s = 28800 s -> : 47
   set current-time 0
   set current-month 1
+  set current-day 1
   set episode-counter 0
 
   set max-distance 20
@@ -270,9 +271,11 @@ to reset-episode
 
   set current-time 0
   set episode-counter episode-counter + 1
+  set current-day current-day + 1
   if episode-counter mod 30 = 0 [ ;; uproszczenie
     renew-resources ;;trzeba dostosowac do sezonu
     set current-month current-month + 1
+    set current-day 1
     if current-month > 12 [
       set current-month 1
     ]
@@ -634,8 +637,8 @@ MONITOR
 494
 1110
 539
-Month:
-item (current-month - 1) [\"January\" \"February\" \"March\" \"April\" \"May\" \"June\" \"July\" \"August\" \"September\" \"October\" \"November\" \"December\"]
+Current Day:
+word (item (current-month - 1) [\"January\" \"February\" \"March\" \"April\" \"May\" \"June\" \"July\" \"August\" \"September\" \"October\" \"November\" \"December\"]) \" \" current-day \n  (ifelse-value ((current-day mod 10) = 1 and (current-day != 11)) [\" st\"] \n    [ifelse-value ((current-day mod 10) = 2 and (current-day != 12)) [\" nd\"] \n      [ifelse-value ((current-day mod 10) = 3 and (current-day != 13)) [\" rd\"] [\" th\"]]])
 0
 1
 11
