@@ -24,6 +24,7 @@ hedgehogs-own [
   visited-patches last-heading stuck-count
   nest ;;mother
   flags
+  remaining-days ;;dla samic ile dni ciąży zostało, dla samców ile dni odpoczynku zostało
   terrain-color food-here fence-ahead distance-to-nest stay-in-nest
   family-color
 ]
@@ -72,7 +73,7 @@ end
 to setup-variables
   set night-duration 613  ;; 2.3m : 0.049 m/s  47 --> 8 * 60 * 60 s = 28800 s -> : 47
   set current-time 0
-  set current-month 1
+  set current-month 3
   set current-day 1
   set episode-counter 0
 
@@ -126,6 +127,7 @@ to setup-hedgehogs
 
     random-turn-hedgehog
     set flags []
+    set remaining-days 0
     set last-heading heading
     set stuck-count 0
     set stay-in-nest false
@@ -267,6 +269,11 @@ to reset-episode
     set distance-traveled 0
     set daily-mass-gain 0
     set return-probability 0.05
+    ifelse remaining-days <= 0 [
+      set remaining-days 0 ;; na wszelki
+    ] [
+      set remaining-days remaining-days - 1
+    ]
   ]
 
   set current-time 0
@@ -340,6 +347,7 @@ to come-of-age
 
     random-turn-hedgehog
     set flags []
+    set remaining-days 0
     set last-heading heading
     set stuck-count 0
     set stay-in-nest false

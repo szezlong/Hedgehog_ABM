@@ -17,7 +17,7 @@ to go
        
         ;;rozmnazanie ale rozmnazanie tez moze sprawic ze przejdzie przez ulice
         if current-month >= 3 and current-month <= 8 [
-          ask hedgehogs with [sex = 0] [
+          if sex = 0 and remaining-days = 0 [
             reproduce
           ]
         ]
@@ -162,18 +162,12 @@ end
 ;;;;;;;;;;;;;;;;;
 
 to reproduce
-  ;; 1. Sprawdź intensywność rozrodu
   let intensity reproduction-intensity
-  
-  ;; 2. Prawdopodobieństwo rozpoczęcia poszukiwań
   if random-float 1 < intensity [
-    
-    ;; 3. Sprawdź, czy w pobliżu jest samica w promieniu zależnym od intensywności
     let search-radius ifelse-value (intensity > 0.7) [10] [5]  ;; Wyższa intensywność -> większy promień poszukiwań
-    let nearby-females turtles with [sex = 1] in-radius search-radius
+    let nearby-females turtles with [sex = 1 and remaining-days = 0] in-radius search-radius
     
     if any? nearby-females [
-      ;; 4. Zbliż się do samicy
       let chosen-female min-one-of nearby-females [distance myself]
       face-patch chosen-female
       let direction decide-direction
@@ -183,6 +177,7 @@ to reproduce
       ;; 5. Sprawdź, czy kopulacja jest udana
       if random-float 1 < intensity [ ;; czy sa na tym samym patchu
         ;; Sukces kopulacji
+        set remaining-days 3
         print (word "Samiec " who " skopił z samicą " [who] of chosen-female)
         ;; Logika tworzenia miotu tutaj
       ]
