@@ -1,4 +1,4 @@
-__includes ["go_procedures//fence_behavior.nls" "go_procedures//food_behavior.nls" "go_procedures//nest_behavior.nls"]
+__includes ["go_procedures//fence_behavior.nls" "go_procedures//food_behavior.nls" "go_procedures//nest_behavior.nls" "go_procedures//mating_behavior.nls"]
 
 extensions [table]
 
@@ -154,70 +154,4 @@ to face-patch [patch-to-face]
     ]
   ]
   set heading closest-angle
-end
-
-
-;;;;;;;;;;;;;;;;;
-;; ROZMNAŻANIE ;;
-;;;;;;;;;;;;;;;;;
-
-to reproduce
-  let intensity reproduction-intensity
-  if random-float 1 < intensity [
-    let search-radius ifelse-value (intensity > 0.7) [10] [4]  ;; Wyższa intensywność -> większy promień poszukiwań
-    let nearby-females hedgehogs with [sex = 1 and remaining-days = 0] in-radius search-radius
-    
-    if any? nearby-females [
-      let chosen-female min-one-of nearby-females [distance myself]
-      face-patch chosen-female
-      let direction decide-direction
-      move-along-fencing direction
-      fd speed
-      
-      if [patch-here] of chosen-female = patch-here [
-        if random-float 1 < 0.65 [
-          set remaining-days 3
-          print (word "Samiec " who " pokrył samicę " [who] of chosen-female)
-          ask chosen-female [
-            set remaining-days (36 + random 7)
-          ]
-        ]
-      ]
-    ]
-  ]
-end
-
-to-report reproduction-intensity
-  ;; Faza 1: 21 marca - 30 marca (wzrost z 0 do 0.25)
-  if current-month = 3 and current-day >= 21 [
-    report (current-day - 20) / 10
-  ]
-  
-  ;; Faza 1: 1 kwietnia - 30 kwietnia (wzrost z 0.25 do 1)
-  if current-month = 4 [
-    report 0.25 + (current-day / 30) * 0.75
-  ]
-  
-  ;; Faza 2: 1 maja - 15 czerwca (maksimum, intensywność 1)
-  if (current-month = 5) or (current-month = 6 and current-day <= 15) [
-    report 1
-  ]
-  
-  ;; Faza 3: 16 czerwca - 30 czerwca (spadek z 1 do 0.75)
-  if current-month = 6 and current-day > 15 [
-    report 1 - ((current-day - 15) / 15) * 0.25
-  ]
-  
-  ;; Faza 3: 1 lipca - 30 lipca (spadek z 0.75 do 0.25)
-  if current-month = 7 [
-    report 0.75 - (current-day / 30) * 0.5
-  ]
-  
-  ;; Faza 4: 1 sierpnia - 15 sierpnia (spadek z 0.25 do 0)
-  if current-month = 8 and current-day <= 15 [
-    report 0.25 - (current-day / 15) * 0.25
-  ]
-  
-  ;; Poza okresem rozrodu
-  report 0
 end

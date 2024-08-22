@@ -223,6 +223,10 @@ to-report reward-func
   report (reward + penalty)
 end
 
+;;;;;;;;;;;;;;;;;;
+;; Time Passage ;;
+;;;;;;;;;;;;;;;;;;
+
 to reset-episode
   ask hedgehogs [
     give-birth
@@ -306,27 +310,6 @@ to give-birth
   ]
 end
 
-to next-night
-  while [not isEndState] [
-    go
-  ]
-  reset-episode
-end
-
-to-report isEndState
-  report current-time >= night-duration
-end
-
-to renew-resources
-  print "Nature is healing..."
-  ask patches [
-    if member? self environment-types [
-      set food food + random 5 + 3 ;;różne środowiska może z inną prędkością powinny?
-      ;;trzeba tu jakos ograniczyc zeby nie odnawialo za duzo, zwlaszcza tam gdzie nic nie ma!
-    ]
-  ]
-end
-
 to kill-hedgehog
   if nest != 0 [
       ask nest [ set pcolor og-color ]
@@ -382,6 +365,27 @@ to come-of-age
   ]
 
   die
+end
+
+to next-night
+  while [not isEndState] [
+    go
+  ]
+  reset-episode
+end
+
+to-report isEndState
+  report current-time >= night-duration
+end
+
+to renew-resources
+  print "Nature is healing..."
+  ask patches [
+    if member? self environment-types [
+      set food food + random 5 + 3 ;;różne środowiska może z inną prędkością powinny?
+      ;;trzeba tu jakos ograniczyc zeby nie odnawialo za duzo, zwlaszcza tam gdzie nic nie ma!
+    ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
