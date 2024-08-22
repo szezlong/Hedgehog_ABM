@@ -1,8 +1,8 @@
 to update-graph
   ifelse any? turtles [
-    set-current-plot "Średnia masa jeży podczas symulacji"
+    set-current-plot "Średnia masa dorosłych jeży podczas symulacji"
     set-current-plot-pen "avg-mass"
-    plot mean [mass] of turtles
+    plot mean [mass] of hedgehogs
   ] [ plot 0 ]
 end
 

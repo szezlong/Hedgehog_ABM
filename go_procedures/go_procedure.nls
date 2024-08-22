@@ -165,7 +165,7 @@ to reproduce
   let intensity reproduction-intensity
   if random-float 1 < intensity [
     let search-radius ifelse-value (intensity > 0.7) [10] [4]  ;; Wyższa intensywność -> większy promień poszukiwań
-    let nearby-females turtles with [sex = 1 and remaining-days = 0] in-radius search-radius
+    let nearby-females hedgehogs with [sex = 1 and remaining-days = 0] in-radius search-radius
     
     if any? nearby-females [
       let chosen-female min-one-of nearby-females [distance myself]
@@ -178,7 +178,9 @@ to reproduce
         if random-float 1 < 0.65 [
           set remaining-days 3
           print (word "Samiec " who " pokrył samicę " [who] of chosen-female)
-          ;; Logika tworzenia miotu tutaj
+          ask chosen-female [
+            set remaining-days (36 + random 7)
+          ]
         ]
       ]
     ]

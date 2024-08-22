@@ -74,7 +74,7 @@ to setup-variables
   set night-duration 613  ;; 2.3m : 0.049 m/s  47 --> 8 * 60 * 60 s = 28800 s -> : 47
   set current-time 0
   set current-month 3
-  set current-day 1
+  set current-day 21
   set episode-counter 0
 
   ;set max-distance 20
@@ -223,19 +223,17 @@ to-report reward-func
   report (reward + penalty)
 end
 
-to-report isEndState
-  report current-time >= night-duration
-end
-
 to reset-episode
   ask hedgehogs [
+    give-birth
+
     let metabolic-loss 30 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
     let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
     set mass mass - (metabolic-loss + distance-loss)
     if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g/600g
       let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
       if random-float 1 > survival-chance [
-        print word "too small mass - died: " mass
+        print word "too small mass - died: " who
         kill-hedgehog
       ]
     ]
@@ -288,14 +286,35 @@ to reset-episode
     ]
   ]
   reset-ticks
-  ;;reset rewards?
 end
 
-to next-night ;;czy nie jest zbędne mając już "reset-episode"?
+to give-birth
+  ask hedgehogs with [sex = 1 and remaining-days = 1] [
+    print "time to give birth"
+    let litter-size random-normal 5 1
+    hatch-hoglets min list litter-size 10 [
+      set sex one-of [0 1]
+      set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
+      set age 0
+      set mass 200 + (age / 49) * 35 + random 20
+      set size 2.5
+      set mother myself
+      set nest [nest] of myself
+      set come-of-age-done false
+    ]
+    set remaining-days 54 ;; póki opiekuje się oseskami nie będzie się rozmnażać
+  ]
+end
+
+to next-night
   while [not isEndState] [
     go
   ]
   reset-episode
+end
+
+to-report isEndState
+  report current-time >= night-duration
 end
 
 to renew-resources
@@ -358,7 +377,6 @@ to come-of-age
     qlearningextension:reward [reward-func]
     qlearningextension:end-episode [isEndState] reset-episode
     qlearningextension:action-selection "e-greedy" [0.25 0.995]
-    ;qlearningextension:action-selection-egreedy 0.75 "rate" 0.95
     qlearningextension:learning-rate 0.95
     qlearningextension:discount-factor 0.55
   ]
@@ -522,7 +540,7 @@ PLOT
 234
 1482
 359
-Średnia masa jeży podczas symulacji
+Średnia masa dorosłych jeży podczas symulacji
 Noc
 Masa (g)
 0.0
@@ -531,7 +549,7 @@ Masa (g)
 10.0
 true
 false
-"set-current-plot \"Średnia masa jeży podczas symulacji\"\nset-current-plot-pen \"avg-mass\"\n" ""
+"set-current-plot \"Średnia masa dorosłych jeży podczas symulacji\"\nset-current-plot-pen \"avg-mass\"\n" ""
 PENS
 "avg-mass" 1.0 0 -16777216 true "" "\n"
 
