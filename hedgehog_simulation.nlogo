@@ -10,7 +10,8 @@ globals [
   night-duration current-time current-month current-day episode-counter
   ;max-distance
   avg-mass std-dev low-mass-threshold high-mass-threshold
-  hedgehog-memory hedgehog-data
+  hedgehog-memory
+  hedgehog-data mortality-data
 
   fence street urban ;o to też można później uprościć
   environment-types
@@ -64,7 +65,10 @@ to setup
 
   if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
   set hedgehog-data array:from-list n-values 7 [0]
-  collect-hedgehog-data
+  ;collect-hedgehog-data
+
+  if file-exists? "results//mortality-data.csv" [ file-delete "results//mortality-data.csv" ]
+  set mortality-data array:from-list n-values 10 [0]
 
   ; check-food
   print "Setup completed."
@@ -236,12 +240,16 @@ to reset-episode
     set mass mass - (metabolic-loss + distance-loss)
     if mass < 100 [
       print word "too small mass - died: " who
+      let cause "too small mass"
+      collect-mortality-data cause who
       kill-hedgehog
     ]
     if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g/600g
       let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
       if random-float 1 > survival-chance [
         print word "too small mass - died: " who
+        let cause "too small mass"
+        collect-mortality-data cause who
         kill-hedgehog
       ]
     ]
@@ -249,6 +257,8 @@ to reset-episode
       let mortality-risk (age - 2920) / 3650 ;; ryzyko śmierci rośnie z wiekiem, do 1 przy 15 latach
       if random-float 1 < mortality-risk [
         print word "Died of old age: " age
+        let cause "old age"
+        collect-mortality-data cause who
         kill-hedgehog
       ]
     ]
@@ -263,7 +273,7 @@ to reset-episode
 
   update-graph
   collect-hedgehog-data
-  export-data
+
   if not any? turtles [
     user-message "Wszystkie jeże nie żyją. Symulacja została przerwana." ;;ok nic nie daje
     stop
@@ -340,6 +350,8 @@ to come-of-age
     let sorted-litter sort-on [mass] litter
     ask turtle-set (sublist sorted-litter 0 num-to-die) [
       print word "Died during come-of-age: " [mass] of self
+      let cause "come of age"
+      collect-mortality-data cause who
       kill-hedgehog
     ]
   ]
@@ -538,7 +550,7 @@ BUTTON
 323
 143
 356
-export results
+export map
 export-result-map
 NIL
 1

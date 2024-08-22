@@ -47,6 +47,8 @@ to go
       if current-time + 1 >= night-duration and patch-here != nest[
         if patch-here = street [
           show "didn't reach the nest on time - died"
+          let cause "didn't reach the nest"
+          collect-mortality-data cause who
           kill-hedgehog
           ;;die ;;nie zdążył wrócić
         ]
@@ -93,6 +95,8 @@ to cross-street
   print "I'm crossing the street!"
   if random-float 1 < 0.5 [
     show "died while crossing the street"
+    let cause "roadkill"
+    collect-mortality-data cause who
     kill-hedgehog
   ] 
   let direction decide-direction ;;albo przed siebie
@@ -121,11 +125,15 @@ to check-stuck
         move-to chosen-patch
       ] [
         show "One got stuck and died :("
+        let cause "stuck in fencing"
+        collect-mortality-data cause who
         kill-hedgehog
         ;;die
       ]
     ] [
       show "One got stuck and died :("
+      let cause "stuck in fencing"
+      collect-mortality-data cause who
       kill-hedgehog
       ;;die
     ]
