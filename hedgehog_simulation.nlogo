@@ -324,7 +324,7 @@ to come-of-age
     ]
     ;;umiera 1/4 miotu
     let litter hoglets with [mother = [mother] of myself]
-    let num-to-die ceiling (count litter / 4)
+    let num-to-die floor (count litter / 4)
     print num-to-die
     let sorted-litter sort-on [mass] litter
     ask turtle-set (sublist sorted-litter 0 num-to-die) [
