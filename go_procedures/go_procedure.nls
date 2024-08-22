@@ -56,9 +56,18 @@ to go
       
       update-visited-patches
     ]
+    ask hoglets [
+      if mother != nobody [
+        let mothers-nest [nest] of mother
+        if mothers-nest != nobody and nest != mothers-nest [
+          set nest mothers-nest
+          move-to nest
+        ]
+      ]
+    ]
     set current-time current-time + 1
     tick
-    ]
+  ]
 end
 
 to check-cross-street ;;można by też dodać hotspoty gdzie najczęściej jeże przechodzą przez ulicę

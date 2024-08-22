@@ -100,7 +100,7 @@ to setup-variables
 end
 
 to setup-hedgehogs
-  let total-count 20
+  let total-count 30
 
   create-hedgehogs round (0.7 * total-count) [
     set sex one-of [0 1] ;; samica=1
@@ -157,7 +157,7 @@ to setup-hedgehogs
     set size 2.5
     set mother one-of turtles with [age >= 50 and sex = 1] ;; +zabezpieczenie
     set nest [nest] of mother ;;
-    move-to one-of ([neighbors] of [patch-here] of mother) with [member? self available-patches] ;; +zabezpieczenie
+    move-to nest
     set come-of-age-done false
 
     ;set color [family-color] of mother
@@ -234,6 +234,10 @@ to reset-episode
     let metabolic-loss 30 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
     let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
     set mass mass - (metabolic-loss + distance-loss)
+    if mass < 100 [
+      print word "too small mass - died: " who
+      kill-hedgehog
+    ]
     if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g/600g
       let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
       if random-float 1 > survival-chance [
@@ -281,10 +285,11 @@ to reset-episode
   set current-time 0
   set episode-counter episode-counter + 1
   set current-day current-day + 1
-  if episode-counter mod 30 = 0 [ ;; uproszczenie
+  if current-day > 30 [
     renew-resources ;;trzeba dostosowac do sezonu
-    set current-month current-month + 1
+
     set current-day 1
+    set current-month current-month + 1
     if current-month > 12 [
       set current-month 1
     ]
@@ -321,6 +326,12 @@ to come-of-age
   if not come-of-age-done [
     ask hoglets with [mother = [mother] of myself] [
       set come-of-age-done true
+      if myself != nobody [
+        let target-patch one-of ([neighbors] of nest)
+        if target-patch != nobody and member? self available-patches [
+          move-to target-patch
+        ]
+      ]
     ]
     ;;umiera 1/4 miotu
     let litter hoglets with [mother = [mother] of myself]
@@ -339,7 +350,7 @@ to come-of-age
     set color ifelse-value (sex = 0) [brown - 2] [brown]
     set size 3.5
     set mass [mass] of myself
-    ;set nest [nest] of myself
+    set nest 0
 
     set daily-mass-gain 0
     set speed random-normal 1 0.02
