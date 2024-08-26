@@ -31,7 +31,7 @@ end
 to-report reproduction-intensity
   ;; Faza 1: 21 marca - 30 marca (wzrost z 0 do 0.25)
   if current-month = 3 and current-day >= 21 [
-    report (current-day - 20) / 10
+    report (current-day - 20) / 40
   ]
   
   ;; Faza 1: 1 kwietnia - 30 kwietnia (wzrost z 0.25 do 1)

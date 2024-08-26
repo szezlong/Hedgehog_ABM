@@ -266,7 +266,7 @@ to reset-episode
 
   ask hoglets [
     set age age + 1
-    if age = 50 [ ;; osesek to 50 dni
+    if age >= 45 [ ;; osesek to 45 dni
       come-of-age
     ]
   ]
@@ -315,13 +315,13 @@ to give-birth
       set sex one-of [0 1]
       set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
       set age 0
-      set mass 200 + (age / 49) * 35 + random 20
+      set mass 200 + random 35
       set size 2.5
       set mother myself
       set nest [nest] of myself
       set come-of-age-done false
     ]
-    set remaining-days 54 ;; póki opiekuje się oseskami nie będzie się rozmnażać
+    set remaining-days 50 ;; póki opiekuje się oseskami nie będzie się rozmnażać
   ]
 end
 
@@ -344,7 +344,7 @@ to come-of-age
       ]
     ]
     ;;umiera 1/4 miotu
-    let litter hoglets with [mother = [mother] of myself]
+    let litter hoglets with [mother = [mother] of myself and age = [age] of myself]
     let num-to-die floor (count litter / 4)
     print num-to-die
     let sorted-litter sort-on [mass] litter
