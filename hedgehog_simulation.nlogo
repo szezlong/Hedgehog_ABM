@@ -135,6 +135,7 @@ to setup-hedgehogs
     set last-heading heading
     set stuck-count 0
     set stay-in-nest false
+
     update-state-variables
 
     ;set family-color one-of base-colors
@@ -376,6 +377,7 @@ to come-of-age
     set last-heading heading
     set stuck-count 0
     set stay-in-nest false
+
     update-state-variables
 
     qlearningextension:state-def ["terrain-color" "fence-ahead" "food-here" "mass" "distance-to-nest"]

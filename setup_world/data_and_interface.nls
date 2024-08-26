@@ -52,7 +52,10 @@ to collect-mortality-data [cause-of-death who-died]
   array:set mortality-data 4 sex
   array:set mortality-data 5 age
   array:set mortality-data 6 mass
-  array:set mortality-data 7 remaining-days
+  array:set hedgehog-data 7 (ifelse-value (
+    sex = 1 and (count hedgehogs with [mother = self] = 0)
+    ) [remaining-days] [-1]
+  )
   array:set mortality-data 8 cause-of-death
   array:set mortality-data 9 who-died
   
@@ -77,20 +80,25 @@ end
 to draw-heatmap
   ask patches [
   if visit-count > 0 [
-        set pcolor scale-color red visit-count 0 (max [visit-count] of patches)
-      ]
+      set pcolor scale-color red visit-count 0 (
+        max [visit-count] of patches
+      )]
   ]
 end
 
 to draw-heatmap-with-threshold
   let sorted-patches sort-on [visit-count] patches with [visit-count > 0]
   let num-visited-patches length sorted-patches
-  let threshold-index floor (num-visited-patches * 0.1)  ; 5% najrzadziej odwiedzanych patchy
-  let visit-threshold [visit-count] of item threshold-index sorted-patches
+  let threshold-index floor (num-visited-patches * 0.1)
+  let visit-threshold [visit-count] of (
+    item threshold-index sorted-patches
+  )
   print visit-threshold
   ask patches [
     if visit-count > visit-threshold [
-      set pcolor scale-color red visit-count visit-threshold (max [visit-count] of patches)
+      set pcolor scale-color red visit-count visit-threshold (
+        max [visit-count] of patches
+      )
     ]
   ]
 end
@@ -112,27 +120,27 @@ to export-result-map
 
   draw-heatmap
   export-view "results//result-map.png"
-  export-legend
+  export-legend "results//legend.csv"
 
   restore-original-colors
 
   draw-heatmap-with-threshold
   export-view "results//result-map-2.png"
-  restore-original-colors
-
+  export-legend "results//legend_2.csv"
+  restore-original-colors 
 
   ask turtles [ show-turtle ]
   ask links [ show-link ]
   display
 end
 
-to export-legend
+to export-legend [path]
   let max-visit-count max [visit-count] of patches
-  file-open "results//legend.csv"
+  file-open path
   file-print "Color,Visits,Percentage"
   ask patches [
     if visit-count > 0 [
-      let color-value scale-color red visit-count 0 max-visit-count
+      let color-value extract-rgb (scale-color red visit-count 0 max-visit-count)
       let percentage (visit-count / max-visit-count) * 100
       file-print (word color-value "," visit-count "," percentage)
     ]

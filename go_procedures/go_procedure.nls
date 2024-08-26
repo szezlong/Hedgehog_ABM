@@ -35,28 +35,9 @@ to go
           set visit-count visit-count + 1
         ]
         set distance-traveled distance-traveled + distance old-position
-      ]
-      
-      if current-time > (night-duration * 0.8) [
-        if any? patches in-radius 4 with [ self = [nest] of myself ] [
-          set distance-traveled distance-traveled + distance nest
-          move-to nest ;;zakładam że zdążyłby wrócić <-- chyba że dzieli go jezdnia, to powinien podjąć ryzyko przejścia przez ulicę
-        ]
-        set stay-in-nest true
-      ]
-      if current-time + 1 >= night-duration and patch-here != nest[
-        if patch-here = street [
-          show "didn't reach the nest on time - died"
-          let cause "didn't reach the nest"
-          collect-mortality-data cause who
-          kill-hedgehog
-          ;;die ;;nie zdążył wrócić
-        ]
-        build-new-nest
-      ]
-      ;show flags
-      
-      update-visited-patches
+    ]
+    check-return-nest
+    update-visited-patches
     ]
     ask hoglets [
       if mother != nobody [
@@ -69,6 +50,27 @@ to go
     ]
     set current-time current-time + 1
     tick
+  ]
+end
+
+
+to check-return-nest
+    if current-time > (night-duration * 0.8) [
+    if any? patches in-radius 4 with [ self = [nest] of myself ] [
+      set distance-traveled distance-traveled + distance nest
+      move-to nest ;;zakładam że zdążyłby wrócić <-- chyba że dzieli go jezdnia, to powinien podjąć ryzyko przejścia przez ulicę
+    ]
+    set stay-in-nest true
+  ]
+  if current-time + 1 >= night-duration and patch-here != nest[
+    if patch-here = street [
+      show "didn't reach the nest on time - died"
+      let cause "didn't reach the nest"
+      collect-mortality-data cause who
+      kill-hedgehog
+      ;;die ;;nie zdążył wrócić
+    ]
+    build-new-nest
   ]
 end
 
