@@ -52,8 +52,8 @@ to collect-mortality-data [cause-of-death who-died]
   array:set mortality-data 4 sex
   array:set mortality-data 5 age
   array:set mortality-data 6 mass
-  array:set hedgehog-data 7 (ifelse-value (
-    sex = 1 and (count hedgehogs with [mother = self] = 0)
+  array:set mortality-data 7 (ifelse-value (
+    sex = 1 and (count hoglets with [mother = self] = 0)
     ) [remaining-days] [-1]
   )
   array:set mortality-data 8 cause-of-death

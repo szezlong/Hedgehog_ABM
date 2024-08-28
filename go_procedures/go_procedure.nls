@@ -5,47 +5,8 @@ extensions [table]
 to go
   if not isEndState [
     ask hedgehogs [
-      update-state-variables
-       
-      if not stay-in-nest [
-        while [not can-move? 1] [
-          random-turn-hedgehog ;; krawędź świata
-        ]
-        
-        let old-position patch-here
-        ;;ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
-       
-        ;;rozmnazanie ale rozmnazanie tez moze sprawic ze przejdzie przez ulice
-        if current-month >= 3 and current-month <= 8 [
-          if sex = 0 and remaining-days = 0 [
-            reproduce
-          ]
-        ]
-        check-cross-street
-        
-        (qlearningextension:learning)
-        
-        if abs (heading - last-heading) = 180 [
-          set flags lput "rotated-180" flags ;;sprawdz czy tego w ogole nie wywalic
-        ]
-        check-stuck
-        set last-heading heading
-        
-        ask patch-here [
-          set visit-count visit-count + 1
-        ]
-        set distance-traveled distance-traveled + distance old-position
-    ]
-    check-return-nest
-    update-visited-patches
-    ]
-    ask hoglets [
-      if mother != nobody [
-        let mothers-nest [nest] of mother
-        if mothers-nest != nobody and nest != mothers-nest [
-          set nest mothers-nest
-          move-to nest
-        ]
+      if not hibernating [
+        active-behavior
       ]
     ]
     set current-time current-time + 1
@@ -53,6 +14,52 @@ to go
   ]
 end
 
+to active-behavior
+  ask hedgehogs [
+    update-state-variables       
+    if not stay-in-nest [
+      while [not can-move? 1] [
+        random-turn-hedgehog ;; krawędź świata
+      ]
+      
+      let old-position patch-here
+      ;;ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
+     
+      ;;rozmnazanie ale rozmnazanie tez moze sprawic ze przejdzie przez ulice
+      if current-month >= 3 and current-month <= 8 [
+        if sex = 0 and remaining-days = 0 [
+          reproduce
+        ]
+      ]
+      check-cross-street
+      
+      (qlearningextension:learning)
+      
+      if abs (heading - last-heading) = 180 [
+        set flags lput "rotated-180" flags ;;sprawdz czy tego w ogole nie wywalic
+      ]
+      check-stuck
+      set last-heading heading
+      
+      ask patch-here [
+        set visit-count visit-count + 1
+      ]
+      set distance-traveled distance-traveled + distance old-position
+    ]
+    check-return-nest
+    update-visited-patches
+  ]
+  
+  ask hoglets [
+    if mother != nobody [
+      let mothers-nest [nest] of mother
+      if mothers-nest != nobody and nest != mothers-nest [
+        set nest mothers-nest
+        move-to nest
+      ]
+    ]
+  ]
+end
 
 to check-return-nest
     if current-time > (night-duration * 0.8) [

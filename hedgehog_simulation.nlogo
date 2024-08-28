@@ -16,6 +16,8 @@ globals [
   fence street urban ;o to też można później uprościć
   environment-types
   avoided-patches available-patches
+
+  hibernating
 ]
 
 hedgehogs-own [
@@ -80,6 +82,7 @@ to setup-variables
   set current-month 3
   set current-day 21
   set episode-counter 0
+  set hibernating false
 
   ;set max-distance 20
   set possible-angles [0 45 90 135 180 225 270 315]
@@ -233,34 +236,53 @@ end
 ;;;;;;;;;;;;;;;;;;
 
 to reset-episode
-  ask hedgehogs [
-    give-birth
+  ifelse hibernating [
+    ask hedgehogs [
+      let nightly-loss random-normal 0.28 0.08  ;; Średnia 28% z odchyleniem standardowym 8%
 
-    let metabolic-loss 30 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
-    let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
-    set mass mass - (metabolic-loss + distance-loss)
-    if mass < 100 [
-      print word "too small mass - died: " who
-      let cause "too small mass"
-      collect-mortality-data cause who
-      kill-hedgehog
+      ;; Obliczenie procentowego ubytku na każdy dzień hibernacji
+      let daily-loss-percentage nightly-loss / 4 ;;4 miesiace hibernują
+
+      ;; Zmniejszenie masy jeża
+      set mass mass * (1 - daily-loss-percentage)
+
+      if (age < 365 and mass < 475) or (age >= 365 and mass < 700) [
+        print word "too small mass during hibernation - died: " who
+        let cause "hibernation"
+        collect-mortality-data cause who
+        kill-hedgehog
+      ]
     ]
-    if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g/600g
-      let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
-      if random-float 1 > survival-chance [
+  ] [
+    ask hedgehogs [
+      give-birth
+
+      let metabolic-loss 30 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
+      let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
+      set mass mass - (metabolic-loss + distance-loss)
+      if mass < 100 [
         print word "too small mass - died: " who
         let cause "too small mass"
         collect-mortality-data cause who
         kill-hedgehog
       ]
-    ]
-    if age > 2920 [ ;; ponad 8 lat
-      let mortality-risk (age - 2920) / 3650 ;; ryzyko śmierci rośnie z wiekiem, do 1 przy 15 latach
-      if random-float 1 < mortality-risk [
-        print word "Died of old age: " age
-        let cause "old age"
-        collect-mortality-data cause who
-        kill-hedgehog
+      if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g/600g
+        let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
+        if random-float 1 > survival-chance [
+          print word "too small mass - died: " who
+          let cause "too small mass"
+          collect-mortality-data cause who
+          kill-hedgehog
+        ]
+      ]
+      if age > 2920 [ ;; ponad 8 lat
+        let mortality-risk (age - 2920) / 3650 ;; ryzyko śmierci rośnie z wiekiem, do 1 przy 15 latach
+        if random-float 1 < mortality-risk [
+          print word "Died of old age: " age
+          let cause "old age"
+          collect-mortality-data cause who
+          kill-hedgehog
+        ]
       ]
     ]
   ]
@@ -298,7 +320,7 @@ to reset-episode
   set current-day current-day + 1
   if current-day > 30 [
     renew-resources ;;trzeba dostosowac do sezonu
-
+    check-hibernation
     set current-day 1
     set current-month current-month + 1
     if current-month > 12 [
@@ -306,6 +328,15 @@ to reset-episode
     ]
   ]
   reset-ticks
+end
+
+to check-hibernation
+  if current-month >= 11 and current-month < 3 [
+    set hibernating true
+  ]
+  if current-month >= 3 and current-month < 11 [
+    set hibernating false
+  ]
 end
 
 to give-birth
