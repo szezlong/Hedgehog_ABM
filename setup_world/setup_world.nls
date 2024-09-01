@@ -4,7 +4,9 @@ to setup-world-from-image [image-file width height]
   print "Importing pcolors"
   import-pcolors image-file
   print "Setting patch size"
-  set-patch-size 3
+  set-patch-size 1
+  print "checking unique colors"
+  count-unique-colors
   print "World from image setup completed"
 end
 
@@ -45,5 +47,5 @@ to setup-world
     ;set c c + 1
     ;if c mod 1000 = 0 [ print (word "Processed patches: " c) ]
   ]
-  print "Patch variables reset"
+  print "Patch variables set"
 end
