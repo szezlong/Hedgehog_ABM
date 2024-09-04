@@ -1,5 +1,5 @@
 to update-graph
-  ifelse any? turtles [
+  ifelse any? hedgehogs [
     set-current-plot "Średnia masa dorosłych jeży podczas symulacji"
     set-current-plot-pen "avg-mass"
     plot mean [mass] of hedgehogs
@@ -107,11 +107,59 @@ to draw-heatmap-with-threshold
   ]
 end
 
+to draw-heatmap-with-threshold-opt
+  let total-visit-counts sum [visit-count] of patches with [visit-count > 0]
+  let cumulative-sum 0
+  let visit-threshold 0
+  let threshold-value total-visit-counts * 0.2
 
-to restore-original-colors ;;to tymczasowe rozwiązanie, w przyszłości pewnie szybciej będzie wczytać mapę na nowo
-  ask patches [
-    set pcolor og-color
+  ask patches with [visit-count > 0] [
+    set cumulative-sum cumulative-sum + visit-count
+    if cumulative-sum >= threshold-value [
+      set visit-threshold visit-count
+    ]
   ]
+
+  ask patches [
+    if visit-count > visit-threshold [
+      set pcolor scale-color red visit-count visit-threshold (max [visit-count] of patches)
+    ]
+  ]
+end
+
+to draw-heatmap-opt
+  let color-mapping []
+  let num-colors 10
+  let max-visit-count max [visit-count] of patches
+  let red-shades n-values num-colors [i -> red - 5 + i]
+  
+  foreach (range num-colors) [ i ->
+    let threshold (i + 1) * (max-visit-count / num-colors)
+    set color-mapping lput (list threshold (item i red-shades)) color-mapping
+  ]
+  ;;ex.: [[20 10] [40 11] [60 12] [80 13] [100 14] [120 15] [140 16] [160 17] [180 18] [200 19]]
+  
+  ask patches with [visit-count > 0] [
+    let found-color? false
+    foreach color-mapping [ mapping ->
+      if not found-color? [
+        let threshold first mapping
+        let mapped_color item 1 mapping
+        if visit-count <= threshold [
+          set pcolor mapped_color
+          set found-color? true
+        ]
+      ]
+    ]
+  ]
+  ask patches with [visit-count = 0] [
+    set pcolor black
+  ]
+end
+
+
+to restore-original-colors
+  setup-world-from-image "C:/Users/bokig/OneDrive/Desktop/Julciok Hedgehog/Hedgehog_ABM-main/Hedgehog_ABM-main/setup_world/maps/map.png" 896 824;285 151
   ask hedgehogs [
     if nest != 0 [ ask nest [ set pcolor brown ] ]
   ]
@@ -128,9 +176,10 @@ to export-result-map
 
   ;restore-original-colors
 
-  draw-heatmap-with-threshold
-  export-view (word "results/result-map-thr" timestamp ".png")
-  export-legend (word "results/legend_thr" timestamp ".csv")
+  ;draw-heatmap-with-threshold-opt
+  draw-heatmap-opt
+  export-view (word "results/result-th-map-opt" timestamp ".png")
+  export-legend (word "results/legend_opt" timestamp ".csv")
   restore-original-colors 
 
   ask turtles [ show-turtle ]
@@ -142,12 +191,10 @@ to export-legend [path]
   let max-visit-count max [visit-count] of patches
   file-open path
   file-print "Color,Visits,Percentage"
-  ask patches [
-    if visit-count > 0 [
-      let color-value extract-rgb (scale-color red visit-count 0 max-visit-count)
-      let percentage (visit-count / max-visit-count) * 100
-      file-print (word color-value "," visit-count "," percentage)
-    ]
+  ask patches with [visit-count > 0] [
+    let color-value extract-rgb (scale-color red visit-count 0 max-visit-count)
+    let percentage (visit-count / max-visit-count) * 100
+    file-print (word color-value "," visit-count "," percentage)
   ]
   file-close
 end

@@ -13,17 +13,14 @@ end
 to setup-world
   ;let c 0
   ask patches [
-    ;if c = 0 [print "Setting patch variables"]
-    set visit-count 0 ;<-- ustawianie zmiennych patchom za drugim razem wywoluje sie duzo duzo dluzej
-    set og-color pcolor
+    set visit-count 0
     
-    ;jeśli to wydluzy obliczenia o duzo, to mozna zrezygnowac z env-type i tylko kolory
     (ifelse
-      pcolor = turquoise [
+      pcolor = turquoise - 1 [
         set environment-type "garden-back-1" 
         set food random 30 + 20
       ]
-      pcolor = turquoise + 2 [
+      pcolor = turquoise + 1 [
         set environment-type "garden-front-1" 
         set food random 20 + 15
       ]
@@ -35,7 +32,7 @@ to setup-world
         set environment-type "garden-front-2"
         set food random 5 + 5
       ]
-      pcolor = lime [
+      pcolor = lime + 1 [
         set environment-type "lawn"
         set food random 2
       ]

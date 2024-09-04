@@ -104,22 +104,25 @@ to setup-variables
     and not any? neighbors4 with [member? pcolor avoided-patches]
   ]
 
-  set timestamp (word substring date-and-time 0 2 "-"
-                substring date-and-time 3 5 "-"
-                substring date-and-time 16 18 "-"
+  set timestamp (word
+											   
+                substring date-and-time 16 19
                 substring date-and-time 19 22
-                substring date-and-time 22 27)
+                substring date-and-time 22 27 "-"
+                substring date-and-time 0 2 "-"
+                substring date-and-time 3 5
+                )
 end
 
 to setup-hedgehogs
-  let total-count 30
+  let total-count 42 + random 42
 
   create-hedgehogs round (0.7 * total-count) [
     set sex one-of [0 1] ;; samica=1
     set age random-normal 1095 730  ;; średnia 3 lata (1095 dni), odchylenie standardowe 2 lata (730 dni)
     set color ifelse-value (sex = 0) [brown - 2] [brown]
     set mass random-normal avg-mass std-dev
-    set size 3.5
+    set size 7
     move-to one-of available-patches ;;with [pcolor = turquoise]
     set nest patch-here
     ask nest [ set pcolor brown ]
@@ -167,7 +170,7 @@ to setup-hedgehogs
     set age 49
     ;set age 7 + random 43 ;;wiek od 1 tyg do 7 tyg
     set mass 200 + (age / 49) * 35 + random 20
-    set size 2.5
+    set size 4
     set mother one-of turtles with [age >= 50 and sex = 1] ;; +zabezpieczenie
     set nest [nest] of mother ;;
     move-to nest
@@ -353,7 +356,7 @@ to give-birth
       set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
       set age 0
       set mass 200 + random 35
-      set size 2.5
+      set size 4
       set mother myself
       set nest [nest] of myself
       set come-of-age-done false
@@ -397,7 +400,7 @@ to come-of-age
     set sex [sex] of myself
     set age [age] of myself
     set color ifelse-value (sex = 0) [brown - 2] [brown]
-    set size 3.5
+    set size 7
     set mass [mass] of myself
     set nest 0
 
@@ -444,7 +447,7 @@ to renew-resources
   ask patches [
     if member? self environment-types [
       set food food + random 5 + 3 ;;różne środowiska może z inną prędkością powinny?
-      ;;trzeba tu jakos ograniczyc zeby nie odnawialo za duzo, zwlaszcza tam gdzie nic nie ma!
+      ;;trzeba tu jakos ograniczyc zeby nie odnawialo za duzo
     ]
   ]
 end
@@ -619,10 +622,10 @@ PENS
 "avg-mass" 1.0 0 -16777216 true "" "\n"
 
 MONITOR
-231
-719
-403
-764
+1357
+622
+1529
+667
 Frontowym domu blizniaczego
 time-percent-in-env \"garden-front-1\"
 2
@@ -630,10 +633,10 @@ time-percent-in-env \"garden-front-1\"
 11
 
 MONITOR
-47
-778
-217
-823
+1173
+681
+1343
+726
 Tylnym domu wolnostojącego
 time-percent-in-env \"garden-back-2\"
 2
@@ -641,10 +644,10 @@ time-percent-in-env \"garden-back-2\"
 11
 
 MONITOR
-229
-779
-404
-824
+1355
+682
+1530
+727
 Frontowym domu wolnostojącego
 time-percent-in-env \"garden-front-2\"
 2
@@ -652,20 +655,20 @@ time-percent-in-env \"garden-front-2\"
 11
 
 TEXTBOX
-50
-687
-200
-705
+1176
+590
+1326
+608
 Procent czasu w ogrodzie:
 12
 0.0
 1
 
 MONITOR
-48
-719
-217
-764
+1174
+622
+1343
+667
 Tylnym domu bliźniaczego
 time-percent-in-env \"garden-back-1\"
 2
