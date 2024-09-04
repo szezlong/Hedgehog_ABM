@@ -12,12 +12,12 @@ globals [
   avg-mass std-dev low-mass-threshold high-mass-threshold
   hedgehog-memory
   hedgehog-data mortality-data
+  hibernating
 
   fence street urban ;o to też można później uprościć
   environment-types
   avoided-patches available-patches
-
-  hibernating
+  timestamp
 ]
 
 hedgehogs-own [
@@ -52,8 +52,9 @@ to setup
   reset-ticks
 
   print "Loading image"
-  setup-world-from-image "D:/GitHub/Hedgehog_ABM/setup_world/maps/map_2.png" 285 151 ;190 100 ;571 302 ;857 453
+  setup-world-from-image "C:/Users/HARDPC/Documents/GitHub/Hedgehog_ABM/setup_world/maps/map.png" 896 824;285 151;285 151
   print "Image loaded"
+
 
   print "Setting up world"
   setup-world
@@ -66,14 +67,14 @@ to setup
   print "Hedgehogs setup completed"
 
   if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
-  set hedgehog-data array:from-list n-values 7 [0]
+  set hedgehog-data array:from-list n-values 9 [0]
   ;collect-hedgehog-data
 
   if file-exists? "results//mortality-data.csv" [ file-delete "results//mortality-data.csv" ]
   set mortality-data array:from-list n-values 10 [0]
 
   ; check-food
-  print "Setup completed."
+  print "=====> Setup completed. <====="
 end
 
 to setup-variables
@@ -97,13 +98,17 @@ to setup-variables
   set urban yellow
 
   set environment-types ["garden-back-1" "garden-front-1" "garden-back-2" "garden-front-2" "lawn"]
-  set avoided-patches (list fence street urban)
-  show avoided-patches
+  set avoided-patches (list fence street urban violet) ;;violet is for out-of-bounds
   set available-patches patches with [
     not member? pcolor avoided-patches
     and not any? neighbors4 with [member? pcolor avoided-patches]
   ]
-  show available-patches
+
+  set timestamp (word substring date-and-time 0 2 "-"
+                substring date-and-time 3 5 "-"
+                substring date-and-time 16 18 "-"
+                substring date-and-time 19 22
+                substring date-and-time 22 27)
 end
 
 to setup-hedgehogs
@@ -445,13 +450,13 @@ to renew-resources
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-249
-17
-1112
-479
+261
+10
+1165
+843
 -1
 -1
-3.0
+1.0
 1
 10
 1
@@ -462,9 +467,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-284
+895
 0
-150
+823
 0
 0
 1
@@ -489,10 +494,10 @@ NIL
 1
 
 BUTTON
-37
-443
-158
-476
+18
+531
+139
+564
 clear everything
 ask hedgehogs [ die ]\nca\nif file-exists? \"results//hedgehog-data.csv\" [ file-delete \"results//hedgehog-data.csv\" ]\nif file-exists? \"results//legend.csv\" [ file-delete \"results//legend.csv\" ]\nif file-exists? \"results//result-map.png\" [ file-delete \"results//result-map.png\" ]
 NIL
@@ -507,9 +512,9 @@ NIL
 
 BUTTON
 99
-28
-188
-61
+27
+180
+60
 NIL
 next-night
 NIL
@@ -523,10 +528,10 @@ NIL
 1
 
 BUTTON
-32
-184
-144
-217
+19
+342
+131
+375
 NIL
 draw-heatmap
 NIL
@@ -540,10 +545,10 @@ NIL
 1
 
 BUTTON
-33
-229
-143
-262
+18
+428
+128
+461
 clear heatmap
 restore-original-colors\n
 NIL
@@ -557,10 +562,10 @@ NIL
 1
 
 MONITOR
-519
-522
-658
-567
+1451
+80
+1590
+125
 Average distance [m]
 word \"Males: \" precision (array:item hedgehog-data 4) 2
 2
@@ -568,10 +573,10 @@ word \"Males: \" precision (array:item hedgehog-data 4) 2
 11
 
 MONITOR
-249
-495
-365
-540
+1181
+53
+1297
+98
 Hedgehogs Count
 (word count hedgehogs \" : \" count hoglets)
 0
@@ -579,10 +584,10 @@ Hedgehogs Count
 11
 
 BUTTON
-34
-323
-143
-356
+135
+429
+244
+462
 export map
 export-result-map
 NIL
@@ -596,10 +601,10 @@ NIL
 1
 
 PLOT
-1148
-234
-1482
-359
+1181
+201
+1515
+326
 Średnia masa dorosłych jeży podczas symulacji
 Noc
 Masa (g)
@@ -614,10 +619,10 @@ PENS
 "avg-mass" 1.0 0 -16777216 true "" "\n"
 
 MONITOR
-1327
-46
-1499
-91
+231
+719
+403
+764
 Frontowym domu blizniaczego
 time-percent-in-env \"garden-front-1\"
 2
@@ -625,10 +630,10 @@ time-percent-in-env \"garden-front-1\"
 11
 
 MONITOR
-1143
-105
-1313
-150
+47
+778
+217
+823
 Tylnym domu wolnostojącego
 time-percent-in-env \"garden-back-2\"
 2
@@ -636,10 +641,10 @@ time-percent-in-env \"garden-back-2\"
 11
 
 MONITOR
-1325
-106
-1500
-151
+229
+779
+404
+824
 Frontowym domu wolnostojącego
 time-percent-in-env \"garden-front-2\"
 2
@@ -647,20 +652,20 @@ time-percent-in-env \"garden-front-2\"
 11
 
 TEXTBOX
-1146
-14
-1296
-32
+50
+687
+200
+705
 Procent czasu w ogrodzie:
 12
 0.0
 1
 
 MONITOR
-1144
-46
-1313
-91
+48
+719
+217
+764
 Tylnym domu bliźniaczego
 time-percent-in-env \"garden-back-1\"
 2
@@ -669,9 +674,9 @@ time-percent-in-env \"garden-back-1\"
 
 BUTTON
 99
-69
-193
-102
+68
+180
+101
 run a week 
 let counter 0\nwhile [counter < 7] [\n next-night\n set counter counter + 1\n]
 NIL
@@ -685,10 +690,10 @@ NIL
 1
 
 BUTTON
-1147
-367
-1236
-400
+1176
+800
+1265
+833
 NIL
 check-food
 NIL
@@ -702,10 +707,10 @@ NIL
 1
 
 BUTTON
-31
-276
-220
-309
+18
+378
+207
+411
 NIL
 draw-heatmap-with-threshold
 NIL
@@ -719,10 +724,10 @@ NIL
 1
 
 MONITOR
-997
-494
-1110
-539
+17
+258
+176
+303
 Current Day:
 word (item (current-month - 1) [\"January\" \"February\" \"March\" \"April\" \"May\" \"June\" \"July\" \"August\" \"September\" \"October\" \"November\" \"December\"]) \" \" current-day \n  (ifelse-value ((current-day mod 10) = 1 and (current-day != 11)) [\" st\"] \n    [ifelse-value ((current-day mod 10) = 2 and (current-day != 12)) [\" nd\"] \n      [ifelse-value ((current-day mod 10) = 3 and (current-day != 13)) [\" rd\"] [\" th\"]]])
 0
@@ -730,10 +735,10 @@ word (item (current-month - 1) [\"January\" \"February\" \"March\" \"April\" \"M
 11
 
 MONITOR
-380
-495
-504
-540
+1312
+53
+1436
+98
 Average mass [g]
 (word (ifelse-value any? hedgehogs [ precision mean [mass] of hedgehogs 2 ] [ 0 ]) \" : \" (ifelse-value any? hoglets [ precision mean [mass] of hoglets 2 ] [ 0 ]))
 2
@@ -741,10 +746,10 @@ Average mass [g]
 11
 
 BUTTON
-100
-115
-196
-148
+98
+110
+182
+143
 run a month
 let counter 0\nwhile [counter < 30] [\n next-night\n set counter counter + 1\n]
 NIL
@@ -758,15 +763,32 @@ NIL
 1
 
 MONITOR
-519
-495
-658
-540
+1451
+53
+1590
+98
 Average distance [m]
 word \"Females: \" precision (array:item hedgehog-data 5) 2
 2
 1
 11
+
+BUTTON
+99
+158
+188
+191
+run a year
+let counter 0\nwhile [counter < (30 * 12)] [\n next-night\n set counter counter + 1\n]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
