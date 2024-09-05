@@ -339,10 +339,9 @@ to reset-episode
 end
 
 to check-hibernation
-  if current-month >= 11 and current-month < 3 [
+  ifelse current-month >= 11 or current-month < 3 [
     set hibernating true
-  ]
-  if current-month >= 3 and current-month < 11 [
+  ] [
     set hibernating false
   ]
 end
