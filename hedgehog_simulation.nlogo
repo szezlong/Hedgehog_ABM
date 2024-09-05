@@ -249,13 +249,13 @@ to reset-episode
       let nightly-loss random-normal 0.28 0.08  ;; Średnia 28% z odchyleniem standardowym 8%
 
       ;; Obliczenie procentowego ubytku na każdy dzień hibernacji
-      let daily-loss-percentage nightly-loss / 4 ;;4 miesiace hibernują
+      let daily-loss-percentage nightly-loss / 120 ;;4 miesiace hibernują
 
       ;; Zmniejszenie masy jeża
       set mass mass * (1 - daily-loss-percentage)
 
       if (age < 365 and mass < 475) or (age >= 365 and mass < 700) [
-        print word "too small mass during hibernation - died: " who
+        ;print word "too small mass during hibernation - died: " who
         let cause "hibernation"
         collect-mortality-data cause who
         kill-hedgehog
@@ -265,11 +265,11 @@ to reset-episode
     ask hedgehogs [
       give-birth
 
-      let metabolic-loss 30 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
+      let metabolic-loss 20 ;; constant metabolic loss per day: https://journals.biologists.com/jeb/article/220/3/460/18766/Daily-energy-expenditure-in-the-face-of-predation
       let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
       set mass mass - (metabolic-loss + distance-loss)
       if mass < 100 [
-        print word "too small mass - died: " who
+       ;print word "too small mass - died: " who
         let cause "too small mass"
         collect-mortality-data cause who
         kill-hedgehog
@@ -277,7 +277,7 @@ to reset-episode
       if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g/600g
         let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
         if random-float 1 > survival-chance [
-          print word "too small mass - died: " who
+          ;print word "too small mass - died: " who
           let cause "too small mass"
           collect-mortality-data cause who
           kill-hedgehog
@@ -286,7 +286,7 @@ to reset-episode
       if age > 2920 [ ;; ponad 8 lat
         let mortality-risk (age - 2920) / 3650 ;; ryzyko śmierci rośnie z wiekiem, do 1 przy 15 latach
         if random-float 1 < mortality-risk [
-          print word "Died of old age: " age
+          ;print word "Died of old age: " age
           let cause "old age"
           collect-mortality-data cause who
           kill-hedgehog
@@ -389,7 +389,7 @@ to come-of-age
     print num-to-die
     let sorted-litter sort-on [mass] litter
     ask turtle-set (sublist sorted-litter 0 num-to-die) [
-      print word "Died during come-of-age: " [mass] of self
+      ;print word "Died during come-of-age: " [mass] of self
       let cause "come of age"
       collect-mortality-data cause who
       kill-hedgehog

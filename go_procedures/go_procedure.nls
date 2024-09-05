@@ -71,7 +71,7 @@ to check-return-nest
   ]
   if current-time + 1 >= night-duration and patch-here != nest[
     if patch-here = street [
-      show "didn't reach the nest on time - died"
+      ;show "didn't reach the nest on time - died"
       let cause "didn't reach the nest"
       collect-mortality-data cause who
       kill-hedgehog
@@ -101,9 +101,9 @@ to check-cross-street ;;można by też dodać hotspoty gdzie najczęściej jeże
 end
 
 to cross-street
-  print "I'm crossing the street!"
+  ;print "I'm crossing the street!"
   if random-float 1 < 0.5 [
-    show "died while crossing the street"
+    ;show "died while crossing the street"
     let cause "roadkill"
     collect-mortality-data cause who
     kill-hedgehog
@@ -133,14 +133,14 @@ to check-stuck
         set distance-traveled distance-traveled + distance chosen-patch
         move-to chosen-patch
       ] [
-        show "One got stuck and died :("
+        ;show "One got stuck and died :("
         let cause "stuck in fencing"
         collect-mortality-data cause who
         kill-hedgehog
         ;;die
       ]
     ] [
-      show "One got stuck and died :("
+      ;show "One got stuck and died :("
       let cause "stuck in fencing"
       collect-mortality-data cause who
       kill-hedgehog
