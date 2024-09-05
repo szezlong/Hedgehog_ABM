@@ -67,7 +67,7 @@ to setup
   print "Hedgehogs setup completed"
 
   if file-exists? "results//hedgehog-data.csv" [ file-delete "results//hedgehog-data.csv" ]
-  set hedgehog-data array:from-list n-values 9 [0]
+  set hedgehog-data array:from-list n-values 11 [0]
   ;collect-hedgehog-data
 
   if file-exists? "results//mortality-data.csv" [ file-delete "results//mortality-data.csv" ]
@@ -105,7 +105,7 @@ to setup-variables
   ]
 
   set timestamp (word
-											   
+											
                 substring date-and-time 16 19
                 substring date-and-time 19 22
                 substring date-and-time 22 27 "-"
@@ -473,11 +473,11 @@ GRAPHICS-WINDOW
 895
 0
 823
-0
-0
+1
+1
 1
 ticks
-30.0
+10.0
 
 BUTTON
 26

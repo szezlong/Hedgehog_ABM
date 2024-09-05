@@ -22,15 +22,15 @@ to setup-world
       ]
       pcolor = turquoise + 1 [
         set environment-type "garden-front-1" 
-        set food random 20 + 15
+        set food random 25 + 20
       ]
       pcolor = green [
         set environment-type "garden-back-2"
-        set food random 10 + 10
+        set food random 20 + 10
       ]
       pcolor = green + 2 [
         set environment-type "garden-front-2"
-        set food random 5 + 5
+        set food random 15 + 5
       ]
       pcolor = lime + 1 [
         set environment-type "lawn"

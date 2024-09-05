@@ -14,23 +14,25 @@ end
 
 to collect-hedgehog-data
   array:set hedgehog-data 0 episode-counter
+  array:set mortality-data 1 current-day
+  array:set mortality-data 2 current-month
   ifelse any? hedgehogs [
-    array:set hedgehog-data 1 sum [mass] of hedgehogs
-    array:set hedgehog-data 2 mean [mass] of hedgehogs
-    array:set hedgehog-data 3 sum [distance-traveled] of hedgehogs * 2.3
-    array:set hedgehog-data 4 (ifelse-value 
+    array:set hedgehog-data 3 sum [mass] of hedgehogs
+    array:set hedgehog-data 4 mean [mass] of hedgehogs
+    array:set hedgehog-data 5 sum [distance-traveled] of hedgehogs * 2.3
+    array:set hedgehog-data 6 (ifelse-value 
       (count (hedgehogs with [sex = 0]) > 0)
       [mean ([distance-traveled] of hedgehogs with [sex = 0]) * 2.3]
       [0]
     )
-    array:set hedgehog-data 5 (ifelse-value 
+    array:set hedgehog-data 7 (ifelse-value 
       (count (hedgehogs with [sex = 1]) > 0)
       [mean ([distance-traveled] of hedgehogs with [sex = 1]) * 2.3]
       [0]
     )
-    array:set hedgehog-data 6 count hedgehogs with [sex = 0]
-    array:set hedgehog-data 7 count hedgehogs with [sex = 1]
-    array:set hedgehog-data 8 count hoglets
+    array:set hedgehog-data 8 count hedgehogs with [sex = 0]
+    array:set hedgehog-data 9 count hedgehogs with [sex = 1]
+    array:set hedgehog-data 10 count hoglets
   ] [
     array:set hedgehog-data 1 0
     array:set hedgehog-data 2 0
@@ -40,12 +42,14 @@ to collect-hedgehog-data
     array:set hedgehog-data 6 0
     array:set hedgehog-data 7 0
     array:set hedgehog-data 8 0
+    array:set hedgehog-data 9 0
+    array:set hedgehog-data 10 0
   ]
   
   export-data
-    (word "results/hedgehog-data_" timestamp ".csv")
-    "Episode,Total Mass,Average Mass,Total Distance,Average Distance Males,Average Distance Females,Male Hedgehogs Count,Feale Hedgehogs Count,Hoglets Count "
-    (word array:item hedgehog-data 0 "," array:item hedgehog-data 1 "," array:item hedgehog-data 2 "," array:item hedgehog-data 3 "," array:item hedgehog-data 4 "," array:item hedgehog-data 5 "," array:item hedgehog-data 6 "," array:item hedgehog-data 7 "," array:item hedgehog-data 8)
+    (word "results/hed_data/hedgehog-data_" timestamp ".csv")
+    "Episode,Current Day,Current Month,Total Mass,Average Mass,Total Distance,Average Distance Males,Average Distance Females,Male Hedgehogs Count,Feale Hedgehogs Count,Hoglets Count "
+    (word array:item hedgehog-data 0 "," array:item hedgehog-data 1 "," array:item hedgehog-data 2 "," array:item hedgehog-data 3 "," array:item hedgehog-data 4 "," array:item hedgehog-data 5 "," array:item hedgehog-data 6 "," array:item hedgehog-data 7 "," array:item hedgehog-data 8 "," array:item hedgehog-data 9 "," array:item hedgehog-data 10)
 end
 
 to collect-mortality-data [cause-of-death who-died]
@@ -64,7 +68,7 @@ to collect-mortality-data [cause-of-death who-died]
   array:set mortality-data 9 who-died
   
   export-data
-    (word "results/mortality-data_" timestamp ".csv")
+    (word "results/mort_data/mortality-data_" timestamp ".csv")
     "Episode,Current Day,Current Month,Current Time,Sex,Age,Mass,Remaining Days,Cause of Death,Who Died"
     (word array:item mortality-data 0 "," array:item mortality-data 1 "," array:item mortality-data 2 "," array:item mortality-data 3 "," array:item mortality-data 4 "," array:item mortality-data 5 "," array:item mortality-data 6 "," array:item mortality-data 7 "," array:item mortality-data 8 "," array:item mortality-data 9)
 
@@ -159,7 +163,7 @@ end
 
 
 to restore-original-colors
-  setup-world-from-image "C:/Users/bokig/OneDrive/Desktop/Julciok Hedgehog/Hedgehog_ABM-main/Hedgehog_ABM-main/setup_world/maps/map.png" 896 824;285 151
+  setup-world-from-image "C:/Users/HARDPC/Documents/GitHub/Hedgehog_ABM/setup_world/maps/map.png" 896 824;285 151
   ask hedgehogs [
     if nest != 0 [ ask nest [ set pcolor brown ] ]
   ]
@@ -178,9 +182,10 @@ to export-result-map
 
   ;draw-heatmap-with-threshold-opt
   draw-heatmap-opt
-  export-view (word "results/result-th-map-opt" timestamp ".png")
-  export-legend (word "results/legend_opt" timestamp ".csv")
+  export-view (word "results/maps/result-map_" timestamp ".png")
   restore-original-colors 
+  export-legend (word "results/legends/result-legend_" timestamp ".csv")
+
 
   ask turtles [ show-turtle ]
   ask links [ show-link ]
@@ -192,7 +197,7 @@ to export-legend [path]
   file-open path
   file-print "Color,Visits,Percentage"
   ask patches with [visit-count > 0] [
-    let color-value extract-rgb (scale-color red visit-count 0 max-visit-count)
+    let color-value extract-rgb (pcolor)
     let percentage (visit-count / max-visit-count) * 100
     file-print (word color-value "," visit-count "," percentage)
   ]

@@ -18,11 +18,11 @@ end
 to eat-food
   ifelse [food] of patch-here > 0 [
     let environment-factor 1
-    if [environment-type] of patch-here = "garden-back-1" [ set environment-factor 1.2 ]
-    if [environment-type] of patch-here = "garden-front-1" [ set environment-factor 1.1 ]
+    if [environment-type] of patch-here = "garden-back-1" [ set environment-factor 1.5 ]
+    if [environment-type] of patch-here = "garden-front-1" [ set environment-factor 1.2 ]
     if [environment-type] of patch-here = "garden-back-2" [ set environment-factor 0.9 ]
-    if [environment-type] of patch-here = "garden-front-2" [ set environment-factor 0.85 ]
-    if [environment-type] of patch-here = "lawn" [ set environment-factor 0.3 ]
+    if [environment-type] of patch-here = "garden-front-2" [ set environment-factor 0.65 ]
+    if [environment-type] of patch-here = "lawn" [ set environment-factor 0.25 ]
 
     let available-food [food] of patch-here
     let max-gain ifelse-value (mass < low-mass-threshold) [25] [12]

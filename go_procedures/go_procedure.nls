@@ -125,8 +125,8 @@ to check-stuck
   let current-patch patch-here ;;czy qlearning cos da zeby tam nie szly?
   
   if member? "die" flags [
-    ;15% szans że utknął i zginie
-    ifelse random-float 1 < 0.85 [
+    ;5% szans że utknął i zginie
+    ifelse random-float 1 < 0.95 [
       let available-patches-in-radius patches in-radius 3 with [member? self available-patches]
        ifelse any? available-patches-in-radius [
         let chosen-patch one-of available-patches-in-radius
