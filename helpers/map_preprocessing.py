@@ -2,13 +2,28 @@
 from PIL import Image
 import numpy as np
 
+image_path = 'map_pre.png'
+image = Image.open(image_path)
+
+new_width = image.width // 3
+new_height = image.height // 3
+new_size = (new_width, new_height)
+resized_image = image.resize(new_size, Image.ANTIALIAS)
+resized_image_path = 'map_resized.png'
+resized_image.save(resized_image_path)
+
 colors = {
+    'turquoise': ( 22, 129, 97, 255 ),
+    'turquoise+1': ( 74, 178, 147, 255),
+    'green': (89, 176, 60, 255),
+    'green+2': (155, 208, 138, 255),
+    'lime': ( 86, 218, 98, 255),
+    'yellow': (237, 237, 49, 255),
+    'red': (215, 50, 41, 255),
+    #'gray': (141, 141, 141, 255),
+    #'violet': ( 124, 80, 164, 255),
     'black': (0, 0, 0, 255),
-    'light_green': (223, 245, 135, 255),
-    'dark_green': (154, 214, 101, 255),
-    'blue_green': (75, 206, 148, 255),
-    'wheat': (255, 234, 209, 255),
-    'red': (255, 0, 0, 255)
+    'white': (255, 255, 255, 255)
 }
 
 image_path = 'map_resized.png'
@@ -30,7 +45,7 @@ def get_color_index(color):
 
 index_array = np.apply_along_axis(lambda pixel: get_color_index(pixel), 2, image_array)
 
-neighborhood_size = 6
+neighborhood_size = 3
 
 def process_pixel(x, y):
     x_min = max(0, x - neighborhood_size // 2)

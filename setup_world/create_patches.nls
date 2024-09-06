@@ -15,7 +15,6 @@ to setup-sandbox
     set visit-count 0
     (ifelse
       pcolor = green [
-        ;;na razie losowo
         set environment-type one-of environment-types
       ]
       pcolor = fence [
@@ -59,7 +58,7 @@ end
 
 to create-dark-green-clusters [num]
   repeat num [
-    let cluster-size random 5 + 2  ; Losowa wielkość klastra
+    let cluster-size random 5 + 2
     let cluster-patch one-of patches
     ask cluster-patch [
       create-dark-green-cluster cluster-size
@@ -69,7 +68,7 @@ end
 
 to create-dark-green-cluster [cluster-size]
   ask patches in-radius cluster-size [
-    set pcolor green - 1 ; Ustaw ciemno-zielony kolor
+    set pcolor green - 1
   ]
 end
 
@@ -78,7 +77,7 @@ to setup-lines [num col len]
     let line-length random 5 + len
     let start-x random (world-width + 1)
     let start-y random (world-height + 1)
-    let direction one-of [0 90] ;; 0 oznacza ruch w prawo, 90 - ruch do góry
+    let direction one-of [0 90]
     create-line start-x start-y direction line-length col
   ]
 end
@@ -90,7 +89,6 @@ to create-line [x y direction line-length col]
   let shortest-distance min (list end-x end-y (world-width - end-x) (world-height - end-y))
 
   if shortest-distance < line-length [
-    ; Znajdź kierunek najbliższej krawędzi i ustaw end-x i end-y na odpowiednią krawędź
     if end-x <= shortest-distance [set end-x 0]
     if end-y <= shortest-distance [set end-y 0]
     if world-width - end-x <= shortest-distance [set end-x world-width]
@@ -110,7 +108,6 @@ to create-line [x y direction line-length col]
           set end-y end-y + 1
         ]
       ]
-      ; Dodatkowe sprawdzenie warunków granicznych przed wywołaniem ask patch
       if end-x <= world-width and end-y <= world-height [       
         let target-patch patch end-x end-y
         if is-patch? target-patch [
@@ -127,7 +124,6 @@ to create-rectangle
   let bottom-bound -12
   let top-bound 12
   
-  ; Rysowanie prostokąta
   ask patches with [
     (pxcor >= left-bound and pxcor <= right-bound and pycor = bottom-bound) or
     (pxcor >= left-bound and pxcor <= right-bound and pycor = top-bound) or
@@ -138,14 +134,12 @@ end
 
 to draw-random-diagonal-lines
 
-  let number-of-lines 2 ; liczba linii do narysowania
-  let max-line-length 8  ; maksymalna długość linii
+  let number-of-lines 2
+  let max-line-length 8
   
   repeat number-of-lines [
-    let start-patch one-of patches  ; wybiera losową łatkę jako początek
-    ;let line-length random-float (max-line-length + 5)  ; wybiera losową długość linii od 1 do max-line-length
+    let start-patch one-of patches
     ask start-patch [
-      ; rysuje linię o długości line-length w diagonalnym kierunku
       repeat number-of-lines [
         set pcolor blue
         if (patch-at 1 1 != nobody) [ ask patch-at 1 1 [ set pcolor blue ] ]
