@@ -13,9 +13,7 @@ to go
           ]
           
           let old-position patch-here
-          ;;ifelse nest != 0 [ set distance-to-nest distance nest ] [ set distance-to-nest -1 ]
          
-          ;;rozmnazanie ale rozmnazanie tez moze sprawic ze przejdzie przez ulice
           if current-month >= 3 and current-month <= 8 [
             if sex = 0 and remaining-days = 0 [
               reproduce
@@ -26,7 +24,7 @@ to go
           (qlearningextension:learning)
           
           if abs (heading - last-heading) = 180 [
-            set flags lput "rotated-180" flags ;;sprawdz czy tego w ogole nie wywalic
+            set flags lput "rotated-180" flags
           ]
           check-stuck
           set last-heading heading
@@ -59,34 +57,25 @@ to check-return-nest
     if current-time > (night-duration * 0.8) [
     if any? patches in-radius 4 with [ self = [nest] of myself ] [
       set distance-traveled distance-traveled + distance nest
-      move-to nest ;;zakładam że zdążyłby wrócić <-- chyba że dzieli go jezdnia, to powinien podjąć ryzyko przejścia przez ulicę
+      move-to nest ;;zakładam że zdążyłby wrócić
     ]
     set stay-in-nest true
   ]
   if current-time + 1 >= night-duration and patch-here != nest[
     if patch-here = street [
-      ;show "didn't reach the nest on time - died"
       let cause "didn't reach the nest"
       collect-mortality-data cause who
       kill-hedgehog
-      ;;die ;;nie zdążył wrócić
     ]
     build-new-nest
   ]
 end
 
-to check-cross-street ;;można by też dodać hotspoty gdzie najczęściej jeże przechodzą przez ulicę
+to check-cross-street
   ask hedgehogs [
-    if patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = street [
-      
-      ;; Warunki przejścia przez drogę:
-      ;; 1. Jeż ma niską masę ciała i potrzebuje jedzenia.
-      ;; 2. Jeż zdąży wrócić do gniazda.
-      ;; 3. Prawdopodobieństwo ruchu samochodowego (ryzyko).
-      
+    if patch-ahead 1 != nobody and [pcolor] of patch-ahead 1 = street [      
       if (mass < low-mass-threshold and current-time < (night-duration * 0.5)) [
         if random-float 1 > 0.1 [
-          ;;powinien zwrocic flage ze chce przejsc i wtedy wywoluje sie cross-street zamiast qlearning
           cross-street
         ]
       ]
@@ -95,14 +84,12 @@ to check-cross-street ;;można by też dodać hotspoty gdzie najczęściej jeże
 end
 
 to cross-street
-  ;print "I'm crossing the street!"
   if random-float 1 < 0.5 [
-    ;show "died while crossing the street"
     let cause "roadkill"
     collect-mortality-data cause who
     kill-hedgehog
   ] 
-  let direction decide-direction ;;albo przed siebie
+  let direction decide-direction
   move-along-fencing direction
   fd speed * 0.6 ;;po drodze poruszają się wolniej
 end
@@ -116,7 +103,7 @@ to update-visited-patches
 end
 
 to check-stuck
-  let current-patch patch-here ;;czy qlearning cos da zeby tam nie szly?
+  let current-patch patch-here
   
   if member? "die" flags [
     ;5% szans że utknął i zginie
@@ -127,40 +114,19 @@ to check-stuck
         set distance-traveled distance-traveled + distance chosen-patch
         move-to chosen-patch
       ] [
-        ;show "One got stuck and died :("
         let cause "stuck in fencing"
         collect-mortality-data cause who
         kill-hedgehog
-        ;;die
       ]
     ] [
-      ;show "One got stuck and died :("
       let cause "stuck in fencing"
       collect-mortality-data cause who
       kill-hedgehog
       ;;die
     ]
-;  ] [ TO JEDNAK NIE ZAWIESZA
-;    ifelse (not empty? visited-patches) and (current-patch = last visited-patches) [
-;      ifelse (heading != last-heading) [
-;        set stuck-count stuck-count + 1
-;      ] [
-;        set stuck-count 0
-;      ]
-;      if stuck-count > 10 [
-;        show "got stuck with heading"
-;       ;;kill-hedgehog
-;        ;;die
-;      ]
-;    ] [
-;      set stuck-count 0
-;    ]
   ]
 end
 
-;;;;;;;;;;;;
-; to opisz ;
-;;;;;;;;;;;;
 to face-patch [patch-to-face]
   face patch-to-face
   let angle heading

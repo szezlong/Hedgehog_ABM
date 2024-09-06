@@ -14,7 +14,7 @@ globals [
   hedgehog-data mortality-data
   hibernating
 
-  fence street urban ;o to też można później uprościć
+  fence street urban
   environment-types
   avoided-patches available-patches
   timestamp
@@ -25,7 +25,7 @@ hedgehogs-own [
   mass daily-mass-gain
   speed distance-traveled return-probability
   visited-patches last-heading stuck-count
-  nest ;;mother
+  nest
   flags
   remaining-days ;;dla samic ile dni ciąży zostało, dla samców ile dni odpoczynku zostało
   terrain-color food-here fence-ahead distance-to-nest stay-in-nest
@@ -52,13 +52,13 @@ to setup
   reset-ticks
 
   print "Loading image"
-  setup-world-from-image "C:/Users/HARDPC/Documents/GitHub/Hedgehog_ABM/setup_world/maps/map.png" 896 824;285 151;285 151
+  setup-world-from-image "C:/Users/HARDPC/Documents/GitHub/Hedgehog_ABM/setup_world/maps/map.png" 896 824
   print "Image loaded"
 
 
   print "Setting up world"
   setup-world
-  print "World setup completed" ;; <-- to się liczy najdłużej
+  print "World setup completed"
 
   setup-variables
   print "Variables setup completed"
@@ -73,7 +73,6 @@ to setup
   if file-exists? "results//mortality-data.csv" [ file-delete "results//mortality-data.csv" ]
   set mortality-data array:from-list n-values 10 [0]
 
-  ; check-food
   print "=====> Setup completed. <====="
 end
 
@@ -85,7 +84,6 @@ to setup-variables
   set episode-counter 0
   set hibernating false
 
-  ;set max-distance 20
   set possible-angles [0 45 90 135 180 225 270 315]
   set hedgehog-memory 10
   set avg-mass 846 ;;na razie dla samców
@@ -132,12 +130,6 @@ to setup-hedgehogs
     set distance-traveled 0
     set return-probability 0.05
 
-
-    ;let nearest-nest min-one-of available-patches with [is-nest?] [distance self]
-    ;set nest nearest-nest
-    ;set nest one-of available-patches
-    ;move-to nest
-    ;set nest nobody
     set visited-patches (list patch-here)
 
     random-turn-hedgehog
@@ -148,9 +140,6 @@ to setup-hedgehogs
     set stay-in-nest false
 
     update-state-variables
-
-    ;set family-color one-of base-colors
-    ;set color family-color
   ]
 
   ask hedgehogs [
@@ -159,7 +148,6 @@ to setup-hedgehogs
     qlearningextension:reward [reward-func]
     qlearningextension:end-episode [isEndState] reset-episode
     qlearningextension:action-selection "e-greedy" [0.25 0.995]
-    ;qlearningextension:action-selection-egreedy 0.75 "rate" 0.95
     qlearningextension:learning-rate 0.95
     qlearningextension:discount-factor 0.55
   ]
@@ -167,7 +155,7 @@ to setup-hedgehogs
   create-hoglets round (0.3 * total-count) [
     set sex one-of [0 1]
     set color ifelse-value (sex = 0) [brown + 1] [brown + 3]
-    set age 49
+    set age 44
     ;set age 7 + random 43 ;;wiek od 1 tyg do 7 tyg
     set mass 200 + (age / 49) * 35 + random 20
     set size 4
@@ -175,14 +163,9 @@ to setup-hedgehogs
     set nest [nest] of mother ;;
     move-to nest
     set come-of-age-done false
-
-    ;set color [family-color] of mother
   ]
 end
 
-;;;;;;;;;;;;;;;;
-;; to opisać? ;;
-;;;;;;;;;;;;;;;;
 to update-state-variables
   ask hedgehogs [
     set terrain-color [pcolor] of patch-here
@@ -192,13 +175,12 @@ to update-state-variables
     set fence-ahead ifelse-value (ahead-patch != nobody and ( any? patches in-cone 2 90 with [pcolor = fence])) [1] [0]
     ifelse [nest] of myself != 0 [ set distance-to-nest distance [nest] of myself ] [ set distance-to-nest -1 ]
     set flags []
-    ;update-visited-patches
   ]
 end
 
 to-report reward-func
   let penalty 0
-  if member? "rotated-180" flags [ ;;sprawdz czy to potrzebne
+  if member? "rotated-180" flags [
     set penalty -100
   ]
 
@@ -248,14 +230,11 @@ to reset-episode
     ask hedgehogs [
       let nightly-loss random-normal 0.28 0.08  ;; Średnia 28% z odchyleniem standardowym 8%
 
-      ;; Obliczenie procentowego ubytku na każdy dzień hibernacji
       let daily-loss-percentage nightly-loss / 120 ;;4 miesiace hibernują
 
-      ;; Zmniejszenie masy jeża
       set mass mass * (1 - daily-loss-percentage)
 
       if (age < 365 and mass < 475) or (age >= 365 and mass < 700) [
-        ;print word "too small mass during hibernation - died: " who
         let cause "hibernation"
         collect-mortality-data cause who
         kill-hedgehog
@@ -269,15 +248,13 @@ to reset-episode
       let distance-loss ((random-float 100 + 10) + (floor (distance-traveled / 100) * 30))
       set mass mass - (metabolic-loss + distance-loss)
       if mass < 100 [
-       ;print word "too small mass - died: " who
         let cause "too small mass"
         collect-mortality-data cause who
         kill-hedgehog
       ]
-      if age > 365 and mass > 100 and mass <= 450 [ ;;dla hibernacji to bedzie 700g/600g
+      if age > 365 and mass > 100 and mass <= 450 [
         let survival-chance 0.9 * (mass - 100) / 350 ;;dla 100g umrze, dla 450g ma 90% przezyc
         if random-float 1 > survival-chance [
-          ;print word "too small mass - died: " who
           let cause "too small mass"
           collect-mortality-data cause who
           kill-hedgehog
@@ -286,7 +263,6 @@ to reset-episode
       if age > 2920 [ ;; ponad 8 lat
         let mortality-risk (age - 2920) / 3650 ;; ryzyko śmierci rośnie z wiekiem, do 1 przy 15 latach
         if random-float 1 < mortality-risk [
-          ;print word "Died of old age: " age
           let cause "old age"
           collect-mortality-data cause who
           kill-hedgehog
@@ -306,18 +282,18 @@ to reset-episode
   collect-hedgehog-data
 
   if not any? turtles [
-    user-message "Wszystkie jeże nie żyją. Symulacja została przerwana." ;;ok nic nie daje
+    user-message "Wszystkie jeże nie żyją. Symulacja została przerwana."
     stop
   ]
 
-  ask hedgehogs [   ;;reset hedgehogs variables
+  ask hedgehogs [
     set age age + 1
     set stay-in-nest false
     set distance-traveled 0
     set daily-mass-gain 0
     set return-probability 0.05
     ifelse remaining-days <= 0 [
-      set remaining-days 0 ;; na wszelki
+      set remaining-days 0
     ] [
       set remaining-days remaining-days - 1
     ]
@@ -327,7 +303,7 @@ to reset-episode
   set episode-counter episode-counter + 1
   set current-day current-day + 1
   if current-day > 30 [
-    renew-resources ;;trzeba dostosowac do sezonu
+    renew-resources
     check-hibernation
     set current-day 1
     set current-month current-month + 1
@@ -388,7 +364,6 @@ to come-of-age
     print num-to-die
     let sorted-litter sort-on [mass] litter
     ask turtle-set (sublist sorted-litter 0 num-to-die) [
-      ;print word "Died during come-of-age: " [mass] of self
       let cause "come of age"
       collect-mortality-data cause who
       kill-hedgehog
@@ -445,8 +420,7 @@ to renew-resources
   print "Nature is healing..."
   ask patches [
     if member? self environment-types [
-      set food food + random 5 + 3 ;;różne środowiska może z inną prędkością powinny?
-      ;;trzeba tu jakos ograniczyc zeby nie odnawialo za duzo
+      set food food + random 5 + 3
     ]
   ]
 end

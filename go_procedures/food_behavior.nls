@@ -5,10 +5,6 @@ to forage
   
   move-towards-food-patch
   
-;  if random-float 1 < 0.1 [
-;    random-turn-hedgehog
-;  ]
-  
   let direction decide-direction
   move-along-fencing direction
   fd speed

@@ -141,7 +141,6 @@ to draw-heatmap-opt
     let threshold (i + 1) * (max-visit-count / num-colors)
     set color-mapping lput (list threshold (item i red-shades)) color-mapping
   ]
-  ;;ex.: [[20 10] [40 11] [60 12] [80 13] [100 14] [120 15] [140 16] [160 17] [180 18] [200 19]]
   
   ask patches with [visit-count > 0] [
     let found-color? false
@@ -174,18 +173,10 @@ to export-result-map
   ask turtles [ hide-turtle ]
   ask links [ hide-link ]
 
-  ;draw-heatmap
-  ;export-view (word "results/result-map" timestamp ".png")
-  ;export-legend (word "results/legend" timestamp ".csv")
-
-  ;restore-original-colors
-
-  ;draw-heatmap-with-threshold-opt
   draw-heatmap-opt
   export-view (word "results/maps/result-map_" timestamp ".png")
   restore-original-colors 
   export-legend (word "results/legends/result-legend_" timestamp ".csv")
-
 
   ask turtles [ show-turtle ]
   ask links [ show-link ]

@@ -69,13 +69,11 @@ to move-along-fencing [direction]
     ] 
     set direction decide-direction
     
-    ;;tutaj jeśli sie zapetla to zabij
     set counter counter + 1
     if counter >= 10 [
       set flags lput "die" flags
       set direction 0
     ]
-    ;show direction 
   ]
 end
 
